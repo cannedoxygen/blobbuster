@@ -318,12 +318,12 @@ export function ContentDetailsModal({
             <div className="mt-4 p-4 bg-blockbuster-darkBlue/50 rounded-lg">
               <p className="text-xs text-gray-400 uppercase mb-2">Weighted Score Multiplier</p>
               <p className="text-2xl font-black text-blockbuster-yellow">
-                {content.averageCompletionRate >= 80 ? '1.5x' :
-                 content.averageCompletionRate >= 50 ? '1.25x' :
+                {(content.averageCompletionRate ?? 0) >= 80 ? '1.5x' :
+                 (content.averageCompletionRate ?? 0) >= 50 ? '1.25x' :
                  '1.0x'}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Based on {content.averageCompletionRate}% average completion rate
+                Based on {content.averageCompletionRate ?? 0}% average completion rate
               </p>
             </div>
           </div>
