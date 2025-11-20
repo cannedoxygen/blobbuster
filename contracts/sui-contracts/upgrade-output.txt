@@ -1,0 +1,7 @@
+[warning] Client/Server api version mismatch, client api version : 1.45.0, server api version : 1.60.0
+2025-11-13T18:53:08.361079Z ERROR telemetry_subscribers: panicked at crates/sui-protocol-config/src/lib.rs:1889:9:
+Network protocol version is ProtocolVersion(101), but the maximum supported version by the binary is 77. Please upgrade the binary. panic.file="crates/sui-protocol-config/src/lib.rs" panic.line=1889 panic.column=9
+
+thread 'main' panicked at crates/sui-protocol-config/src/lib.rs:1889:9:
+Network protocol version is ProtocolVersion(101), but the maximum supported version by the binary is 77. Please upgrade the binary.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

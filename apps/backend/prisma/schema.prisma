@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model content {
+  id                      String            @id
+  blockchain_id           String            @unique
+  uploader_id             String
+  title                   String            @db.VarChar(200)
+  description             String
+  genre                   Int
+  duration_seconds        Int
+  walrus_blob_ids         Json
+  thumbnail_url           String?
+
+  // TMDB Metadata (auto-fetched)
+  tmdb_id                 Int?
+  imdb_id                 String?
+  original_title          String?
+  year                    Int?
+  plot                    String?           @db.Text
+  runtime                 Int?
+  tagline                 String?
+  poster_url              String?
+  backdrop_url            String?
+  genres_list             String?           // JSON array ["Action", "Sci-Fi"]
+  cast                    String?           @db.Text // JSON array of {name, character, profilePath}
+  director                String?
+  external_rating         Float?            // TMDB rating (0-10)
+  language                String?
+  country                 String?
+
+  // Payment tracking (for Walrus storage)
+  payment_tx_digest       String?           @unique // User's payment transaction digest
+
+  // Storage expiration tracking (Walrus epochs)
+  storage_epochs          Int?
+  storage_expires_at      DateTime?
+
+  status                  Int               @default(0)
+  total_streams           BigInt            @default(0)
+  total_watch_time        BigInt            @default(0)
+  average_completion_rate Int               @default(0)
+  rating_sum              BigInt            @default(0)
+  rating_count            BigInt            @default(0)
+  created_at              DateTime            @default(now())
+  updated_at              DateTime
+  uploader_profiles       uploader_profiles   @relation(fields: [uploader_id], references: [id])
+  streams                 streams[]
+  watches                 membership_watches[]
+
+  @@index([genre])
+  @@index([status])
+  @@index([uploader_id])
+  @@index([tmdb_id])
+  @@index([year])
+  @@index([payment_tx_digest])
+}
+
+model daily_analytics {
+  id                String   @id
+  date              DateTime @unique @db.Date
+  new_members       Int      @default(0)
+  active_members    Int      @default(0)
+  total_streams     Int      @default(0)
+  total_watch_hours Int      @default(0)
+  revenue_collected BigInt   @default(0)
+  new_content       Int      @default(0)
+  created_at        DateTime @default(now())
+}
+
+model distributions {
+  id                   String            @id
+  uploader_id          String
+  week_start_date      DateTime          @db.Date
+  week_end_date        DateTime          @db.Date
+  amount               BigInt
+  weighted_score       BigInt
+  total_streams        Int
+  blockchain_tx_digest String
+  created_at           DateTime          @default(now())
+  uploader_profiles    uploader_profiles @relation(fields: [uploader_id], references: [id])
+
+  @@index([uploader_id])
+  @@index([week_start_date])
+}
+
+model memberships {
+  id                 String              @id
+  user_id            String
+  nft_object_id      String              @unique
+  member_number      Int
+  tier               Int
+  issued_at          DateTime
+  expires_at         DateTime
+  is_active          Boolean             @default(true)
+  active_card_url    String?
+  expired_card_url   String?
+  active_card_cid    String?
+  expired_card_cid   String?
+  points             Int                 @default(0)
+  referred_by_code   String?             @db.VarChar(5)
+  created_at         DateTime            @default(now())
+  users              users               @relation(fields: [user_id], references: [id])
+  watches            membership_watches[]
+
+  @@index([user_id])
+  @@index([referred_by_code])
+}
+
+model membership_watches {
+  id              String      @id @default(uuid())
+  membership_id   String
+  content_id      String
+  watched_at      DateTime    @default(now())
+  completion_rate Float
+  points_awarded  Boolean     @default(false)
+
+  membership      memberships @relation(fields: [membership_id], references: [id])
+  content         content     @relation(fields: [content_id], references: [id])
+
+  @@unique([membership_id, content_id])
+  @@index([membership_id])
+  @@index([content_id])
+}
+
+model platform_config {
+  id          String   @id
+  key         String   @unique
+  value       String
+  description String?
+  updated_at  DateTime
+}
+
+model streams {
+  id                    String    @id
+  user_id               String
+  content_id            String
+  session_id            String
+  start_time            DateTime
+  end_time              DateTime?
+  watch_duration        Int?
+  completion_percentage Int?
+  quality_level         Int?
+  blockchain_tx_digest  String?
+  created_at            DateTime  @default(now())
+  content               content   @relation(fields: [content_id], references: [id])
+  users                 users     @relation(fields: [user_id], references: [id])
+
+  @@index([content_id])
+  @@index([created_at])
+  @@index([user_id])
+}
+
+model uploader_profiles {
+  id                     String          @id
+  user_id                String          @unique
+  blockchain_account_id  String          @unique
+  total_earnings         BigInt          @default(0)
+  pending_earnings       BigInt          @default(0)
+  total_streams          BigInt          @default(0)
+  total_content_uploaded Int             @default(0)
+  referral_code          String?         @unique @db.VarChar(5)
+  referral_count         Int             @default(0)
+  created_at             DateTime        @default(now())
+  updated_at             DateTime
+  content                content[]
+  distributions          distributions[]
+  users                  users           @relation(fields: [user_id], references: [id])
+}
+
+model users {
+  id                String             @id
+  wallet_address    String             @unique
+  username          String?            @db.VarChar(50)
+  email             String?            @db.VarChar(255)
+  avatar_url        String?
+  created_at        DateTime           @default(now())
+  updated_at        DateTime
+  memberships       memberships[]
+  streams           streams[]
+  uploader_profiles uploader_profiles?
+}
