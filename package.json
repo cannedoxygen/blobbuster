@@ -1,0 +1,44 @@
+{
+  "name": "blockbuster-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Decentralized streaming platform on Sui blockchain",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "contracts/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "contracts:build": "cd contracts/sui-contracts && sui move build",
+    "contracts:test": "cd contracts/sui-contracts && sui move test",
+    "contracts:deploy": "cd contracts/sui-contracts && sui client publish --gas-budget 100000000",
+    "backend:dev": "turbo run dev --filter=@blockbuster/backend",
+    "frontend:dev": "turbo run dev --filter=@blockbuster/frontend",
+    "db:migrate": "cd apps/backend && npm run db:migrate",
+    "db:seed": "cd apps/backend && npm run db:seed"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.4.18",
+    "tsx": "^4.20.6",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "packageManager": "npm@9.8.1",
+  "dependencies": {
+    "pinata": "^2.5.1"
+  }
+}

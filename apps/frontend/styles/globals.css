@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply font-body;
+    background: #002D72;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(0 245 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+    color: white;
+    margin: 0;
+    padding: 0;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+@layer components {
+  /* Primary Button - Bold Blockbuster Style */
+  .btn-primary {
+    background: #FFD700;
+    color: #002D72;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 900;
+    border: 3px solid #002D72;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    font-family: 'Archivo Black', sans-serif;
+    box-shadow: 4px 4px 0 #000033;
+    transition: all 0.1s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 #000033;
+    background: #FFC700;
+  }
+
+  /* Blockbuster Card */
+  .blockbuster-card {
+    background: #001144;
+    border: 3px solid #FFD700;
+    border-radius: 0.5rem;
+    box-shadow: 4px 4px 0 #000033;
+    transition: all 0.1s ease;
+  }
+
+  .blockbuster-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #000033;
+  }
+
+  /* Blockbuster Title - Yellow with shadow */
+  .blockbuster-title {
+    color: #FFD700;
+    text-transform: uppercase;
+    font-family: 'Archivo Black', sans-serif;
+    text-shadow: 3px 3px 0 #001144;
+    letter-spacing: 2px;
+  }
+
+  /* Neon Text Animation */
+  .neon-text {
+    animation: neon-pulse 2s infinite;
+  }
+
+  @keyframes neon-pulse {
+    0%, 100% {
+      text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
+    }
+    50% {
+      text-shadow: 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFD700;
+    }
+  }
+
+  /* Text Gradient */
+  .text-gradient {
+    background: #FFD700;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Video.js custom styling */
+  .video-js {
+    font-family: var(--font-inter);
+  }
+
+  .video-js .vjs-big-play-button {
+    background-color: #FFD700;
+    border-color: #002D72;
+    border-width: 3px;
+    border-radius: 0.5rem;
+  }
+
+  .video-js .vjs-control-bar {
+    background-color: rgba(0, 45, 114, 0.9);
+  }
+
+  .video-js .vjs-progress-holder .vjs-play-progress {
+    background-color: #FFD700;
+  }
+}
+
+@layer utilities {
+  /* Blockbuster link styling */
+  .blockbuster-link {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.1s ease;
+  }
+
+  .blockbuster-link:hover {
+    color: #FFC700;
+    text-shadow: 2px 2px 0 #001144;
+  }
+}
