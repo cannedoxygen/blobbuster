@@ -542,7 +542,10 @@ export default function LibraryPage() {
             setShowMovieModal(false);
             setSelectedMovie(null);
           }}
-          content={selectedMovie}
+          content={{
+            ...selectedMovie,
+            thumbnailUrl: selectedMovie.thumbnailUrl ?? undefined,
+          }}
         />
       )}
     </div>
