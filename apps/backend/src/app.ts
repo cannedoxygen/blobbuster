@@ -26,9 +26,26 @@ export const app: Application = express();
 // Security headers
 app.use(helmet());
 
-// CORS
+// CORS - Allow localhost, ngrok, and Vercel domains
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      process.env.CORS_ORIGIN
+    ];
+
+    // Allow any Vercel domain or ngrok domain
+    if (!origin ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.includes('.ngrok') ||
+        origin.includes('.ngrok-free.dev')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
