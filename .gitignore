@@ -17,6 +17,10 @@ out/
 .env
 .env*.local
 .env.production
+.env.development
+.env.test
+apps/backend/.env
+apps/frontend/.env.local
 
 # Logs
 logs/
@@ -58,3 +62,10 @@ transcoded/
 *.db
 *.sqlite
 postgres-data/
+
+# Wallet & Keys (Extra Safety)
+*.key
+*.keystore
+wallet.json
+keystore.json
+*.wallet
