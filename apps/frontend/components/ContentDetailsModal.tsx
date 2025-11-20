@@ -239,8 +239,8 @@ export function ContentDetailsModal({
                 </div>
                 <p className="text-xs text-gray-400 uppercase">Avg. Completion</p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {content.averageCompletionRate >= 80 ? '🔥 1.5x bonus' :
-                   content.averageCompletionRate >= 50 ? '✨ 1.25x bonus' :
+                  {(content.averageCompletionRate ?? 0) >= 80 ? '🔥 1.5x bonus' :
+                   (content.averageCompletionRate ?? 0) >= 50 ? '✨ 1.25x bonus' :
                    '📊 1.0x base'}
                 </p>
               </div>
