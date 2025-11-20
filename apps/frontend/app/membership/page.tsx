@@ -331,9 +331,10 @@ export default function MembershipPage() {
       console.log('Transaction executed:', result);
 
       // IMPORTANT: Check if NFT was created first - this is the source of truth
-      const nftId = result.objectChanges?.find(
+      const createdObject = result.objectChanges?.find(
         (c: any) => c.type === 'created' && c.objectType?.includes('MembershipNFT')
-      )?.objectId;
+      ) as any;
+      const nftId = createdObject?.objectId;
 
       if (!nftId) {
         console.error('No NFT found in object changes:', result.objectChanges);
