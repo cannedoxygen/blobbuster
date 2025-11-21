@@ -78,12 +78,26 @@ if (process.env.NODE_ENV === 'development') {
 
 // ===== Health Check =====
 
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
+app.get('/health', async (req, res) => {
+  try {
+    // Ping database to wake it up
+    const { prisma } = await import('./config/database');
+    await prisma.$queryRaw`SELECT 1`;
+
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      database: 'disconnected',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  }
 });
 
 // ===== API Routes =====

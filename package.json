@@ -21,7 +21,8 @@
     "backend:dev": "turbo run dev --filter=@blockbuster/backend",
     "frontend:dev": "turbo run dev --filter=@blockbuster/frontend",
     "db:migrate": "cd apps/backend && npm run db:migrate",
-    "db:seed": "cd apps/backend && npm run db:seed"
+    "db:seed": "cd apps/backend && npm run db:seed",
+    "wake-db": "node wake-db.js"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
