@@ -35,10 +35,11 @@ app.use(cors({
       process.env.CORS_ORIGIN
     ];
 
-    // Allow any Vercel domain or ngrok domain
+    // Allow any Vercel domain, ngrok domain, or simp.wtf
     if (!origin ||
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
+        origin.endsWith('.simp.wtf') ||
         origin.includes('.ngrok') ||
         origin.includes('.ngrok-free.dev')) {
       callback(null, true);
