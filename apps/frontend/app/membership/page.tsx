@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useCurrentAccount, useSignAndExecuteTransactionBlock } from '@mysten/dapp-kit';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
-import { SuiClient, getFullnodeUrl } from '@mysten/sui.js/client';
 import Header from '@/components/Header';
 
 // Single-tier membership page - $5/month
@@ -160,52 +159,21 @@ export default function MembershipPage() {
     }
   }, []);
 
-  // Fetch NFT image from blockchain
+  // Use NFT card image from backend (already stored when membership was created)
   React.useEffect(() => {
-    if (!currentMembership?.nftId) return;
+    if (!currentMembership) return;
 
-    const fetchNFTImage = async () => {
-      try {
-        const client = new SuiClient({ url: getFullnodeUrl('mainnet') });
-        const nftObject = await client.getObject({
-          id: currentMembership.nftId,
-          options: {
-            showDisplay: true,
-            showContent: true,
-          },
-        });
+    // Use activeCardUrl if membership is active, otherwise use expiredCardUrl
+    const cardUrl = currentMembership.isActive
+      ? currentMembership.activeCardUrl
+      : currentMembership.expiredCardUrl;
 
-        console.log('NFT Object:', nftObject);
-
-        // Try to get image from display metadata
-        if (nftObject.data?.display?.data) {
-          const imageUrl = nftObject.data.display.data.image_url;
-          console.log('NFT Image URL from display (raw):', imageUrl);
-          if (imageUrl) {
-            const httpUrl = convertIpfsUrl(imageUrl);
-            console.log('NFT Image URL (converted):', httpUrl);
-            setNftImageUrl(httpUrl);
-            return;
-          }
-        }
-
-        // Fallback: try to get from content
-        if (nftObject.data?.content?.dataType === 'moveObject') {
-          const fields = (nftObject.data.content as any).fields;
-          console.log('NFT Fields:', fields);
-          if (fields?.image_url) {
-            console.log('NFT Image URL from fields (raw):', fields.image_url);
-            const httpUrl = convertIpfsUrl(fields.image_url);
-            console.log('NFT Image URL (converted):', httpUrl);
-            setNftImageUrl(httpUrl);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch NFT image:', err);
-      }
-    };
-
-    fetchNFTImage();
+    if (cardUrl) {
+      console.log('Using card URL from backend:', cardUrl);
+      const httpUrl = convertIpfsUrl(cardUrl);
+      console.log('Converted to HTTP:', httpUrl);
+      setNftImageUrl(httpUrl);
+    }
   }, [currentMembership]);
 
   // Copy referral link to clipboard
