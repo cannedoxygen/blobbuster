@@ -407,7 +407,7 @@ export default function UploadPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-300 mb-4">Please sign in to upload content</p>
-          <Link href="/membership" className="blockbuster-link">
+          <Link href="/membership" className="blobbuster-link">
             Go to Sign In
           </Link>
         </div>
@@ -432,16 +432,16 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b-4 border-blockbuster-yellow">
+      <header className="border-b-4 border-blobbuster-yellow">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <Link href="/uploader" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-blockbuster-yellow rounded-lg" />
-              <h1 className="text-2xl font-heading text-blockbuster-yellow">BLOCKBUSTER</h1>
+              <div className="w-10 h-10 bg-blobbuster-yellow rounded-lg" />
+              <h1 className="text-2xl font-heading text-blobbuster-yellow">BLOBBUSTER</h1>
             </Link>
             <Link
               href="/uploader"
-              className="blockbuster-link"
+              className="blobbuster-link"
             >
               ← Back to Dashboard
             </Link>
@@ -455,7 +455,7 @@ export default function UploadPage() {
             <h1 className="text-5xl font-heading text-white mb-4 uppercase">
               Upload Content
             </h1>
-            <p className="text-xl text-blockbuster-yellow font-bold uppercase">
+            <p className="text-xl text-blobbuster-yellow font-bold uppercase">
               Drop your movie → Preview metadata → Upload
             </p>
           </div>
@@ -469,8 +469,8 @@ export default function UploadPage() {
               onClick={() => fileInputRef.current?.click()}
               className={`border-3 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
                 isDragging
-                  ? 'border-blockbuster-yellow bg-blockbuster-yellow/10'
-                  : 'border-blockbuster-yellow/30 hover:border-blockbuster-yellow bg-blockbuster-darkBlue/30'
+                  ? 'border-blobbuster-yellow bg-blobbuster-yellow/10'
+                  : 'border-blobbuster-yellow/30 hover:border-blobbuster-yellow bg-blobbuster-darkBlue/30'
               }`}
             >
               <input
@@ -483,7 +483,7 @@ export default function UploadPage() {
               {videoFile ? (
                 <div>
                   <div className="text-5xl mb-4">📹</div>
-                  <p className="text-xl font-bold text-blockbuster-yellow mb-2 uppercase">{videoFile.name}</p>
+                  <p className="text-xl font-bold text-blobbuster-yellow mb-2 uppercase">{videoFile.name}</p>
                   <p className="text-sm text-gray-400">
                     {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
@@ -495,7 +495,7 @@ export default function UploadPage() {
                       setMetadata(null);
                       setMetadataFound(false);
                     }}
-                    className="mt-4 text-blockbuster-yellow hover:underline uppercase font-bold"
+                    className="mt-4 text-blobbuster-yellow hover:underline uppercase font-bold"
                   >
                     Remove
                   </button>
@@ -515,21 +515,21 @@ export default function UploadPage() {
 
           {/* Step 2: Metadata Loading */}
           {isFetchingMetadata && (
-            <div className="blockbuster-card rounded-lg p-8 text-center mb-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blockbuster-yellow mx-auto mb-4"></div>
+            <div className="blobbuster-card rounded-lg p-8 text-center mb-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blobbuster-yellow mx-auto mb-4"></div>
               <p className="text-lg text-gray-300 uppercase">Fetching metadata from TMDB...</p>
             </div>
           )}
 
           {/* Step 3: Metadata Preview (if found or file selected) */}
           {videoFile && !isFetchingMetadata && (
-            <div className="blockbuster-card rounded-lg overflow-hidden mb-8">
+            <div className="blobbuster-card rounded-lg overflow-hidden mb-8">
               {metadata?.backdropUrl && (
                 <div
                   className="h-48 bg-cover bg-center relative"
                   style={{ backgroundImage: `url(${metadata.backdropUrl})` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-blockbuster-navy via-blockbuster-navy/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-blobbuster-navy via-blobbuster-navy/80 to-transparent" />
                 </div>
               )}
 
@@ -541,12 +541,12 @@ export default function UploadPage() {
                       <img
                         src={metadata.posterUrl}
                         alt={metadata.title}
-                        className="w-40 rounded-lg shadow-blockbuster border-3 border-blockbuster-yellow"
+                        className="w-40 rounded-lg shadow-blobbuster border-3 border-blobbuster-yellow"
                       />
                       {metadata.rating && (
                         <div className="mt-3 text-center bg-black/60 py-2 rounded-lg">
                           <span className="text-2xl">⭐</span>
-                          <span className="ml-2 text-xl font-bold text-blockbuster-yellow">
+                          <span className="ml-2 text-xl font-bold text-blobbuster-yellow">
                             {metadata.rating.toFixed(1)}
                           </span>
                           <span className="text-gray-400 text-sm">/10</span>
@@ -574,11 +574,11 @@ export default function UploadPage() {
                                 <img
                                   src={duplicateContent.posterUrl}
                                   alt={duplicateContent.title}
-                                  className="w-16 h-24 object-cover rounded border-2 border-blockbuster-yellow"
+                                  className="w-16 h-24 object-cover rounded border-2 border-blobbuster-yellow"
                                 />
                               )}
                               <div>
-                                <p className="font-bold text-blockbuster-yellow">
+                                <p className="font-bold text-blobbuster-yellow">
                                   {duplicateContent.title} {duplicateContent.year && `(${duplicateContent.year})`}
                                 </p>
                                 <p className="text-sm text-gray-400">
@@ -614,39 +614,39 @@ export default function UploadPage() {
 
                     {/* Editable Title */}
                     <div className="mb-4">
-                      <label className="block text-sm font-bold text-blockbuster-yellow mb-2 uppercase">
+                      <label className="block text-sm font-bold text-blobbuster-yellow mb-2 uppercase">
                         Title *
                       </label>
                       <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-4 py-2 bg-blockbuster-darkBlue border-3 border-blockbuster-yellow/30 rounded-lg focus:border-blockbuster-yellow focus:outline-none text-white"
+                        className="w-full px-4 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white"
                       />
                     </div>
 
                     {/* Editable Description */}
                     <div className="mb-4">
-                      <label className="block text-sm font-bold text-blockbuster-yellow mb-2 uppercase">
+                      <label className="block text-sm font-bold text-blobbuster-yellow mb-2 uppercase">
                         Description
                       </label>
                       <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         rows={4}
-                        className="w-full px-4 py-2 bg-blockbuster-darkBlue border-3 border-blockbuster-yellow/30 rounded-lg focus:border-blockbuster-yellow focus:outline-none text-white resize-none"
+                        className="w-full px-4 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white resize-none"
                       />
                     </div>
 
                     {/* Genre */}
                     <div className="mb-4">
-                      <label className="block text-sm font-bold text-blockbuster-yellow mb-2 uppercase">
+                      <label className="block text-sm font-bold text-blobbuster-yellow mb-2 uppercase">
                         Genre *
                       </label>
                       <select
                         value={genre}
                         onChange={(e) => setGenre(parseInt(e.target.value))}
-                        className="w-full px-4 py-2 bg-blockbuster-darkBlue border-3 border-blockbuster-yellow/30 rounded-lg focus:border-blockbuster-yellow focus:outline-none text-white"
+                        className="w-full px-4 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white"
                       >
                         {GENRES.map((g) => (
                           <option key={g.value} value={g.value}>
@@ -686,7 +686,7 @@ export default function UploadPage() {
                     {metadata.director && (
                       <div>
                         <p className="text-xs text-gray-500 uppercase">Director</p>
-                        <p className="font-bold text-blockbuster-yellow">{metadata.director}</p>
+                        <p className="font-bold text-blobbuster-yellow">{metadata.director}</p>
                       </div>
                     )}
                     {metadata.genres && metadata.genres.length > 0 && (
@@ -700,8 +700,8 @@ export default function UploadPage() {
 
                 {/* Cast */}
                 {metadata?.cast && metadata.cast.length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-blockbuster-yellow/30">
-                    <p className="text-sm font-bold text-blockbuster-yellow mb-3 uppercase">Cast</p>
+                  <div className="mt-6 pt-6 border-t border-blobbuster-yellow/30">
+                    <p className="text-sm font-bold text-blobbuster-yellow mb-3 uppercase">Cast</p>
                     <div className="flex gap-3 overflow-x-auto pb-2">
                       {metadata.cast.slice(0, 6).map((actor, idx) => (
                         <div key={idx} className="flex-shrink-0 text-center" style={{ width: '80px' }}>
@@ -709,7 +709,7 @@ export default function UploadPage() {
                             <img
                               src={actor.profilePath}
                               alt={actor.name}
-                              className="w-20 h-20 rounded-full object-cover mb-1 border-3 border-blockbuster-yellow/30"
+                              className="w-20 h-20 rounded-full object-cover mb-1 border-3 border-blobbuster-yellow/30"
                             />
                           )}
                           <p className="text-xs font-bold truncate">{actor.name}</p>
@@ -729,13 +729,13 @@ export default function UploadPage() {
               {/* Storage Duration */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-lg font-bold text-blockbuster-yellow uppercase">
+                  <label className="block text-lg font-bold text-blobbuster-yellow uppercase">
                     Storage Duration
                   </label>
                   <button
                     type="button"
                     onClick={() => setIsAboutWalrusOpen(true)}
-                    className="text-sm blockbuster-link flex items-center gap-1"
+                    className="text-sm blobbuster-link flex items-center gap-1"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -765,7 +765,7 @@ export default function UploadPage() {
                       max="365"
                       value={storageEpochs}
                       onChange={(e) => setStorageEpochs(Math.min(365, Math.max(1, parseInt(e.target.value) || 1)))}
-                      className="w-full px-3 py-2 bg-blockbuster-darkBlue border-3 border-blockbuster-yellow/30 rounded-lg focus:border-blockbuster-yellow focus:outline-none text-white text-center"
+                      className="w-full px-3 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white text-center"
                     />
                     <p className="text-xs text-gray-400 mt-1 text-center uppercase">epochs</p>
                   </div>
@@ -794,11 +794,11 @@ export default function UploadPage() {
                 <div className="mb-8">
                   <div className="flex justify-between mb-2">
                     <span className="text-sm text-gray-400 uppercase">Uploading...</span>
-                    <span className="text-sm text-blockbuster-yellow font-bold">{uploadProgress}%</span>
+                    <span className="text-sm text-blobbuster-yellow font-bold">{uploadProgress}%</span>
                   </div>
                   <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div
-                      className="bg-blockbuster-yellow h-full transition-all duration-300"
+                      className="bg-blobbuster-yellow h-full transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
@@ -815,7 +815,7 @@ export default function UploadPage() {
                     <p className="text-green-400 font-semibold uppercase">Payment Successful!</p>
                   </div>
                   <p className="text-sm text-gray-300">
-                    Transaction: <span className="text-blockbuster-yellow font-mono text-xs">{paymentDigest.slice(0, 20)}...</span>
+                    Transaction: <span className="text-blobbuster-yellow font-mono text-xs">{paymentDigest.slice(0, 20)}...</span>
                   </p>
                 </div>
               )}
@@ -830,7 +830,7 @@ export default function UploadPage() {
                 >
                   {isPaying ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blockbuster-blue"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blobbuster-blue"></div>
                       <span className="uppercase">Processing Payment...</span>
                     </>
                   ) : isDuplicate ? (

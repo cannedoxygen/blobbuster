@@ -11,8 +11,8 @@ const archivoBlack = Archivo_Black({
 });
 
 export const metadata: Metadata = {
-  title: 'Blockbuster - Decentralized Streaming on Sui',
-  description: 'The Blockbuster they can\'t kill. Built on Sui blockchain.',
+  title: 'BlobBuster - Decentralized Streaming on Sui',
+  description: 'The BlobBuster they can\'t kill. Built on Sui blockchain.',
   keywords: ['streaming', 'blockchain', 'Sui', 'NFT', 'Web3', 'decentralized'],
 };
 

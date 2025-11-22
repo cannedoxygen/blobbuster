@@ -12,12 +12,12 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-6xl md:text-8xl font-heading text-white mb-6 uppercase">
-            THE BLOCKBUSTER
+            THE BLOBBUSTER
             <br />
             THEY CAN'T KILL
           </h1>
 
-          <p className="text-xl md:text-2xl text-blockbuster-yellow font-bold mb-8 uppercase">
+          <p className="text-xl md:text-2xl text-blobbuster-yellow font-bold mb-8 uppercase">
             Decentralized streaming on Sui blockchain
           </p>
 
@@ -35,7 +35,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/library"
-              className="px-8 py-4 border-3 border-blockbuster-yellow text-blockbuster-yellow hover:bg-blockbuster-yellow hover:text-blockbuster-blue font-bold text-lg transition uppercase shadow-blockbuster hover:shadow-blockbuster-hover hover:transform hover:-translate-x-0.5 hover:-translate-y-0.5 rounded-lg"
+              className="px-8 py-4 border-3 border-blobbuster-yellow text-blobbuster-yellow hover:bg-blobbuster-yellow hover:text-blobbuster-blue font-bold text-lg transition uppercase shadow-blobbuster hover:shadow-blobbuster-hover hover:transform hover:-translate-x-0.5 hover:-translate-y-0.5 rounded-lg"
             >
               Browse Library
             </Link>
@@ -54,9 +54,9 @@ export default function HomePage() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="blockbuster-card p-6 text-center rounded-lg"
+              className="blobbuster-card p-6 text-center rounded-lg"
             >
-              <div className="text-4xl font-heading text-blockbuster-yellow mb-2 font-black">
+              <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
                 {stat.value}
               </div>
               <div className="text-gray-300 uppercase font-bold text-sm">{stat.label}</div>
@@ -67,17 +67,17 @@ export default function HomePage() {
 
       {/* Membership Section */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-4xl blockbuster-title text-center mb-6">
+        <h2 className="text-4xl blobbuster-title text-center mb-6">
           SIMPLE MEMBERSHIP
         </h2>
-        <p className="text-center text-xl text-blockbuster-yellow font-bold uppercase mb-12">
+        <p className="text-center text-xl text-blobbuster-yellow font-bold uppercase mb-12">
           Just $5/month - No tiers, no limits, unlimited streaming
         </p>
 
         <div className="max-w-2xl mx-auto">
-          <div className="blockbuster-card p-8 rounded-lg">
+          <div className="blobbuster-card p-8 rounded-lg">
             <div className="text-center mb-6">
-              <div className="text-5xl font-black text-blockbuster-yellow neon-text mb-2">
+              <div className="text-5xl font-black text-blobbuster-yellow neon-text mb-2">
                 $5
               </div>
               <div className="text-lg text-gray-300 uppercase font-bold">2.5 SUI per month</div>
@@ -88,12 +88,12 @@ export default function HomePage() {
                 'Unlimited streaming access',
                 'HD & 4K quality options',
                 'Support content creators directly',
-                'Retro Blockbuster card NFT',
+                'Retro BlobBuster card NFT',
                 'Dynamic card that changes when expired',
                 'Unique member number',
               ].map((feature) => (
                 <li key={feature} className="flex items-start">
-                  <span className="text-blockbuster-yellow mr-2 text-lg font-black">✓</span>
+                  <span className="text-blobbuster-yellow mr-2 text-lg font-black">✓</span>
                   <span className="text-gray-300">{feature}</span>
                 </li>
               ))}
@@ -111,46 +111,46 @@ export default function HomePage() {
 
       {/* Divider */}
       <div className="container mx-auto px-4">
-        <div className="h-1 bg-blockbuster-yellow rounded-full" />
+        <div className="h-1 bg-blobbuster-yellow rounded-full" />
       </div>
 
       {/* Footer */}
-      <footer className="border-t-4 border-blockbuster-yellow mt-20">
+      <footer className="border-t-4 border-blobbuster-yellow mt-20">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="blockbuster-title mb-4">BLOCKBUSTER</h3>
+              <h3 className="blobbuster-title mb-4">BLOBBUSTER</h3>
               <p className="text-gray-300 text-sm">
                 The decentralized streaming platform built on Sui blockchain.
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-4 text-blockbuster-yellow uppercase">Platform</h4>
+              <h4 className="font-bold mb-4 text-blobbuster-yellow uppercase">Platform</h4>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li><Link href="/library" className="blockbuster-link">Library</Link></li>
-                <li><Link href="/membership" className="blockbuster-link">Membership</Link></li>
-                <li><Link href="/uploader" className="blockbuster-link">Creators</Link></li>
+                <li><Link href="/library" className="blobbuster-link">Library</Link></li>
+                <li><Link href="/membership" className="blobbuster-link">Membership</Link></li>
+                <li><Link href="/uploader" className="blobbuster-link">Creators</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4 text-blockbuster-yellow uppercase">Resources</h4>
+              <h4 className="font-bold mb-4 text-blobbuster-yellow uppercase">Resources</h4>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li><a href="#" className="blockbuster-link">Documentation</a></li>
-                <li><a href="#" className="blockbuster-link">API</a></li>
-                <li><a href="#" className="blockbuster-link">Support</a></li>
+                <li><a href="#" className="blobbuster-link">Documentation</a></li>
+                <li><a href="#" className="blobbuster-link">API</a></li>
+                <li><a href="#" className="blobbuster-link">Support</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4 text-blockbuster-yellow uppercase">Community</h4>
+              <h4 className="font-bold mb-4 text-blobbuster-yellow uppercase">Community</h4>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li><a href="#" className="blockbuster-link">Discord</a></li>
-                <li><a href="#" className="blockbuster-link">Twitter</a></li>
-                <li><a href="#" className="blockbuster-link">GitHub</a></li>
+                <li><a href="#" className="blobbuster-link">Discord</a></li>
+                <li><a href="#" className="blobbuster-link">Twitter</a></li>
+                <li><a href="#" className="blobbuster-link">GitHub</a></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t-2 border-blockbuster-yellow text-center text-gray-400 text-sm uppercase">
-            © 2025 Blockbuster. Built on Sui.
+          <div className="mt-12 pt-8 border-t-2 border-blobbuster-yellow text-center text-gray-400 text-sm uppercase">
+            © 2025 BlobBuster. Built on Sui.
           </div>
         </div>
       </footer>

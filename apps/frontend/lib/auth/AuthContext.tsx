@@ -17,8 +17,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'blockbuster_access_token';
-const REFRESH_TOKEN_KEY = 'blockbuster_refresh_token';
+const TOKEN_KEY = 'blobbuster_access_token';
+const REFRESH_TOKEN_KEY = 'blobbuster_refresh_token';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const currentAccount = useCurrentAccount();

@@ -106,14 +106,14 @@ export function ContentDetailsModal({
       />
 
       {/* Modal */}
-      <div className="relative z-10 bg-gradient-to-br from-blockbuster-navy to-blockbuster-navy/90 border-3 border-blockbuster-yellow rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy to-blobbuster-navy/90 border-3 border-blobbuster-yellow rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Backdrop Image Header */}
         {content.backdropUrl && (
           <div
             className="h-64 bg-cover bg-center relative rounded-t-lg"
             style={{ backgroundImage: `url(${content.backdropUrl})` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-blockbuster-navy via-blockbuster-navy/80 to-transparent rounded-t-lg" />
+            <div className="absolute inset-0 bg-gradient-to-t from-blobbuster-navy via-blobbuster-navy/80 to-transparent rounded-t-lg" />
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-white/80 hover:text-white transition bg-black/50 rounded-full p-2"
@@ -127,9 +127,9 @@ export function ContentDetailsModal({
 
         {/* Header (if no backdrop) */}
         {!content.backdropUrl && (
-          <div className="sticky top-0 bg-blockbuster-navy border-b-3 border-blockbuster-yellow p-6">
+          <div className="sticky top-0 bg-blobbuster-navy border-b-3 border-blobbuster-yellow p-6">
             <div className="flex items-start justify-between">
-              <h2 className="text-3xl font-heading text-blockbuster-yellow uppercase">
+              <h2 className="text-3xl font-heading text-blobbuster-yellow uppercase">
                 Content Analytics
               </h2>
               <button
@@ -154,7 +154,7 @@ export function ContentDetailsModal({
                 <img
                   src={content.posterUrl || content.thumbnailUrl}
                   alt={content.title}
-                  className="w-48 rounded-lg shadow-blockbuster border-3 border-blockbuster-yellow"
+                  className="w-48 rounded-lg shadow-blobbuster border-3 border-blobbuster-yellow"
                 />
               </div>
             )}
@@ -168,12 +168,12 @@ export function ContentDetailsModal({
               {/* Meta Info */}
               <div className="flex flex-wrap gap-3 mb-4 text-sm">
                 {content.year && (
-                  <span className="px-3 py-1 bg-blockbuster-darkBlue rounded-full text-blockbuster-yellow font-bold">
+                  <span className="px-3 py-1 bg-blobbuster-darkBlue rounded-full text-blobbuster-yellow font-bold">
                     {content.year}
                   </span>
                 )}
                 {content.genre !== undefined && (
-                  <span className="px-3 py-1 bg-blockbuster-darkBlue rounded-full text-neon-cyan font-bold">
+                  <span className="px-3 py-1 bg-blobbuster-darkBlue rounded-full text-neon-cyan font-bold">
                     {GENRE_MAP[content.genre] || 'Other'}
                   </span>
                 )}
@@ -193,14 +193,14 @@ export function ContentDetailsModal({
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-blockbuster-darkBlue/50 rounded-lg p-3">
+                <div className="bg-blobbuster-darkBlue/50 rounded-lg p-3">
                   <p className="text-xs text-gray-400 uppercase">Uploaded</p>
                   <p className="text-white font-bold">
                     {new Date(content.createdAt).toLocaleDateString()}
                   </p>
                 </div>
                 {content.director && (
-                  <div className="bg-blockbuster-darkBlue/50 rounded-lg p-3">
+                  <div className="bg-blobbuster-darkBlue/50 rounded-lg p-3">
                     <p className="text-xs text-gray-400 uppercase">Director</p>
                     <p className="text-white font-bold">{content.director}</p>
                   </div>
@@ -210,22 +210,22 @@ export function ContentDetailsModal({
           </div>
 
           {/* Performance Metrics */}
-          <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
-            <h3 className="text-xl font-heading text-blockbuster-gold uppercase mb-4">
+          <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
+            <h3 className="text-xl font-heading text-blobbuster-gold uppercase mb-4">
               📊 Performance Metrics
             </h3>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {/* Total Streams */}
-              <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-black text-blockbuster-yellow mb-1">
+              <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-black text-blobbuster-yellow mb-1">
                   {totalStreams.toLocaleString()}
                 </div>
                 <p className="text-xs text-gray-400 uppercase">Total Streams</p>
               </div>
 
               {/* Watch Time */}
-              <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 text-center">
+              <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 text-center">
                 <div className="text-3xl font-black text-neon-cyan mb-1">
                   {totalWatchHours > 0 ? `${totalWatchHours}h` : `${totalWatchMinutes}m`}
                 </div>
@@ -233,7 +233,7 @@ export function ContentDetailsModal({
               </div>
 
               {/* Completion Rate */}
-              <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 text-center">
+              <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 text-center">
                 <div className="text-3xl font-black text-green-400 mb-1">
                   {content.averageCompletionRate || 0}%
                 </div>
@@ -246,7 +246,7 @@ export function ContentDetailsModal({
               </div>
 
               {/* Average Rating */}
-              <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 text-center">
+              <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 text-center">
                 <div className="text-3xl font-black text-yellow-400 mb-1">
                   {averageRating === 'N/A' ? averageRating : `⭐ ${averageRating}`}
                 </div>
@@ -261,9 +261,9 @@ export function ContentDetailsModal({
           <div className={`border rounded-lg p-6 ${
             isExpired ? 'bg-red-900/20 border-red-500' :
             isExpiringSoon ? 'bg-orange-900/20 border-orange-500' :
-            'bg-blockbuster-navy/50 border-neon-cyan/30'
+            'bg-blobbuster-navy/50 border-neon-cyan/30'
           }`}>
-            <h3 className="text-xl font-heading text-blockbuster-gold uppercase mb-4">
+            <h3 className="text-xl font-heading text-blobbuster-gold uppercase mb-4">
               💾 Storage Information
             </h3>
 
@@ -307,17 +307,17 @@ export function ContentDetailsModal({
           </div>
 
           {/* Revenue Insights (Placeholder - would need API endpoint) */}
-          <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
-            <h3 className="text-xl font-heading text-blockbuster-gold uppercase mb-4">
+          <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
+            <h3 className="text-xl font-heading text-blobbuster-gold uppercase mb-4">
               💰 Revenue Insights
             </h3>
             <p className="text-gray-400 text-sm">
               Your earnings are calculated weekly based on this content's weighted score.
               Higher completion rates earn 1.5x bonus (80%+) or 1.25x bonus (50-79%).
             </p>
-            <div className="mt-4 p-4 bg-blockbuster-darkBlue/50 rounded-lg">
+            <div className="mt-4 p-4 bg-blobbuster-darkBlue/50 rounded-lg">
               <p className="text-xs text-gray-400 uppercase mb-2">Weighted Score Multiplier</p>
-              <p className="text-2xl font-black text-blockbuster-yellow">
+              <p className="text-2xl font-black text-blobbuster-yellow">
                 {(content.averageCompletionRate ?? 0) >= 80 ? '1.5x' :
                  (content.averageCompletionRate ?? 0) >= 50 ? '1.25x' :
                  '1.0x'}
@@ -330,7 +330,7 @@ export function ContentDetailsModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-blockbuster-navy border-t-3 border-blockbuster-yellow p-6">
+        <div className="sticky bottom-0 bg-blobbuster-navy border-t-3 border-blobbuster-yellow p-6">
           <div className="flex gap-4">
             <button
               onClick={onClose}

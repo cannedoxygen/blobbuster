@@ -81,7 +81,7 @@ export function WalrusCostCalculator({
 
   if (loading) {
     return (
-      <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
+      <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
         <div className="flex items-center justify-center gap-3">
           <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-neon-cyan"></div>
           <p className="text-gray-300">Calculating cost...</p>
@@ -103,9 +103,9 @@ export function WalrusCostCalculator({
   }
 
   return (
-    <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4">
+    <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-heading text-blockbuster-gold">
+        <h3 className="text-lg font-heading text-blobbuster-gold">
           Storage Cost Estimate
         </h3>
         <span className="text-xs text-neon-cyan font-semibold">Formula-based</span>
@@ -135,7 +135,7 @@ export function WalrusCostCalculator({
       {/* Cost Breakdown */}
       <div className="border-t border-neon-cyan/20 pt-4 space-y-3">
         {/* Walrus costs (actual, not multiplied) */}
-        <div className="bg-blockbuster-navy/30 rounded p-3 space-y-2">
+        <div className="bg-blobbuster-navy/30 rounded p-3 space-y-2">
           <p className="text-xs font-semibold text-gray-400 uppercase">Walrus Network Cost</p>
           <div className="flex justify-between text-sm">
             <span className="text-gray-300">Storage ({estimate.duration.epochs} epochs)</span>
@@ -163,7 +163,7 @@ export function WalrusCostCalculator({
             <span className="text-white font-mono">{(estimate.costs.suiGas * 3).toFixed(4)} SUI</span>
           </div>
           <div className="flex justify-between font-bold pt-2 border-t border-neon-cyan/20">
-            <span className="text-blockbuster-gold">Total Payment</span>
+            <span className="text-blobbuster-gold">Total Payment</span>
             <span className="text-neon-cyan text-lg font-mono">{estimate.costs.totalWithGas.toFixed(4)} SUI</span>
           </div>
         </div>

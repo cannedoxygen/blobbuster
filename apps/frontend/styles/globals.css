@@ -25,7 +25,7 @@
 }
 
 @layer components {
-  /* Primary Button - Bold Blockbuster Style */
+  /* Primary Button - Bold BlobBuster Style */
   .btn-primary {
     background: #FFD700;
     color: #002D72;
@@ -50,8 +50,8 @@
     background: #FFC700;
   }
 
-  /* Blockbuster Card */
-  .blockbuster-card {
+  /* BlobBuster Card */
+  .blobbuster-card {
     background: #001144;
     border: 3px solid #FFD700;
     border-radius: 0.5rem;
@@ -59,13 +59,13 @@
     transition: all 0.1s ease;
   }
 
-  .blockbuster-card:hover {
+  .blobbuster-card:hover {
     transform: translate(-2px, -2px);
     box-shadow: 6px 6px 0 #000033;
   }
 
-  /* Blockbuster Title - Yellow with shadow */
-  .blockbuster-title {
+  /* BlobBuster Title - Yellow with shadow */
+  .blobbuster-title {
     color: #FFD700;
     text-transform: uppercase;
     font-family: 'Archivo Black', sans-serif;
@@ -117,8 +117,8 @@
 }
 
 @layer utilities {
-  /* Blockbuster link styling */
-  .blockbuster-link {
+  /* BlobBuster link styling */
+  .blobbuster-link {
     color: #FFD700;
     text-decoration: none;
     font-weight: bold;
@@ -126,7 +126,7 @@
     transition: all 0.1s ease;
   }
 
-  .blockbuster-link:hover {
+  .blobbuster-link:hover {
     color: #FFC700;
     text-shadow: 2px 2px 0 #001144;
   }

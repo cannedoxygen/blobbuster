@@ -41,7 +41,7 @@ export default function ReferralSuccessModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative bg-gradient-to-br from-blockbuster-navy to-blockbuster-darkBlue border-2 border-blockbuster-gold/50 rounded-xl shadow-2xl max-w-lg w-full mx-4 p-8 animate-in fade-in zoom-in duration-300">
+      <div className="relative bg-gradient-to-br from-blobbuster-navy to-blobbuster-darkBlue border-2 border-blobbuster-gold/50 rounded-xl shadow-2xl max-w-lg w-full mx-4 p-8 animate-in fade-in zoom-in duration-300">
         {/* Success Icon */}
         <div className="text-center mb-6">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -49,7 +49,7 @@ export default function ReferralSuccessModal({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-3xl font-heading text-blockbuster-gold mb-2 uppercase">
+          <h2 className="text-3xl font-heading text-blobbuster-gold mb-2 uppercase">
             You're Now a Provider!
           </h2>
           <p className="text-gray-300">
@@ -58,10 +58,10 @@ export default function ReferralSuccessModal({
         </div>
 
         {/* Referral Code Display */}
-        <div className="bg-blockbuster-darkBlue/50 rounded-lg p-6 mb-6 border border-neon-cyan/20">
+        <div className="bg-blobbuster-darkBlue/50 rounded-lg p-6 mb-6 border border-neon-cyan/20">
           <div className="text-center mb-4">
             <p className="text-sm text-gray-400 mb-2 uppercase font-bold">Your Referral Code</p>
-            <div className="text-4xl font-black text-blockbuster-gold tracking-widest">
+            <div className="text-4xl font-black text-blobbuster-gold tracking-widest">
               {referralCode}
             </div>
           </div>
@@ -89,14 +89,14 @@ export default function ReferralSuccessModal({
         </div>
 
         {/* Share Link */}
-        <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 mb-6 border border-neon-cyan/20">
+        <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 mb-6 border border-neon-cyan/20">
           <p className="text-xs text-gray-400 mb-2 uppercase font-bold">Share Your Collection</p>
           <div className="flex gap-2">
             <input
               type="text"
               value={shareUrl}
               readOnly
-              className="flex-1 px-3 py-2 bg-blockbuster-navy border border-neon-cyan/30 rounded text-sm text-gray-300 focus:outline-none"
+              className="flex-1 px-3 py-2 bg-blobbuster-navy border border-neon-cyan/30 rounded text-sm text-gray-300 focus:outline-none"
             />
             <button
               onClick={handleCopyLink}
@@ -109,7 +109,7 @@ export default function ReferralSuccessModal({
 
         {/* What You Can Do */}
         <div className="space-y-3 mb-6">
-          <p className="text-sm font-bold text-blockbuster-gold uppercase">What's Next:</p>
+          <p className="text-sm font-bold text-blobbuster-gold uppercase">What's Next:</p>
           <div className="space-y-2 text-sm text-gray-300">
             <div className="flex items-start gap-2">
               <span className="text-neon-cyan">✓</span>
@@ -117,7 +117,7 @@ export default function ReferralSuccessModal({
             </div>
             <div className="flex items-start gap-2">
               <span className="text-neon-cyan">✓</span>
-              <span>Track how many people you bring to Blockbuster</span>
+              <span>Track how many people you bring to BlobBuster</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="text-neon-cyan">✓</span>

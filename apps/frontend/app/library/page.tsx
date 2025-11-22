@@ -259,15 +259,15 @@ export default function LibraryPage() {
       <Header />
 
       <div className="container mx-auto p-8">
-        <h1 className="text-5xl font-heading text-blockbuster-gold mb-8">
+        <h1 className="text-5xl font-heading text-blobbuster-gold mb-8">
           CONTENT LIBRARY
         </h1>
 
         {/* Provider Filter Section */}
-        <div className="mb-8 p-6 bg-blockbuster-navy/50 border-2 border-neon-cyan/30 rounded-lg">
+        <div className="mb-8 p-6 bg-blobbuster-navy/50 border-2 border-neon-cyan/30 rounded-lg">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-bold text-blockbuster-gold uppercase mb-2">
+              <label className="block text-sm font-bold text-blobbuster-gold uppercase mb-2">
                 🎬 Browse by Provider
               </label>
               <div className="flex gap-2">
@@ -282,7 +282,7 @@ export default function LibraryPage() {
                   }}
                   placeholder="Enter 5-character code"
                   maxLength={5}
-                  className="flex-1 px-4 py-2 bg-blockbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500 uppercase font-mono text-lg tracking-wider"
+                  className="flex-1 px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500 uppercase font-mono text-lg tracking-wider"
                 />
                 <button
                   onClick={() => applyProviderFilter(providerCode)}
@@ -308,11 +308,11 @@ export default function LibraryPage() {
 
           {/* Active Provider Banner */}
           {activeProviderCode && providerInfo && (
-            <div className="mt-4 p-4 bg-blockbuster-gold/10 border border-blockbuster-gold/30 rounded">
+            <div className="mt-4 p-4 bg-blobbuster-gold/10 border border-blobbuster-gold/30 rounded">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400 uppercase font-bold">Currently Viewing</p>
-                  <p className="text-xl font-black text-blockbuster-gold">
+                  <p className="text-xl font-black text-blobbuster-gold">
                     {providerInfo.username}'s Collection
                   </p>
                   <p className="text-sm text-gray-400">
@@ -339,20 +339,20 @@ export default function LibraryPage() {
           <select
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
-            className="px-4 py-2 bg-blockbuster-navy border border-neon-cyan/20 rounded font-bold"
+            className="px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold"
             style={{ color: '#FFD700' }}
           >
-            <option value="all" className="bg-blockbuster-navy text-white">All Genres</option>
-            <option value="1" className="bg-blockbuster-navy text-white">Action</option>
-            <option value="2" className="bg-blockbuster-navy text-white">Comedy</option>
-            <option value="3" className="bg-blockbuster-navy text-white">Drama</option>
-            <option value="4" className="bg-blockbuster-navy text-white">Horror</option>
-            <option value="5" className="bg-blockbuster-navy text-white">Sci-Fi</option>
-            <option value="6" className="bg-blockbuster-navy text-white">Documentary</option>
-            <option value="7" className="bg-blockbuster-navy text-white">Thriller</option>
-            <option value="8" className="bg-blockbuster-navy text-white">Romance</option>
-            <option value="9" className="bg-blockbuster-navy text-white">Animation</option>
-            <option value="10" className="bg-blockbuster-navy text-white">Other</option>
+            <option value="all" className="bg-blobbuster-navy text-white">All Genres</option>
+            <option value="1" className="bg-blobbuster-navy text-white">Action</option>
+            <option value="2" className="bg-blobbuster-navy text-white">Comedy</option>
+            <option value="3" className="bg-blobbuster-navy text-white">Drama</option>
+            <option value="4" className="bg-blobbuster-navy text-white">Horror</option>
+            <option value="5" className="bg-blobbuster-navy text-white">Sci-Fi</option>
+            <option value="6" className="bg-blobbuster-navy text-white">Documentary</option>
+            <option value="7" className="bg-blobbuster-navy text-white">Thriller</option>
+            <option value="8" className="bg-blobbuster-navy text-white">Romance</option>
+            <option value="9" className="bg-blobbuster-navy text-white">Animation</option>
+            <option value="10" className="bg-blobbuster-navy text-white">Other</option>
           </select>
 
           <input
@@ -360,7 +360,7 @@ export default function LibraryPage() {
             placeholder="Search content..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-4 py-2 bg-blockbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500"
+            className="flex-1 px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500"
           />
         </div>
 
@@ -392,7 +392,7 @@ export default function LibraryPage() {
                 onClick={() => handleMovieClick(item)}
                 className="group cursor-pointer relative"
               >
-                <div className="aspect-[2/3] bg-blockbuster-navy/50 rounded-lg mb-2 overflow-hidden border border-neon-cyan/20 group-hover:border-neon-pink transition relative">
+                <div className="aspect-[2/3] bg-blobbuster-navy/50 rounded-lg mb-2 overflow-hidden border border-neon-cyan/20 group-hover:border-neon-pink transition relative">
                   {/* Use TMDB poster if available, fallback to thumbnail */}
                   {item.posterUrl || item.thumbnailUrl ? (
                     <>
@@ -484,7 +484,7 @@ export default function LibraryPage() {
             ></div>
 
             {/* Modal */}
-            <div className="relative z-10 bg-gradient-to-br from-blockbuster-navy to-blockbuster-navy/90 border-2 border-neon-cyan/30 rounded-xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300">
+            <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy to-blobbuster-navy/90 border-2 border-neon-cyan/30 rounded-xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300">
               <div className="text-center">
                 {/* Icon */}
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-neon-pink/20 flex items-center justify-center">
@@ -504,13 +504,13 @@ export default function LibraryPage() {
                 </div>
 
                 {/* Title */}
-                <h2 className="text-2xl font-heading text-blockbuster-gold mb-4">
+                <h2 className="text-2xl font-heading text-blobbuster-gold mb-4">
                   Membership Required
                 </h2>
 
                 {/* Message */}
                 <p className="text-gray-300 mb-8 leading-relaxed">
-                  You need an active Blockbuster membership to watch content. Get instant access to our entire library!
+                  You need an active BlobBuster membership to watch content. Get instant access to our entire library!
                 </p>
 
                 {/* Buttons */}

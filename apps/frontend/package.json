@@ -1,7 +1,7 @@
 {
-  "name": "@blockbuster/frontend",
+  "name": "@blobbuster/frontend",
   "version": "1.0.0",
-  "description": "Blockbuster Next.js frontend application",
+  "description": "BlobBuster Next.js frontend application",
   "private": true,
   "scripts": {
     "dev": "next dev",

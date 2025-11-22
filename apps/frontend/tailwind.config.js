@@ -9,12 +9,12 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // Blockbuster Brand Colors
+      // BlobBuster Brand Colors
       colors: {
-        blockbuster: {
-          blue: '#002D72', // Primary Blockbuster Blue
+        blobbuster: {
+          blue: '#002D72', // Primary BlobBuster Blue
           darkBlue: '#001144', // Darker Blue
-          yellow: '#FFD700', // Blockbuster Yellow/Gold
+          yellow: '#FFD700', // BlobBuster Yellow/Gold
           lightYellow: '#FFC700', // Lighter Yellow
           black: '#000033', // Deep Black/Blue
           white: '#FFFFFF',
@@ -52,7 +52,7 @@ module.exports = {
       // Animations
       animation: {
         'neon-pulse': 'neonPulse 2s ease-in-out infinite',
-        'blockbuster-hover': 'blockbusterHover 0.1s ease',
+        'blobbuster-hover': 'blobbusterHover 0.1s ease',
       },
 
       keyframes: {
@@ -60,7 +60,7 @@ module.exports = {
           '0%, 100%': { textShadow: '0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700' },
           '50%': { textShadow: '0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFD700' },
         },
-        blockbusterHover: {
+        blobbusterHover: {
           '0%': { transform: 'translate(0, 0)' },
           '100%': { transform: 'translate(-3px, -3px)' },
         },
@@ -68,9 +68,9 @@ module.exports = {
 
       // Box shadows
       boxShadow: {
-        'blockbuster': '4px 4px 0 #000033',
-        'blockbuster-hover': '6px 6px 0 #000033',
-        'blockbuster-lg': '8px 8px 0 #000033',
+        'blobbuster': '4px 4px 0 #000033',
+        'blobbuster-hover': '6px 6px 0 #000033',
+        'blobbuster-lg': '8px 8px 0 #000033',
         'neon': '0 0 20px rgba(0, 245, 255, 0.5)',
       },
     },
