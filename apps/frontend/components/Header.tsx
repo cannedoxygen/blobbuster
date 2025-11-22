@@ -46,9 +46,9 @@ export default function Header() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition">
-            <div className="w-10 h-10 bg-blockbuster-gold rounded-sm" />
-            <h1 className="text-2xl font-heading text-blockbuster-gold">
-              BLOCKBUSTER
+            <div className="w-10 h-10 bg-blobbuster-gold rounded-sm" />
+            <h1 className="text-2xl font-heading text-blobbuster-gold">
+              BLOBBUSTER
             </h1>
           </Link>
 

@@ -197,20 +197,20 @@ export function ExtendStorageModal({
       />
 
       {/* Modal */}
-      <div className="relative z-10 bg-gradient-to-br from-blockbuster-navy to-blockbuster-navy/90 border-3 border-blockbuster-yellow rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy to-blobbuster-navy/90 border-3 border-blobbuster-yellow rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-blockbuster-navy border-b-3 border-blockbuster-yellow p-6">
+        <div className="sticky top-0 bg-blobbuster-navy border-b-3 border-blobbuster-yellow p-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               {(content.posterUrl || content.thumbnailUrl) && (
                 <img
                   src={content.posterUrl || content.thumbnailUrl || ''}
                   alt={content.title}
-                  className="w-16 h-24 object-cover rounded-lg border-2 border-blockbuster-yellow"
+                  className="w-16 h-24 object-cover rounded-lg border-2 border-blobbuster-yellow"
                 />
               )}
               <div>
-                <h2 className="text-2xl font-heading text-blockbuster-yellow uppercase">
+                <h2 className="text-2xl font-heading text-blobbuster-yellow uppercase">
                   Extend Storage
                 </h2>
                 <p className="text-white font-bold mt-1">{content.title}</p>
@@ -230,7 +230,7 @@ export function ExtendStorageModal({
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Current Status */}
-          <div className="bg-blockbuster-darkBlue/50 border border-neon-cyan/30 rounded-lg p-4">
+          <div className="bg-blobbuster-darkBlue/50 border border-neon-cyan/30 rounded-lg p-4">
             <p className="text-sm text-gray-400 uppercase mb-2">Current Status</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -254,7 +254,7 @@ export function ExtendStorageModal({
 
           {/* Epoch Selector */}
           <div>
-            <label className="block text-lg font-bold text-blockbuster-yellow uppercase mb-3">
+            <label className="block text-lg font-bold text-blobbuster-yellow uppercase mb-3">
               Additional Storage Duration
             </label>
             <div className="flex gap-4">
@@ -279,7 +279,7 @@ export function ExtendStorageModal({
                   max="365"
                   value={additionalEpochs}
                   onChange={(e) => setAdditionalEpochs(Math.min(365, Math.max(1, parseInt(e.target.value) || 1)))}
-                  className="w-full px-3 py-2 bg-blockbuster-darkBlue border-3 border-blockbuster-yellow/30 rounded-lg focus:border-blockbuster-yellow focus:outline-none text-white text-center"
+                  className="w-full px-3 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white text-center"
                 />
                 <p className="text-xs text-gray-400 mt-1 text-center uppercase">epochs</p>
               </div>
@@ -312,16 +312,16 @@ export function ExtendStorageModal({
 
           {/* Cost Estimate */}
           {isCalculating ? (
-            <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
+            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
               <div className="flex items-center justify-center gap-3">
                 <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-neon-cyan"></div>
                 <p className="text-gray-300">Calculating cost...</p>
               </div>
             </div>
           ) : costEstimate ? (
-            <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4">
+            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-heading text-blockbuster-gold">
+                <h3 className="text-lg font-heading text-blobbuster-gold">
                   Extension Cost
                 </h3>
                 <span className="text-xs text-neon-cyan font-semibold">Formula-based</span>
@@ -330,7 +330,7 @@ export function ExtendStorageModal({
               {/* Cost Breakdown */}
               <div className="space-y-3">
                 {/* Walrus costs */}
-                <div className="bg-blockbuster-navy/30 rounded p-3 space-y-2">
+                <div className="bg-blobbuster-navy/30 rounded p-3 space-y-2">
                   <p className="text-xs font-semibold text-gray-400 uppercase">Walrus Network Cost</p>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-300">Storage ({additionalEpochs} epochs)</span>
@@ -354,7 +354,7 @@ export function ExtendStorageModal({
                     <span className="text-white font-mono">{(costEstimate.costs.suiGas * 3).toFixed(4)} SUI</span>
                   </div>
                   <div className="flex justify-between font-bold pt-2 border-t border-neon-cyan/20">
-                    <span className="text-blockbuster-gold">Total Payment</span>
+                    <span className="text-blobbuster-gold">Total Payment</span>
                     <span className="text-neon-cyan text-lg font-mono">{costEstimate.costs.totalWithGas.toFixed(4)} SUI</span>
                   </div>
                 </div>
@@ -383,14 +383,14 @@ export function ExtendStorageModal({
                 <p className="text-green-400 font-semibold uppercase">Payment Successful!</p>
               </div>
               <p className="text-sm text-gray-300">
-                Transaction: <span className="text-blockbuster-yellow font-mono text-xs">{paymentDigest.slice(0, 20)}...</span>
+                Transaction: <span className="text-blobbuster-yellow font-mono text-xs">{paymentDigest.slice(0, 20)}...</span>
               </p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-blockbuster-navy border-t-3 border-blockbuster-yellow p-6">
+        <div className="sticky bottom-0 bg-blobbuster-navy border-t-3 border-blobbuster-yellow p-6">
           {!paymentDigest ? (
             <div className="flex gap-4">
               <button
@@ -407,7 +407,7 @@ export function ExtendStorageModal({
               >
                 {isPaying ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blockbuster-blue"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blobbuster-blue"></div>
                     <span className="uppercase">Processing Payment...</span>
                   </>
                 ) : (

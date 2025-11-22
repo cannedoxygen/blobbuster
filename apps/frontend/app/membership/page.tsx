@@ -372,14 +372,14 @@ export default function MembershipPage() {
   };
 
   const membership = {
-    name: 'BLOCKBUSTER MEMBERSHIP',
+    name: 'BLOBBUSTER MEMBERSHIP',
     priceUSD: PRICE_PER_MONTH_USD,
     priceSUI: suiPrice ? calculateSuiAmount(PRICE_PER_MONTH_USD) : 0,
     features: [
       'Unlimited streaming access',
       'HD & 4K quality options',
       'Support providers directly',
-      'Retro Blockbuster card NFT',
+      'Retro BlobBuster card NFT',
       'Dynamic card (changes when expired)',
       'Unique member number',
       'Tradeable & transferable',
@@ -394,7 +394,7 @@ export default function MembershipPage() {
         <div className="max-w-5xl mx-auto">
           {/* Single Title */}
           <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-heading text-blockbuster-gold mb-4">
+            <h1 className="text-5xl md:text-6xl font-heading text-blobbuster-gold mb-4">
               {currentMembership ? 'YOUR MEMBERSHIP' : 'MEMBERSHIP'}
             </h1>
           </div>
@@ -406,9 +406,9 @@ export default function MembershipPage() {
               <div className="flex flex-col lg:flex-row gap-8">
                 {/* LEFT: NFT Card - Square */}
                 <div className="w-full lg:w-1/2">
-                  <div className="blockbuster-card rounded-2xl p-2 aspect-square">
+                  <div className="blobbuster-card rounded-2xl p-2 aspect-square">
                     <div className="relative h-full">
-                      <div className="rounded-xl overflow-hidden shadow-2xl bg-blockbuster-gold h-full p-4 flex items-center justify-center">
+                      <div className="rounded-xl overflow-hidden shadow-2xl bg-blobbuster-gold h-full p-4 flex items-center justify-center">
                         {nftImageUrl ? (
                           <img
                             src={nftImageUrl}
@@ -420,10 +420,10 @@ export default function MembershipPage() {
                             }}
                           />
                         ) : (
-                          <div className="w-full h-full bg-blockbuster-navy rounded-lg flex items-center justify-center">
+                          <div className="w-full h-full bg-blobbuster-navy rounded-lg flex items-center justify-center">
                             <div className="text-center">
                               <div className="text-6xl mb-4">🎬</div>
-                              <div className="text-blockbuster-gold font-heading text-2xl">
+                              <div className="text-blobbuster-gold font-heading text-2xl">
                                 Member #{String(currentMembership.memberNumber).padStart(6, '0')}
                               </div>
                               <div className="text-gray-400 text-sm mt-2">Loading card...</div>
@@ -444,21 +444,21 @@ export default function MembershipPage() {
                 <div className="w-full lg:w-1/2 flex flex-col justify-between aspect-square">
                   {/* Info Grid - 3 Stats */}
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="blockbuster-card rounded-lg p-4 text-center flex flex-col justify-center">
+                    <div className="blobbuster-card rounded-lg p-4 text-center flex flex-col justify-center">
                       <div className="text-gray-400 text-xs font-bold uppercase mb-2">Member #</div>
-                      <div className="text-2xl font-black text-blockbuster-gold">
+                      <div className="text-2xl font-black text-blobbuster-gold">
                         #{String(currentMembership.memberNumber).padStart(6, '0')}
                       </div>
                     </div>
 
-                    <div className="blockbuster-card rounded-lg p-4 text-center flex flex-col justify-center">
+                    <div className="blobbuster-card rounded-lg p-4 text-center flex flex-col justify-center">
                       <div className="text-gray-400 text-xs font-bold uppercase mb-2">Status</div>
                       <div className={`text-2xl font-black ${currentMembership.isActive ? 'text-green-400' : 'text-red-400'}`}>
                         {currentMembership.isActive ? 'Active' : 'Expired'}
                       </div>
                     </div>
 
-                    <div className="blockbuster-card rounded-lg p-4 text-center flex flex-col justify-center">
+                    <div className="blobbuster-card rounded-lg p-4 text-center flex flex-col justify-center">
                       <div className="text-gray-400 text-xs font-bold uppercase mb-2">Expires</div>
                       <div className="text-sm font-bold text-white">
                         {new Date(currentMembership.expiresAt).toLocaleDateString('en-US', {
@@ -471,7 +471,7 @@ export default function MembershipPage() {
                   </div>
 
                   {/* NFT ID Container */}
-                  <div className="blockbuster-card rounded-lg p-4 flex flex-col justify-center">
+                  <div className="blobbuster-card rounded-lg p-4 flex flex-col justify-center">
                     <div className="text-gray-400 text-xs font-bold uppercase mb-2">NFT Object ID</div>
                     <div className="text-neon-cyan font-mono text-xs break-all line-clamp-2">
                       {currentMembership.nftId}
@@ -480,13 +480,13 @@ export default function MembershipPage() {
 
                   {/* Provider Referral Stats */}
                   {isProvider && myReferralCode && (
-                    <div className="blockbuster-card rounded-lg p-4 bg-gradient-to-br from-blockbuster-gold/5 to-yellow-700/5 flex items-center justify-center">
+                    <div className="blobbuster-card rounded-lg p-4 bg-gradient-to-br from-blobbuster-gold/5 to-yellow-700/5 flex items-center justify-center">
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div className="flex items-center gap-3">
                           <div className="text-3xl">🎯</div>
                           <div>
                             <div className="text-xs text-gray-400 uppercase font-bold">Referral Code</div>
-                            <div className="text-2xl font-black text-blockbuster-gold tracking-wider font-mono">
+                            <div className="text-2xl font-black text-blobbuster-gold tracking-wider font-mono">
                               {myReferralCode}
                             </div>
                           </div>
@@ -509,7 +509,7 @@ export default function MembershipPage() {
 
                   {/* Active Benefits or Renewal */}
                   {currentMembership.isActive ? (
-                    <div className="blockbuster-card rounded-lg p-4 bg-gradient-to-br from-green-900/10 to-green-800/10 flex items-center justify-center">
+                    <div className="blobbuster-card rounded-lg p-4 bg-gradient-to-br from-green-900/10 to-green-800/10 flex items-center justify-center">
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div className="flex items-center gap-3">
                           <div className="text-3xl">🎬</div>
@@ -526,7 +526,7 @@ export default function MembershipPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="blockbuster-card rounded-lg p-4 bg-gradient-to-br from-red-900/10 to-red-800/10 flex items-center justify-center">
+                    <div className="blobbuster-card rounded-lg p-4 bg-gradient-to-br from-red-900/10 to-red-800/10 flex items-center justify-center">
                       <div className="flex items-center justify-between gap-3 w-full">
                         <div className="flex items-center gap-3">
                           <div className="text-3xl">⚠️</div>
@@ -554,13 +554,13 @@ export default function MembershipPage() {
           {/* Membership Card - Single Option */}
           <div className="mb-12">
             <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-yellow-600 rounded-lg p-1 shadow-2xl">
-              <div className="bg-blockbuster-navy rounded-lg p-8">
+              <div className="bg-blobbuster-navy rounded-lg p-8">
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <div className="text-neon-cyan text-sm font-bold mb-2 uppercase tracking-wide">
                       Monthly Membership
                     </div>
-                    <h2 className="text-3xl font-heading text-blockbuster-gold mb-2">
+                    <h2 className="text-3xl font-heading text-blobbuster-gold mb-2">
                       {membership.name}
                     </h2>
                     <p className="text-gray-400 text-sm">
@@ -568,7 +568,7 @@ export default function MembershipPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-4xl font-bold text-blockbuster-gold">
+                    <div className="text-4xl font-bold text-blobbuster-gold">
                       ${membership.priceUSD}
                     </div>
                     <div className="text-sm text-gray-400">
@@ -588,9 +588,9 @@ export default function MembershipPage() {
                   </div>
                 </div>
 
-                <div className="bg-blockbuster-gold/10 border border-blockbuster-gold/30 rounded p-4 text-center">
-                  <p className="text-blockbuster-gold font-bold">
-                    You'll receive a retro Blockbuster membership card NFT
+                <div className="bg-blobbuster-gold/10 border border-blobbuster-gold/30 rounded p-4 text-center">
+                  <p className="text-blobbuster-gold font-bold">
+                    You'll receive a retro BlobBuster membership card NFT
                   </p>
                   <p className="text-sm text-gray-400 mt-1">
                     Card design changes when expired - just like the old days!
@@ -602,7 +602,7 @@ export default function MembershipPage() {
 
           {/* Duration Selector */}
           <div className="max-w-2xl mx-auto mb-8">
-            <div className="bg-blockbuster-navy/50 rounded-lg p-6 border border-neon-cyan/20">
+            <div className="bg-blobbuster-navy/50 rounded-lg p-6 border border-neon-cyan/20">
               <h3 className="text-xl font-bold mb-4">Select Duration</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
@@ -616,13 +616,13 @@ export default function MembershipPage() {
                     onClick={() => setDuration(option.days)}
                     className={`p-4 rounded border-2 transition ${
                       duration === option.days
-                        ? 'border-blockbuster-gold bg-blockbuster-gold/10'
-                        : 'border-gray-700 hover:border-blockbuster-gold'
+                        ? 'border-blobbuster-gold bg-blobbuster-gold/10'
+                        : 'border-gray-700 hover:border-blobbuster-gold'
                     }`}
                   >
                     <div className="font-bold">{option.label}</div>
                     {option.discount && (
-                      <div className="text-xs text-blockbuster-gold mt-1">
+                      <div className="text-xs text-blobbuster-gold mt-1">
                         {option.discount}
                       </div>
                     )}
@@ -634,15 +634,15 @@ export default function MembershipPage() {
 
           {/* Purchase Summary */}
           <div className="max-w-2xl mx-auto">
-            <div className="bg-blockbuster-navy/70 rounded-lg p-8 border-2 border-neon-cyan/30">
-              <h3 className="text-2xl font-heading text-blockbuster-gold mb-6">
+            <div className="bg-blobbuster-navy/70 rounded-lg p-8 border-2 border-neon-cyan/30">
+              <h3 className="text-2xl font-heading text-blobbuster-gold mb-6">
                 Purchase Summary
               </h3>
 
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Membership:</span>
-                  <span className="font-bold">Blockbuster Monthly</span>
+                  <span className="font-bold">BlobBuster Monthly</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Duration:</span>
@@ -682,7 +682,7 @@ export default function MembershipPage() {
                       }}
                       maxLength={5}
                       placeholder="5-CHAR"
-                      className="flex-1 px-4 py-2 bg-blockbuster-navy border border-neon-cyan/20 rounded placeholder-gray-500 uppercase font-mono tracking-wider"
+                      className="flex-1 px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded placeholder-gray-500 uppercase font-mono tracking-wider"
                       style={{ color: '#F5C518' }}
                     />
                     {referralValid === true && (
@@ -714,7 +714,7 @@ export default function MembershipPage() {
 
                 <div className="border-t border-gray-700 pt-4 flex justify-between text-xl">
                   <span className="font-bold">Total:</span>
-                  <span className="font-bold text-blockbuster-gold">
+                  <span className="font-bold text-blobbuster-gold">
                     {isLoadingPrice ? 'Loading...' : `${calculatePrice(duration).toFixed(2)} SUI`}
                   </span>
                 </div>
@@ -750,8 +750,8 @@ export default function MembershipPage() {
 
           {/* Benefits Section */}
           <div className="mt-16 text-center">
-            <h3 className="text-3xl font-heading text-blockbuster-gold mb-8">
-              Why Blockbuster?
+            <h3 className="text-3xl font-heading text-blobbuster-gold mb-8">
+              Why BlobBuster?
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="p-6">
@@ -765,7 +765,7 @@ export default function MembershipPage() {
                 <div className="text-4xl mb-4">🎨</div>
                 <h4 className="font-bold mb-2">NFT Membership Card</h4>
                 <p className="text-gray-400 text-sm">
-                  Retro Blockbuster card that you own. It even changes when expired!
+                  Retro BlobBuster card that you own. It even changes when expired!
                 </p>
               </div>
               <div className="p-6">

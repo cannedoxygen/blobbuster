@@ -257,7 +257,7 @@ export default function UploaderPage() {
 
   if (authLoading || isFetching) {
     return (
-      <div className="min-h-screen bg-blockbuster-navy flex items-center justify-center">
+      <div className="min-h-screen bg-blobbuster-navy flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-neon-cyan mx-auto mb-4"></div>
           <p className="text-gray-300">Loading...</p>
@@ -279,7 +279,7 @@ export default function UploaderPage() {
             <h1 className="text-5xl md:text-6xl font-heading text-white mb-4 uppercase">
               PROVIDER DASHBOARD
             </h1>
-            <p className="text-xl text-blockbuster-yellow font-bold uppercase">
+            <p className="text-xl text-blobbuster-yellow font-bold uppercase">
               Monetize your content. Earn 70% of streaming revenue.
             </p>
           </div>
@@ -287,33 +287,33 @@ export default function UploaderPage() {
           {/* Stats Cards */}
           {isUploader && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-              <div className="blockbuster-card p-6 rounded-lg">
+              <div className="blobbuster-card p-6 rounded-lg">
                 <div className="text-gray-400 text-sm mb-2 uppercase font-bold">Total Earnings</div>
-                <div className="text-3xl font-black text-blockbuster-yellow">
+                <div className="text-3xl font-black text-blobbuster-yellow">
                   {(parseFloat(analytics?.totalEarnings || '0') / 1e9).toFixed(2)} SUI
                 </div>
                 <div className="text-xs text-gray-500 mt-1 uppercase">Lifetime</div>
               </div>
 
-              <div className="blockbuster-card p-6 rounded-lg">
+              <div className="blobbuster-card p-6 rounded-lg">
                 <div className="text-gray-400 text-sm mb-2 uppercase font-bold">Pending</div>
-                <div className="text-3xl font-black text-blockbuster-yellow">
+                <div className="text-3xl font-black text-blobbuster-yellow">
                   {(parseFloat(analytics?.pendingEarnings || '0') / 1e9).toFixed(2)} SUI
                 </div>
                 <div className="text-xs text-gray-500 mt-1 uppercase">This week</div>
               </div>
 
-              <div className="blockbuster-card p-6 rounded-lg">
+              <div className="blobbuster-card p-6 rounded-lg">
                 <div className="text-gray-400 text-sm mb-2 uppercase font-bold">Total Streams</div>
-                <div className="text-3xl font-black text-blockbuster-yellow">
+                <div className="text-3xl font-black text-blobbuster-yellow">
                   {analytics?.totalStreams || 0}
                 </div>
                 <div className="text-xs text-gray-500 mt-1 uppercase">All content</div>
               </div>
 
-              <div className="blockbuster-card p-6 rounded-lg">
+              <div className="blobbuster-card p-6 rounded-lg">
                 <div className="text-gray-400 text-sm mb-2 uppercase font-bold">Avg. Completion</div>
-                <div className="text-3xl font-black text-blockbuster-yellow">
+                <div className="text-3xl font-black text-blobbuster-yellow">
                   {analytics?.averageCompletion || 0}%
                 </div>
                 <div className="text-xs text-gray-500 mt-1 uppercase">Watch rate</div>
@@ -323,12 +323,12 @@ export default function UploaderPage() {
 
           {/* Referral Stats Section */}
           {isUploader && analytics?.referralCode && (
-            <div className="mb-12 blockbuster-card rounded-lg p-6">
+            <div className="mb-12 blobbuster-card rounded-lg p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-left">
                   <h3 className="text-lg font-bold text-gray-400 uppercase mb-2">Your Referral Code</h3>
                   <div className="flex items-center gap-4">
-                    <div className="text-4xl font-black text-blockbuster-gold tracking-widest">
+                    <div className="text-4xl font-black text-blobbuster-gold tracking-widest">
                       {analytics.referralCode}
                     </div>
                     <button
@@ -374,9 +374,9 @@ export default function UploaderPage() {
           {!isUploader ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               {/* Register as Provider */}
-              <div className="blockbuster-card rounded-lg p-8">
+              <div className="blobbuster-card rounded-lg p-8">
                 <div className="text-4xl mb-4">🎬</div>
-                <h3 className="text-2xl blockbuster-title mb-4">
+                <h3 className="text-2xl blobbuster-title mb-4">
                   Become a Provider
                 </h3>
                 <p className="text-gray-300 mb-6">
@@ -393,7 +393,7 @@ export default function UploaderPage() {
               </div>
 
               {/* Upload Content - Disabled */}
-              <div className="bg-blockbuster-darkBlue/50 rounded-lg p-8 border-3 border-gray-600/50 opacity-60">
+              <div className="bg-blobbuster-darkBlue/50 rounded-lg p-8 border-3 border-gray-600/50 opacity-60">
                 <div className="text-4xl mb-4">📤</div>
                 <h3 className="text-2xl font-heading text-gray-400 mb-4 uppercase">
                   Upload Content
@@ -421,28 +421,28 @@ export default function UploaderPage() {
           )}
 
           {/* How It Works */}
-          <div className="blockbuster-card rounded-lg p-8 mb-12">
-            <h3 className="text-2xl blockbuster-title mb-6 text-center">
+          <div className="blobbuster-card rounded-lg p-8 mb-12">
+            <h3 className="text-2xl blobbuster-title mb-6 text-center">
               How Provider Earnings Work
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="text-5xl mb-4 text-blockbuster-yellow font-black">70%</div>
-                <h4 className="font-bold mb-2 text-blockbuster-yellow uppercase">Revenue Share</h4>
+                <div className="text-5xl mb-4 text-blobbuster-yellow font-black">70%</div>
+                <h4 className="font-bold mb-2 text-blobbuster-yellow uppercase">Revenue Share</h4>
                 <p className="text-sm text-gray-400">
                   You earn 70% of all subscription fees. Platform takes only 30%.
                 </p>
               </div>
               <div className="text-center">
                 <div className="text-5xl mb-4">⭐</div>
-                <h4 className="font-bold mb-2 text-blockbuster-yellow uppercase">Weighted Scoring</h4>
+                <h4 className="font-bold mb-2 text-blobbuster-yellow uppercase">Weighted Scoring</h4>
                 <p className="text-sm text-gray-400">
                   Earn more for high-completion content. 1.5x bonus for 80%+ watch rate.
                 </p>
               </div>
               <div className="text-center">
                 <div className="text-5xl mb-4">📅</div>
-                <h4 className="font-bold mb-2 text-blockbuster-yellow uppercase">Weekly Payouts</h4>
+                <h4 className="font-bold mb-2 text-blobbuster-yellow uppercase">Weekly Payouts</h4>
                 <p className="text-sm text-gray-400">
                   Automatic distribution every Sunday. Paid directly to your wallet.
                 </p>
@@ -454,7 +454,7 @@ export default function UploaderPage() {
           {isUploader && (
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl blockbuster-title">
+                <h3 className="text-2xl blobbuster-title">
                   Your Content
                 </h3>
                 <button
@@ -492,17 +492,17 @@ export default function UploaderPage() {
                     return (
                       <div
                         key={upload.contentId}
-                        className="blockbuster-card rounded-lg p-6 animate-pulse-slow"
+                        className="blobbuster-card rounded-lg p-6 animate-pulse-slow"
                       >
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-blockbuster-yellow/20 rounded-lg flex items-center justify-center">
-                              <svg className="w-6 h-6 text-blockbuster-yellow animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="w-12 h-12 bg-blobbuster-yellow/20 rounded-lg flex items-center justify-center">
+                              <svg className="w-6 h-6 text-blobbuster-yellow animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                               </svg>
                             </div>
                             <div>
-                              <h4 className="font-bold text-lg text-blockbuster-yellow uppercase">Processing Upload</h4>
+                              <h4 className="font-bold text-lg text-blobbuster-yellow uppercase">Processing Upload</h4>
                               <p className="text-sm text-gray-400">
                                 {formatSize(upload.fileSize) && `${formatSize(upload.fileSize)} • `}
                                 Content ID: {upload.contentId.slice(0, 8)}...
@@ -510,7 +510,7 @@ export default function UploaderPage() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-2xl font-black text-blockbuster-yellow">{upload.progress}%</div>
+                            <div className="text-2xl font-black text-blobbuster-yellow">{upload.progress}%</div>
                             <p className="text-xs text-gray-400 capitalize">{upload.status}</p>
                           </div>
                         </div>
@@ -519,14 +519,14 @@ export default function UploaderPage() {
                           <div className="flex justify-between text-sm mb-1">
                             <span className="text-gray-300">{upload.currentStep}</span>
                             {upload.estimatedTimeRemaining > 0 && (
-                              <span className="text-blockbuster-yellow font-medium">
+                              <span className="text-blobbuster-yellow font-medium">
                                 {formatTime(upload.estimatedTimeRemaining)}
                               </span>
                             )}
                           </div>
                           <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                             <div
-                              className="bg-blockbuster-yellow h-full transition-all duration-300"
+                              className="bg-blobbuster-yellow h-full transition-all duration-300"
                               style={{ width: `${upload.progress}%` }}
                             />
                           </div>
@@ -545,9 +545,9 @@ export default function UploaderPage() {
 
               {content.length === 0 && activeUploads.length === 0 ? (
                 /* Empty State */
-                <div className="bg-blockbuster-darkBlue/50 rounded-lg p-12 border-3 border-dashed border-blockbuster-yellow/30 text-center">
+                <div className="bg-blobbuster-darkBlue/50 rounded-lg p-12 border-3 border-dashed border-blobbuster-yellow/30 text-center">
                   <div className="text-6xl mb-4">🎥</div>
-                  <h4 className="text-xl font-bold mb-2 text-blockbuster-yellow uppercase">No Content Yet</h4>
+                  <h4 className="text-xl font-bold mb-2 text-blobbuster-yellow uppercase">No Content Yet</h4>
                   <p className="text-gray-400 mb-6">
                     Upload your first movie or show to start earning
                   </p>
@@ -585,7 +585,7 @@ export default function UploaderPage() {
                       <div
                         key={item.id}
                         onClick={() => handleViewDetails(item)}
-                        className="blockbuster-card rounded-lg p-6 hover:shadow-blockbuster-hover hover:transform hover:-translate-x-0.5 hover:-translate-y-0.5 transition cursor-pointer"
+                        className="blobbuster-card rounded-lg p-6 hover:shadow-blobbuster-hover hover:transform hover:-translate-x-0.5 hover:-translate-y-0.5 transition cursor-pointer"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
@@ -604,7 +604,7 @@ export default function UploaderPage() {
                             )}
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-bold text-lg text-blockbuster-yellow uppercase">{item.title}</h4>
+                                <h4 className="font-bold text-lg text-blobbuster-yellow uppercase">{item.title}</h4>
                                 {expirationWarning && (
                                   <span className={`${expirationWarning.color} px-2 py-1 rounded text-xs font-bold text-white`}>
                                     ⚠️ {expirationWarning.message}
@@ -618,7 +618,7 @@ export default function UploaderPage() {
                                 Status:{' '}
                                 <span
                                   className={
-                                    item.status === 1 ? 'text-blockbuster-yellow' : item.status === 2 ? 'text-red-400' : 'text-gray-400'
+                                    item.status === 1 ? 'text-blobbuster-yellow' : item.status === 2 ? 'text-red-400' : 'text-gray-400'
                                   }
                                 >
                                   {item.status === 1 ? 'Active' : item.status === 2 ? 'Expired' : 'Inactive'}
@@ -632,7 +632,7 @@ export default function UploaderPage() {
                           </div>
                           <div className="text-right flex flex-col gap-2">
                             <div>
-                              <div className="text-2xl font-black text-blockbuster-yellow">
+                              <div className="text-2xl font-black text-blobbuster-yellow">
                                 {(item.totalStreams ? parseInt(item.totalStreams) : 0).toLocaleString()}
                               </div>
                               <p className="text-xs text-gray-400 uppercase">streams</p>
@@ -660,12 +660,12 @@ export default function UploaderPage() {
 
           {/* FAQ */}
           <div className="mt-16">
-            <h3 className="text-2xl blockbuster-title mb-6 text-center">
+            <h3 className="text-2xl blobbuster-title mb-6 text-center">
               Provider FAQ
             </h3>
             <div className="space-y-4 max-w-3xl mx-auto">
-              <details className="blockbuster-card rounded-lg p-6">
-                <summary className="font-bold cursor-pointer text-blockbuster-yellow uppercase">
+              <details className="blobbuster-card rounded-lg p-6">
+                <summary className="font-bold cursor-pointer text-blobbuster-yellow uppercase">
                   What content can I upload?
                 </summary>
                 <p className="text-gray-400 mt-3 text-sm">
@@ -675,8 +675,8 @@ export default function UploaderPage() {
                 </p>
               </details>
 
-              <details className="blockbuster-card rounded-lg p-6">
-                <summary className="font-bold cursor-pointer text-blockbuster-yellow uppercase">
+              <details className="blobbuster-card rounded-lg p-6">
+                <summary className="font-bold cursor-pointer text-blobbuster-yellow uppercase">
                   How is my revenue calculated?
                 </summary>
                 <p className="text-gray-400 mt-3 text-sm">
@@ -686,8 +686,8 @@ export default function UploaderPage() {
                 </p>
               </details>
 
-              <details className="blockbuster-card rounded-lg p-6">
-                <summary className="font-bold cursor-pointer text-blockbuster-yellow uppercase">
+              <details className="blobbuster-card rounded-lg p-6">
+                <summary className="font-bold cursor-pointer text-blobbuster-yellow uppercase">
                   When do I get paid?
                 </summary>
                 <p className="text-gray-400 mt-3 text-sm">
@@ -696,8 +696,8 @@ export default function UploaderPage() {
                 </p>
               </details>
 
-              <details className="blockbuster-card rounded-lg p-6">
-                <summary className="font-bold cursor-pointer text-blockbuster-yellow uppercase">
+              <details className="blobbuster-card rounded-lg p-6">
+                <summary className="font-bold cursor-pointer text-blobbuster-yellow uppercase">
                   What formats are supported?
                 </summary>
                 <p className="text-gray-400 mt-3 text-sm">

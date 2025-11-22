@@ -162,14 +162,14 @@ export function MovieDetailsModal({
       />
 
       {/* Modal */}
-      <div className="relative z-10 bg-gradient-to-br from-blockbuster-navy to-blockbuster-darkBlue border-3 border-blockbuster-yellow rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy to-blobbuster-darkBlue border-3 border-blobbuster-yellow rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         {/* Backdrop Image Header */}
         {content.backdropUrl && (
           <div
             className="h-80 bg-cover bg-center relative rounded-t-lg"
             style={{ backgroundImage: `url(${content.backdropUrl})` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-blockbuster-navy via-blockbuster-navy/60 to-transparent rounded-t-lg" />
+            <div className="absolute inset-0 bg-gradient-to-t from-blobbuster-navy via-blobbuster-navy/60 to-transparent rounded-t-lg" />
 
             {/* Close button */}
             <button
@@ -204,9 +204,9 @@ export function MovieDetailsModal({
 
         {/* Header (if no backdrop) */}
         {!content.backdropUrl && (
-          <div className="bg-blockbuster-navy border-b-3 border-blockbuster-yellow p-6">
+          <div className="bg-blobbuster-navy border-b-3 border-blobbuster-yellow p-6">
             <div className="flex items-start justify-between">
-              <h2 className="text-3xl font-heading text-blockbuster-yellow uppercase">
+              <h2 className="text-3xl font-heading text-blobbuster-yellow uppercase">
                 Movie Details
               </h2>
               <button
@@ -231,13 +231,13 @@ export function MovieDetailsModal({
                 <img
                   src={content.posterUrl || content.thumbnailUrl}
                   alt={content.title}
-                  className="w-64 rounded-lg shadow-blockbuster border-3 border-blockbuster-yellow"
+                  className="w-64 rounded-lg shadow-blobbuster border-3 border-blobbuster-yellow"
                 />
                 {/* Rating on poster */}
                 {content.externalRating && (
-                  <div className="mt-4 text-center bg-blockbuster-navy/80 py-3 rounded-lg border-2 border-blockbuster-yellow">
+                  <div className="mt-4 text-center bg-blobbuster-navy/80 py-3 rounded-lg border-2 border-blobbuster-yellow">
                     <span className="text-3xl">⭐</span>
-                    <span className="ml-2 text-2xl font-black text-blockbuster-yellow">
+                    <span className="ml-2 text-2xl font-black text-blobbuster-yellow">
                       {content.externalRating.toFixed(1)}
                     </span>
                     <span className="text-gray-400 text-sm ml-1">/10</span>
@@ -262,17 +262,17 @@ export function MovieDetailsModal({
               {/* Meta Info */}
               <div className="flex flex-wrap gap-3 mb-6">
                 {content.year && (
-                  <span className="px-4 py-2 bg-blockbuster-darkBlue rounded-full text-blockbuster-yellow font-bold border-2 border-blockbuster-yellow/30">
+                  <span className="px-4 py-2 bg-blobbuster-darkBlue rounded-full text-blobbuster-yellow font-bold border-2 border-blobbuster-yellow/30">
                     {content.year}
                   </span>
                 )}
                 {(content.runtime || content.duration) && (
-                  <span className="px-4 py-2 bg-blockbuster-darkBlue rounded-full text-white font-bold border-2 border-neon-cyan/30">
+                  <span className="px-4 py-2 bg-blobbuster-darkBlue rounded-full text-white font-bold border-2 border-neon-cyan/30">
                     {content.runtime || Math.floor((content.duration || 0) / 60)} min
                   </span>
                 )}
                 {genres.length > 0 && genres.slice(0, 3).map((genre: string, idx: number) => (
-                  <span key={idx} className="px-4 py-2 bg-blockbuster-darkBlue rounded-full text-neon-cyan font-bold border-2 border-neon-cyan/30">
+                  <span key={idx} className="px-4 py-2 bg-blobbuster-darkBlue rounded-full text-neon-cyan font-bold border-2 border-neon-cyan/30">
                     {genre}
                   </span>
                 ))}
@@ -280,7 +280,7 @@ export function MovieDetailsModal({
 
               {/* Description/Plot */}
               <div className="mb-6">
-                <h3 className="text-xl font-heading text-blockbuster-gold uppercase mb-2">
+                <h3 className="text-xl font-heading text-blobbuster-gold uppercase mb-2">
                   Plot
                 </h3>
                 <p className="text-gray-300 leading-relaxed text-lg">
@@ -291,13 +291,13 @@ export function MovieDetailsModal({
               {/* Director & Views */}
               <div className="grid grid-cols-2 gap-4">
                 {content.director && (
-                  <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 border-2 border-blockbuster-yellow/20">
+                  <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 border-2 border-blobbuster-yellow/20">
                     <p className="text-xs text-gray-400 uppercase mb-1">Director</p>
                     <p className="text-white font-bold text-lg">{content.director}</p>
                   </div>
                 )}
                 {content.totalStreams !== undefined && (
-                  <div className="bg-blockbuster-darkBlue/50 rounded-lg p-4 border-2 border-neon-cyan/20">
+                  <div className="bg-blobbuster-darkBlue/50 rounded-lg p-4 border-2 border-neon-cyan/20">
                     <p className="text-xs text-gray-400 uppercase mb-1">Views</p>
                     <p className="text-neon-cyan font-bold text-lg">
                       {content.totalStreams.toLocaleString()}
@@ -310,8 +310,8 @@ export function MovieDetailsModal({
 
           {/* Cast */}
           {castList.length > 0 && (
-            <div className="bg-blockbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
-              <h3 className="text-xl font-heading text-blockbuster-gold uppercase mb-4">
+            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
+              <h3 className="text-xl font-heading text-blobbuster-gold uppercase mb-4">
                 Cast
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -321,7 +321,7 @@ export function MovieDetailsModal({
                       <img
                         src={actor.profilePath}
                         alt={actor.name}
-                        className="w-full aspect-square rounded-full object-cover mb-2 border-3 border-blockbuster-yellow/30"
+                        className="w-full aspect-square rounded-full object-cover mb-2 border-3 border-blobbuster-yellow/30"
                       />
                     )}
                     <p className="text-sm font-bold text-white truncate">{actor.name}</p>
@@ -359,7 +359,7 @@ export function MovieDetailsModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-blockbuster-navy border-t-3 border-blockbuster-yellow p-6">
+        <div className="sticky bottom-0 bg-blobbuster-navy border-t-3 border-blobbuster-yellow p-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={onClose}
@@ -387,11 +387,11 @@ export function MovieDetailsModal({
         {showTipModal && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
             <div className="fixed inset-0 bg-black/95 backdrop-blur-sm" onClick={() => !isTipping && setShowTipModal(false)} />
-            <div className="relative z-10 bg-gradient-to-br from-blockbuster-navy via-blockbuster-darkBlue to-black border-4 border-blockbuster-gold rounded-2xl p-8 max-w-lg w-full shadow-2xl shadow-blockbuster-gold/30 animate-in zoom-in duration-300">
+            <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy via-blobbuster-darkBlue to-black border-4 border-blobbuster-gold rounded-2xl p-8 max-w-lg w-full shadow-2xl shadow-blobbuster-gold/30 animate-in zoom-in duration-300">
               {/* Header */}
               <div className="text-center mb-8">
                 <div className="text-6xl mb-4">💰</div>
-                <h3 className="text-4xl font-heading text-blockbuster-gold mb-2 uppercase tracking-wider">
+                <h3 className="text-4xl font-heading text-blobbuster-gold mb-2 uppercase tracking-wider">
                   TIP THE PROVIDER
                 </h3>
                 <p className="text-neon-cyan text-lg font-bold">
@@ -432,7 +432,7 @@ export function MovieDetailsModal({
                       onChange={(e) => setTipAmount(e.target.value)}
                       min="0.01"
                       step="0.01"
-                      className="flex-1 px-6 py-4 bg-blockbuster-darkBlue border-3 border-neon-cyan/30 rounded-xl text-white text-lg placeholder-gray-500 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/50"
+                      className="flex-1 px-6 py-4 bg-blobbuster-darkBlue border-3 border-neon-cyan/30 rounded-xl text-white text-lg placeholder-gray-500 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/50"
                       disabled={isTipping}
                     />
                     <button

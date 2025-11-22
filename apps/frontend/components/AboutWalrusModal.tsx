@@ -62,10 +62,10 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-blockbuster-navy border-2 border-neon-cyan rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-blobbuster-navy border-2 border-neon-cyan rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-blockbuster-navy border-b border-neon-cyan/30 p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-heading text-blockbuster-gold">
+        <div className="sticky top-0 bg-blobbuster-navy border-b border-neon-cyan/30 p-6 flex items-center justify-between">
+          <h2 className="text-2xl font-heading text-blobbuster-gold">
             About Walrus Storage
           </h2>
           <button
@@ -98,8 +98,8 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
               How Does It Work?
             </h3>
             <div className="space-y-4">
-              <div className="bg-blockbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
-                <h4 className="font-semibold text-blockbuster-gold mb-2">
+              <div className="bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
+                <h4 className="font-semibold text-blobbuster-gold mb-2">
                   1. Erasure Coding (5x Redundancy)
                 </h4>
                 <p className="text-gray-300 text-sm">
@@ -110,8 +110,8 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
                 </p>
               </div>
 
-              <div className="bg-blockbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
-                <h4 className="font-semibold text-blockbuster-gold mb-2">
+              <div className="bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
+                <h4 className="font-semibold text-blobbuster-gold mb-2">
                   2. Epoch-Based Storage
                 </h4>
                 <p className="text-gray-300 text-sm">
@@ -120,8 +120,8 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
                 </p>
               </div>
 
-              <div className="bg-blockbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
-                <h4 className="font-semibold text-blockbuster-gold mb-2">
+              <div className="bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
+                <h4 className="font-semibold text-blobbuster-gold mb-2">
                   3. Sui Blockchain Integration
                 </h4>
                 <p className="text-gray-300 text-sm">
@@ -131,8 +131,8 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
                 </p>
               </div>
 
-              <div className="bg-blockbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
-                <h4 className="font-semibold text-blockbuster-gold mb-2">
+              <div className="bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
+                <h4 className="font-semibold text-blobbuster-gold mb-2">
                   4. Decentralized Retrieval
                 </h4>
                 <p className="text-gray-300 text-sm">
@@ -206,7 +206,7 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
               <h3 className="text-xl font-heading text-neon-cyan mb-3">
                 Network Status
               </h3>
-              <div className="bg-blockbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
+              <div className="bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4">
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-gray-400">Network</p>
@@ -234,7 +234,7 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
             <h3 className="text-xl font-heading text-neon-cyan mb-3">
               Pricing Model
             </h3>
-            <div className="bg-blockbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4 space-y-3">
+            <div className="bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg p-4 space-y-3">
               <div>
                 <h4 className="font-semibold text-white mb-2">Storage Costs (per epoch)</h4>
                 <p className="text-gray-300 text-sm">
@@ -260,7 +260,7 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
           </section>
 
           {/* Mainnet Launch */}
-          <section className="bg-gradient-to-r from-neon-cyan/10 to-blockbuster-gold/10 border border-neon-cyan/30 rounded-lg p-6">
+          <section className="bg-gradient-to-r from-neon-cyan/10 to-blobbuster-gold/10 border border-neon-cyan/30 rounded-lg p-6">
             <h3 className="text-xl font-heading text-neon-cyan mb-2">
               Mainnet Launch: March 2025
             </h3>
@@ -299,7 +299,7 @@ export function AboutWalrusModal({ isOpen, onClose }: AboutWalrusModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-blockbuster-navy border-t border-neon-cyan/30 p-4">
+        <div className="sticky bottom-0 bg-blobbuster-navy border-t border-neon-cyan/30 p-4">
           <button
             onClick={onClose}
             className="w-full px-6 py-3 bg-neon-cyan text-black font-bold rounded hover:bg-neon-cyan/80 transition"

@@ -142,7 +142,7 @@ export default function WatchPage({ params }: { params: { id: string } }) {
 
   if (isLoading && !content) {
     return (
-      <div className="min-h-screen bg-blockbuster-navy flex items-center justify-center">
+      <div className="min-h-screen bg-blobbuster-navy flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-neon-cyan mx-auto mb-4"></div>
           <p className="text-gray-300">Loading content...</p>
@@ -155,12 +155,12 @@ export default function WatchPage({ params }: { params: { id: string } }) {
     const isMembershipError = error.includes('membership') || error.includes('Membership');
 
     return (
-      <div className="min-h-screen bg-blockbuster-navy flex items-center justify-center p-4">
+      <div className="min-h-screen bg-blobbuster-navy flex items-center justify-center p-4">
         {/* Backdrop */}
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm"></div>
 
         {/* Modal */}
-        <div className="relative z-10 bg-gradient-to-br from-blockbuster-navy to-blockbuster-navy/90 border-2 border-neon-cyan/30 rounded-xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300">
+        <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy to-blobbuster-navy/90 border-2 border-neon-cyan/30 rounded-xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300">
           <div className="text-center">
             {/* Icon */}
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-neon-pink/20 flex items-center justify-center">
@@ -180,14 +180,14 @@ export default function WatchPage({ params }: { params: { id: string } }) {
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl font-heading text-blockbuster-gold mb-4">
+            <h2 className="text-2xl font-heading text-blobbuster-gold mb-4">
               {isMembershipError ? 'Membership Required' : 'Oops!'}
             </h2>
 
             {/* Message */}
             <p className="text-gray-300 mb-8 leading-relaxed">
               {isMembershipError
-                ? 'You need an active Blockbuster membership to watch content. Get instant access to our entire library!'
+                ? 'You need an active BlobBuster membership to watch content. Get instant access to our entire library!'
                 : error
               }
             </p>
@@ -217,7 +217,7 @@ export default function WatchPage({ params }: { params: { id: string } }) {
 
   if (!content) {
     return (
-      <div className="min-h-screen bg-blockbuster-navy flex items-center justify-center">
+      <div className="min-h-screen bg-blobbuster-navy flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-300">Content not found</p>
         </div>
@@ -229,7 +229,7 @@ export default function WatchPage({ params }: { params: { id: string } }) {
   console.log('isLoading:', isLoading, 'content:', content);
 
   return (
-    <div className="min-h-screen bg-blockbuster-navy">
+    <div className="min-h-screen bg-blobbuster-navy">
       <Header />
       {/* Video Player */}
       <div className="relative">
@@ -256,7 +256,7 @@ export default function WatchPage({ params }: { params: { id: string } }) {
       {/* Content Info */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl">
-          <h1 className="text-4xl font-heading text-blockbuster-gold mb-4">
+          <h1 className="text-4xl font-heading text-blobbuster-gold mb-4">
             {content.title}
           </h1>
 
