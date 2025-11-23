@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -9,6 +9,7 @@ import { WalrusCostCalculator } from '@/components/WalrusCostCalculator';
 import { AboutWalrusModal } from '@/components/AboutWalrusModal';
 import { useCurrentAccount, useSignAndExecuteTransactionBlock, useSuiClient } from '@mysten/dapp-kit';
 import { payForWalrusStorage, checkWalletBalance } from '@/lib/walrusPayment';
+import { useChunkedUpload } from '@/hooks/useChunkedUpload';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -51,6 +52,7 @@ export default function UploadPage() {
   const currentAccount = useCurrentAccount();
   const { mutateAsync: signAndExecuteTransaction } = useSignAndExecuteTransactionBlock();
   const suiClient = useSuiClient();
+  const { uploadFile, isUploading: isChunkUploading, uploadProgress: chunkProgress, statusMessage } = useChunkedUpload();
 
   // Step 1: File selection
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -84,6 +86,13 @@ export default function UploadPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const PLATFORM_WALLET = process.env.NEXT_PUBLIC_PLATFORM_WALLET || '0x0';
+
+  // Sync chunked upload progress to UI
+  useEffect(() => {
+    if (isChunkUploading) {
+      setUploadProgress(chunkProgress);
+    }
+  }, [isChunkUploading, chunkProgress]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -364,41 +373,33 @@ export default function UploadPage() {
     setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append('video', videoFile);
-      formData.append('title', title || videoFile.name);
-      formData.append('description', description || 'Auto-generated from TMDB');
-      formData.append('genre', genre.toString());
-      formData.append('epochs', storageEpochs.toString()); // User-selected storage duration
-      formData.append('paymentDigest', paymentDigest); // Payment proof
-      formData.append('paidAmount', costEstimate!.costs.totalWithGas.toString()); // Amount user paid
-
-      const response = await axios.post(`${API_URL}/api/upload/content`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${accessToken}`,
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
-          setUploadProgress(percentCompleted);
-        },
+      const result = await uploadFile({
+        file: videoFile,
+        title: title || videoFile.name,
+        description: description || 'Auto-generated from TMDB',
+        genre,
+        epochs: storageEpochs,
+        paymentDigest,
+        paidAmount: costEstimate!.costs.totalWithGas.toString(),
+        accessToken,
+        onProgress: (progress) => setUploadProgress(progress),
+        onStatusUpdate: (status) => console.log('Status:', status),
       });
 
-      if (response.data.success) {
+      if (result.success && result.contentId) {
         setSuccess(true);
-
-        if (response.data.contentId) {
-          localStorage.setItem('latest_upload_id', response.data.contentId);
-        }
+        localStorage.setItem('latest_upload_id', result.contentId);
 
         setTimeout(() => {
           router.push('/uploader');
         }, 2000);
+      } else {
+        setError(result.error || 'Upload failed');
+        setIsUploading(false);
       }
     } catch (error: any) {
       console.error('Upload failed:', error);
-      setError(error.response?.data?.error || 'Failed to upload content');
-    } finally {
+      setError(error.message || 'Failed to upload content');
       setIsUploading(false);
     }
   };

@@ -185,4 +185,45 @@ model users {
   memberships       memberships[]
   streams           streams[]
   uploader_profiles uploader_profiles?
+  upload_sessions   upload_sessions[]
+}
+
+model upload_sessions {
+  id                String    @id @default(uuid())
+  uploader_id       String
+  file_name         String    @db.VarChar(255)
+  file_size         BigInt
+  total_chunks      Int
+  chunks_received   Int       @default(0)
+
+  // Metadata
+  title             String    @db.VarChar(255)
+  description       String?   @db.Text
+  genre             Int
+  epochs            Int
+
+  // Payment verification
+  payment_digest    String    @unique @db.VarChar(255)
+  paid_amount       String    @db.VarChar(100)
+
+  // Status tracking
+  status            String    @default("receiving_chunks") @db.VarChar(50)
+  progress          Int       @default(0)
+  error_message     String?   @db.Text
+
+  // Result
+  content_id        String?
+  video_blob_id     String?   @db.VarChar(255)
+  thumbnail_blob_id String?   @db.VarChar(255)
+
+  // Timestamps
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  completed_at      DateTime?
+
+  uploader          users     @relation(fields: [uploader_id], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([uploader_id])
+  @@index([created_at])
 }
