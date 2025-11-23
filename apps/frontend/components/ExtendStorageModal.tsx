@@ -319,14 +319,14 @@ export function ExtendStorageModal({
 
           {/* Cost Estimate */}
           {isCalculating ? (
-            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
-              <div className="flex items-center justify-center gap-3">
+            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 min-h-[300px] flex items-center justify-center">
+              <div className="flex items-center gap-3">
                 <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-neon-cyan"></div>
                 <p className="text-gray-300">Calculating cost...</p>
               </div>
             </div>
           ) : costEstimate ? (
-            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4">
+            <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4 min-h-[300px]">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-heading text-blobbuster-gold">
                   Extension Cost
