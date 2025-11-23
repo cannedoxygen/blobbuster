@@ -1,10 +1,14 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs/promises';
 import { authMiddleware, requireUploader } from '../middleware/auth.middleware';
 import { getUploadService } from '../services/upload.service';
 import { getSuiBlockchainService } from '../services/suiBlockchain.service';
 import { getPaymentVerificationService } from '../services/paymentVerification.service';
+import { getWalrusService } from '../services/walrus.service';
+import { TranscodingService } from '../services/transcoding.service';
+import { getMetadataService } from '../services/metadata.service';
 import { prisma } from '../config/database';
 import { logger } from '../utils/logger';
 import type { ContentGenre } from '@blobbuster/shared-types';
@@ -12,6 +16,9 @@ import type { ContentGenre } from '@blobbuster/shared-types';
 const router = Router();
 const uploadService = getUploadService();
 const suiService = getSuiBlockchainService();
+const walrusService = getWalrusService();
+const transcodingService = new TranscodingService();
+const metadataService = getMetadataService();
 
 // Configure multer for file uploads
 const uploadDir = process.env.UPLOAD_DIR || '/tmp/uploads';
@@ -411,23 +418,15 @@ router.get('/my-content', authMiddleware, requireUploader, async (req: Request, 
       });
     }
 
-    // Get all content for this uploader (excluding deleted)
+    // Get all content for this uploader
     const [content, total] = await Promise.all([
       prisma.content.findMany({
-        where: {
-          uploader_id: uploaderProfile.id,
-          status: { not: 3 }, // Exclude deleted content
-        },
+        where: { uploader_id: uploaderProfile.id },
         orderBy: { created_at: 'desc' },
         take: limit,
         skip: offset,
       }),
-      prisma.content.count({
-        where: {
-          uploader_id: uploaderProfile.id,
-          status: { not: 3 }, // Exclude deleted content
-        },
-      }),
+      prisma.content.count({ where: { uploader_id: uploaderProfile.id } }),
     ]);
 
     // Convert BigInt fields to Numbers and normalize to camelCase for frontend
@@ -711,86 +710,540 @@ router.post('/extend-storage/:contentId', authMiddleware, requireUploader, async
   }
 });
 
+// ==========================================
+// CHUNKED UPLOAD ENDPOINTS (YouTube-style)
+// ==========================================
+
 /**
- * DELETE /api/upload/:contentId
- * Soft delete content by setting status to 3 (deleted)
- * Requires: Authentication + Uploader status + Content ownership
+ * POST /api/upload/initiate
+ * Initiate a chunked upload session
  */
-router.delete('/:contentId', authMiddleware, requireUploader, async (req: Request, res: Response) => {
+router.post('/initiate', authMiddleware, requireUploader, async (req: Request, res: Response) => {
   try {
-    const userId = req.user!.userId;
-    const { contentId } = req.params;
+    const { fileName, fileSize, totalChunks, title, description, genre, epochs, paymentDigest, paidAmount } =
+      req.body;
 
-    // Get uploader profile
-    const uploaderProfile = await prisma.uploader_profiles.findUnique({
-      where: { user_id: userId },
-    });
-
-    if (!uploaderProfile) {
-      return res.status(404).json({
-        success: false,
-        error: 'Uploader profile not found',
-      });
-    }
-
-    // Find content and verify ownership
-    const content = await prisma.content.findUnique({
-      where: { id: contentId },
-    });
-
-    if (!content) {
-      return res.status(404).json({
-        success: false,
-        error: 'Content not found',
-      });
-    }
-
-    // Verify user owns this content
-    if (content.uploader_id !== uploaderProfile.id) {
-      return res.status(403).json({
-        success: false,
-        error: 'You do not have permission to delete this content',
-      });
-    }
-
-    // Check if already deleted
-    if (content.status === 3) {
+    if (
+      !fileName ||
+      !fileSize ||
+      !totalChunks ||
+      !title ||
+      genre === undefined ||
+      !epochs ||
+      !paymentDigest ||
+      !paidAmount
+    ) {
       return res.status(400).json({
         success: false,
-        error: 'Content is already deleted',
+        error: 'Missing required fields',
       });
     }
 
-    // Soft delete - set status to 3
-    await prisma.content.update({
-      where: { id: contentId },
+    // Verify payment digest hasn't been used before
+    const existingPayment = await prisma.content.findUnique({
+      where: { payment_tx_digest: paymentDigest },
+    });
+
+    const existingSession = await prisma.upload_sessions.findUnique({
+      where: { payment_digest: paymentDigest },
+    });
+
+    if (existingPayment || existingSession) {
+      return res.status(400).json({
+        success: false,
+        error: 'Payment digest already used',
+      });
+    }
+
+    // Create upload session
+    const session = await prisma.upload_sessions.create({
       data: {
-        status: 3,
-        updated_at: new Date(),
+        uploader_id: req.user!.id,
+        file_name: fileName,
+        file_size: BigInt(fileSize),
+        total_chunks: totalChunks,
+        title,
+        description: description || null,
+        genre,
+        epochs,
+        payment_digest: paymentDigest,
+        paid_amount: paidAmount,
+        status: 'receiving_chunks',
+        progress: 0,
       },
     });
 
-    logger.info('Content soft deleted', {
-      contentId,
-      userId,
-      uploaderId: uploaderProfile.id,
-      title: content.title,
+    // Create temporary directory for chunks
+    const uploadDir = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', session.id, 'chunks');
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    logger.info('Chunked upload session created', {
+      sessionId: session.id,
+      fileName,
+      fileSize,
+      totalChunks,
     });
 
     res.json({
       success: true,
-      message: 'Content deleted successfully',
+      uploadId: session.id,
+      message: 'Upload session created',
     });
   } catch (error) {
-    logger.error('Failed to delete content', {
-      error: error instanceof Error ? error.message : error,
-    });
+    logger.error('Failed to initiate chunked upload', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to delete content',
-      details: error instanceof Error ? error.message : String(error),
+      error: 'Failed to initiate upload',
     });
   }
 });
+
+/**
+ * POST /api/upload/chunk/:uploadId
+ * Upload a single chunk
+ */
+const chunkUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 0.5 * 1024 * 1024 * 1024, // 0.5GB (half a gig) max per chunk
+  },
+});
+
+router.post(
+  '/chunk/:uploadId',
+  authMiddleware,
+  requireUploader,
+  chunkUpload.single('chunk'),
+  async (req: Request, res: Response) => {
+    try {
+      const { uploadId } = req.params;
+      const { chunkIndex } = req.body;
+
+      if (!req.file || chunkIndex === undefined) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing chunk data or index',
+        });
+      }
+
+      // Verify session exists and belongs to user
+      const session = await prisma.upload_sessions.findUnique({
+        where: { id: uploadId },
+      });
+
+      if (!session) {
+        return res.status(404).json({
+          success: false,
+          error: 'Upload session not found',
+        });
+      }
+
+      if (session.uploader_id !== req.user!.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Unauthorized',
+        });
+      }
+
+      if (session.status !== 'receiving_chunks') {
+        return res.status(400).json({
+          success: false,
+          error: `Cannot upload chunks in status: ${session.status}`,
+        });
+      }
+
+      // Save chunk to disk
+      const chunkPath = path.join(
+        process.env.UPLOAD_DIR || '/tmp/uploads',
+        uploadId,
+        'chunks',
+        `chunk-${chunkIndex}`
+      );
+      await fs.writeFile(chunkPath, req.file.buffer);
+
+      // Update chunks received count
+      const updatedSession = await prisma.upload_sessions.update({
+        where: { id: uploadId },
+        data: {
+          chunks_received: session.chunks_received + 1,
+          progress: Math.floor(((session.chunks_received + 1) / session.total_chunks) * 80), // 0-80% for chunks
+        },
+      });
+
+      logger.info('Chunk uploaded', {
+        sessionId: uploadId,
+        chunkIndex,
+        chunksReceived: updatedSession.chunks_received,
+        totalChunks: session.total_chunks,
+      });
+
+      res.json({
+        success: true,
+        chunksReceived: updatedSession.chunks_received,
+        totalChunks: session.total_chunks,
+        message: `Chunk ${updatedSession.chunks_received}/${session.total_chunks} uploaded`,
+      });
+    } catch (error) {
+      logger.error('Failed to upload chunk', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to upload chunk',
+      });
+    }
+  }
+);
+
+/**
+ * POST /api/upload/complete/:uploadId
+ * Complete the upload and trigger background processing
+ */
+router.post(
+  '/complete/:uploadId',
+  authMiddleware,
+  requireUploader,
+  async (req: Request, res: Response) => {
+    try {
+      const { uploadId } = req.params;
+
+      // Verify session exists and belongs to user
+      const session = await prisma.upload_sessions.findUnique({
+        where: { id: uploadId },
+      });
+
+      if (!session) {
+        return res.status(404).json({
+          success: false,
+          error: 'Upload session not found',
+        });
+      }
+
+      if (session.uploader_id !== req.user!.id) {
+        return res.status(403).json({
+          success: false,
+          error: 'Unauthorized',
+        });
+      }
+
+      // Verify all chunks received
+      if (session.chunks_received !== session.total_chunks) {
+        return res.status(400).json({
+          success: false,
+          error: `Missing chunks: ${session.chunks_received}/${session.total_chunks}`,
+        });
+      }
+
+      // Mark as assembling
+      await prisma.upload_sessions.update({
+        where: { id: uploadId },
+        data: {
+          status: 'assembling',
+          progress: 80,
+        },
+      });
+
+      // Trigger background job (DO NOT AWAIT)
+      processUploadInBackground(uploadId).catch((error) => {
+        logger.error('Background processing failed', { uploadId, error });
+      });
+
+      logger.info('Upload complete, processing in background', { sessionId: uploadId });
+
+      res.json({
+        success: true,
+        message: 'Processing upload in background',
+        statusUrl: `/api/upload/status/${uploadId}`,
+      });
+    } catch (error) {
+      logger.error('Failed to complete upload', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to complete upload',
+      });
+    }
+  }
+);
+
+/**
+ * GET /api/upload/status/:uploadId
+ * Get upload session status
+ */
+router.get('/status/:uploadId', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { uploadId } = req.params;
+
+    const session = await prisma.upload_sessions.findUnique({
+      where: { id: uploadId },
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        error: 'Upload session not found',
+      });
+    }
+
+    // Only uploader can check status
+    if (session.uploader_id !== req.user!.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'Unauthorized',
+      });
+    }
+
+    res.json({
+      success: true,
+      status: session.status,
+      progress: session.progress,
+      message: getStatusMessage(session.status),
+      contentId: session.content_id,
+      error: session.error_message,
+    });
+  } catch (error) {
+    logger.error('Failed to get upload status', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get status',
+    });
+  }
+});
+
+// ==========================================
+// BACKGROUND PROCESSING FUNCTIONS
+// ==========================================
+
+/**
+ * Process upload in background (assembles chunks, uploads to Walrus, registers on blockchain)
+ */
+async function processUploadInBackground(uploadId: string): Promise<void> {
+  try {
+    const session = await prisma.upload_sessions.findUnique({
+      where: { id: uploadId },
+    });
+
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    // STEP 1: Assemble chunks
+    await updateSessionStatus(uploadId, 'assembling', 80);
+    const assembledFilePath = await assembleChunks(uploadId, session.file_name);
+
+    // STEP 2: Extract video metadata and generate thumbnail
+    await updateSessionStatus(uploadId, 'analyzing', 85);
+    const metadata = await transcodingService.getVideoMetadata(assembledFilePath);
+
+    // Create work directory for thumbnail
+    const workDir = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', uploadId, 'work');
+    await fs.mkdir(workDir, { recursive: true });
+
+    const thumbnailPath = await transcodingService.generateThumbnail(assembledFilePath, workDir);
+
+    // STEP 3: Upload video to Walrus
+    await updateSessionStatus(uploadId, 'uploading_to_walrus', 90);
+    const videoUploadResult = await walrusService.uploadFile(assembledFilePath, {
+      epochs: session.epochs,
+    });
+
+    // STEP 4: Upload thumbnail to Walrus
+    const thumbnailUploadResult = await walrusService.uploadFile(thumbnailPath, {
+      epochs: session.epochs,
+    });
+
+    // STEP 5: Register on SUI blockchain
+    await updateSessionStatus(uploadId, 'registering_blockchain', 95);
+
+    // Get uploader profile
+    const uploaderProfile = await prisma.uploader_profiles.findUnique({
+      where: { user_id: session.uploader_id },
+    });
+
+    if (!uploaderProfile) {
+      throw new Error('Uploader profile not found');
+    }
+
+    const blockchainResult = await suiService.registerContent(
+      uploaderProfile.blockchain_account_id,
+      session.title,
+      session.description || '',
+      Number(session.genre),
+      Math.floor(metadata.duration),
+      [videoUploadResult.blobId, thumbnailUploadResult.blobId]
+    );
+
+    // STEP 6: Fetch TMDB metadata (optional)
+    let tmdbMetadata = null;
+    if (metadataService && metadataService.isEnabled()) {
+      try {
+        tmdbMetadata = await metadataService.searchMovie(session.title);
+      } catch (error) {
+        logger.warn('Failed to fetch TMDB metadata', { error });
+      }
+    }
+
+    // STEP 7: Save to database
+    const blobIdsString = JSON.stringify({
+      video: videoUploadResult.blobId,
+      thumbnail: thumbnailUploadResult.blobId,
+    });
+
+    await prisma.content.create({
+      data: {
+        id: blockchainResult.contentId,
+        blockchain_id: blockchainResult.contentId,
+        payment_tx_digest: session.payment_digest,
+        uploader_id: uploaderProfile.id,
+        title: tmdbMetadata?.title || session.title,
+        description: tmdbMetadata?.plot || session.description || '',
+        genre: session.genre,
+        duration_seconds: Math.floor(metadata.duration),
+
+        // TMDB metadata
+        tmdb_id: tmdbMetadata?.tmdbId,
+        imdb_id: tmdbMetadata?.imdbId,
+        original_title: tmdbMetadata?.originalTitle,
+        year: tmdbMetadata?.year,
+        plot: tmdbMetadata?.plot,
+        runtime: tmdbMetadata?.runtime,
+        tagline: tmdbMetadata?.tagline,
+        poster_url: tmdbMetadata?.posterUrl,
+        backdrop_url: tmdbMetadata?.backdropUrl,
+        genres_list: tmdbMetadata?.genres ? JSON.stringify(tmdbMetadata.genres) : null,
+        cast: tmdbMetadata?.cast ? JSON.stringify(tmdbMetadata.cast) : null,
+        director: tmdbMetadata?.director,
+        external_rating: tmdbMetadata?.rating,
+        language: tmdbMetadata?.language,
+        country: tmdbMetadata?.country,
+
+        // Storage
+        walrus_blob_ids: blobIdsString,
+        thumbnail_url: tmdbMetadata?.posterUrl || walrusService.getStreamingUrl(thumbnailUploadResult.blobId),
+        storage_epochs: session.epochs,
+        storage_expires_at: new Date(Date.now() + (session.epochs * 14 * 24 * 60 * 60 * 1000)),
+
+        status: 1,
+        updated_at: new Date(),
+      },
+    });
+
+    // Update uploader stats
+    await prisma.uploader_profiles.update({
+      where: { id: uploaderProfile.id },
+      data: {
+        total_content_uploaded: { increment: 1 },
+        updated_at: new Date(),
+      },
+    });
+
+    // STEP 8: Cleanup temp files
+    await cleanupUploadDir(uploadId);
+
+    // STEP 9: Mark complete
+    await prisma.upload_sessions.update({
+      where: { id: uploadId },
+      data: {
+        status: 'complete',
+        progress: 100,
+        content_id: blockchainResult.contentId,
+        video_blob_id: videoUploadResult.blobId,
+        thumbnail_blob_id: thumbnailUploadResult.blobId,
+        completed_at: new Date(),
+      },
+    });
+
+    logger.info('Background processing completed', { uploadId, contentId: blockchainResult.contentId });
+  } catch (error) {
+    logger.error('Background processing failed', { uploadId, error });
+
+    await prisma.upload_sessions.update({
+      where: { id: uploadId },
+      data: {
+        status: 'error',
+        progress: 0,
+        error_message: error instanceof Error ? error.message : String(error),
+      },
+    });
+
+    // Cleanup on error
+    await cleanupUploadDir(uploadId).catch((cleanupError) => {
+      logger.error('Cleanup failed', { uploadId, error: cleanupError });
+    });
+  }
+}
+
+/**
+ * Assemble all chunks into a single file
+ */
+async function assembleChunks(uploadId: string, fileName: string): Promise<string> {
+  const chunksDir = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', uploadId, 'chunks');
+  const outputPath = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', uploadId, fileName);
+
+  // Get all chunk files sorted by index
+  const chunkFiles = await fs.readdir(chunksDir);
+  const sortedChunks = chunkFiles
+    .filter((f) => f.startsWith('chunk-'))
+    .sort((a, b) => {
+      const aIndex = parseInt(a.replace('chunk-', ''));
+      const bIndex = parseInt(b.replace('chunk-', ''));
+      return aIndex - bIndex;
+    });
+
+  // Create write stream for output file
+  const writeStream = require('fs').createWriteStream(outputPath);
+
+  // Append each chunk
+  for (const chunkFile of sortedChunks) {
+    const chunkPath = path.join(chunksDir, chunkFile);
+    const chunkData = await fs.readFile(chunkPath);
+    writeStream.write(chunkData);
+  }
+
+  writeStream.end();
+
+  // Wait for write to complete
+  await new Promise((resolve, reject) => {
+    writeStream.on('finish', resolve);
+    writeStream.on('error', reject);
+  });
+
+  logger.info('Chunks assembled', { uploadId, outputPath, chunkCount: sortedChunks.length });
+
+  return outputPath;
+}
+
+/**
+ * Update session status
+ */
+async function updateSessionStatus(uploadId: string, status: string, progress: number): Promise<void> {
+  await prisma.upload_sessions.update({
+    where: { id: uploadId },
+    data: { status, progress },
+  });
+  logger.info('Session status updated', { uploadId, status, progress });
+}
+
+/**
+ * Cleanup upload directory
+ */
+async function cleanupUploadDir(uploadId: string): Promise<void> {
+  const uploadDir = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', uploadId);
+  await fs.rm(uploadDir, { recursive: true, force: true });
+  logger.info('Upload directory cleaned up', { uploadId });
+}
+
+/**
+ * Get human-readable status message
+ */
+function getStatusMessage(status: string): string {
+  const messages: Record<string, string> = {
+    receiving_chunks: 'Receiving chunks...',
+    assembling: 'Assembling video file...',
+    analyzing: 'Analyzing video...',
+    uploading_to_walrus: 'Uploading to Walrus...',
+    registering_blockchain: 'Registering on blockchain...',
+    complete: 'Upload complete!',
+    error: 'Upload failed',
+  };
+  return messages[status] || status;
+}
 
 export default router;
