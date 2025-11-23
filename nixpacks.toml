@@ -1,5 +1,5 @@
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["npm run build -- --filter=@blobbuster/backend..."]
 
 [start]
 cmd = "npm run start --workspace=@blobbuster/backend"
