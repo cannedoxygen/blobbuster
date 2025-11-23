@@ -12,18 +12,24 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-6xl md:text-8xl font-heading text-white mb-6 uppercase">
-            THE BLOBBUSTER
+            <span className="relative inline-block">
+              <span className="absolute inset-0 text-blobbuster-blue" style={{ transform: 'translate(3px, 3px)' }}>
+                BLOBBUSTER
+              </span>
+              <span className="relative text-blobbuster-yellow">
+                BLOBBUSTER
+              </span>
+            </span>
             <br />
-            THEY CAN'T KILL
+            Your media | Your locker | Your control
           </h1>
 
           <p className="text-xl md:text-2xl text-blobbuster-yellow font-bold mb-8 uppercase">
-            Decentralized streaming on Sui blockchain
+            Decentralized personal video storage on Sui + Walrus
           </p>
 
           <p className="text-lg text-white mb-12 max-w-2xl mx-auto">
-            NFT memberships. 70% to creators. Censorship-resistant.
-            The classic video rental experience reimagined for Web3.
+            Upload anything. Stream anywhere. Forever.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
