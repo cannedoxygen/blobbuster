@@ -255,6 +255,31 @@ export default function UploaderPage() {
     }
   };
 
+  const handleDeleteContent = async (contentId: string) => {
+    try {
+      const response = await axios.delete(`${API_URL}/api/upload/${contentId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (response.data.success) {
+        // Remove deleted content from the list
+        setContent((prevContent) => prevContent.filter((item) => item.id !== contentId));
+
+        // Refresh analytics
+        const analyticsResponse = await axios.get(`${API_URL}/api/upload/analytics`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (analyticsResponse.data.success) {
+          setAnalytics(analyticsResponse.data.analytics);
+        }
+      }
+    } catch (error: any) {
+      console.error('Failed to delete content:', error);
+      const errorMessage = error.response?.data?.error || 'Failed to delete content';
+      setError(errorMessage);
+    }
+  };
+
   if (authLoading || isFetching) {
     return (
       <div className="min-h-screen bg-blobbuster-navy flex items-center justify-center">
@@ -721,6 +746,7 @@ export default function UploaderPage() {
           }}
           content={selectedContent}
           onExtendStorage={handleExtendStorageFromDetails}
+          onDelete={handleDeleteContent}
         />
       )}
 
