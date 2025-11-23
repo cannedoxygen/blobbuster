@@ -7,7 +7,7 @@ import { getSuiBlockchainService } from '../services/suiBlockchain.service';
 import { getPaymentVerificationService } from '../services/paymentVerification.service';
 import { prisma } from '../config/database';
 import { logger } from '../utils/logger';
-import type { ContentGenre } from '@blockbuster/shared-types';
+import type { ContentGenre } from '@blobbuster/shared-types';
 
 const router = Router();
 const uploadService = getUploadService();
