@@ -12,18 +12,23 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-heading text-white mb-6 uppercase">
+          <h1 className="text-6xl md:text-8xl font-heading uppercase mb-4">
             <span className="relative inline-block">
-              <span className="absolute inset-0 text-blobbuster-blue" style={{ transform: 'translate(3px, 3px)' }}>
+              <span
+                className="absolute top-0 left-0 text-blobbuster-blue"
+                style={{ transform: 'translate(4px, 4px)', zIndex: 0 }}
+              >
                 BLOBBUSTER
               </span>
-              <span className="relative text-blobbuster-yellow">
+              <span className="relative text-blobbuster-yellow" style={{ zIndex: 1 }}>
                 BLOBBUSTER
               </span>
             </span>
-            <br />
-            Your media | Your locker | Your control
           </h1>
+
+          <p className="text-2xl md:text-3xl text-white font-bold mb-8">
+            Your media | Your locker | Your control
+          </p>
 
           <p className="text-xl md:text-2xl text-blobbuster-yellow font-bold mb-8 uppercase">
             Decentralized personal video storage on Sui + Walrus
