@@ -5,7 +5,7 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://nonemulative-sloshy-jannette.ngrok-free.dev",
+    "NEXT_PUBLIC_API_URL": "https://blockbusterbackend-production.up.railway.app",
     "NEXT_PUBLIC_SUI_RPC_URL": "https://fullnode.mainnet.sui.io:443",
     "NEXT_PUBLIC_MEMBERSHIP_PACKAGE": "0x75a3d6b0405b74c9ee4af7ec299e7f26908a106cc20027ede0aa10b1988d7ad7",
     "NEXT_PUBLIC_MEMBER_REGISTRY": "0x3766a4137c04b81a30a798996dade6498bd530901624984c1bdf8a8f020b551b",
