@@ -81,8 +81,8 @@ export function WalrusCostCalculator({
 
   if (loading) {
     return (
-      <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6">
-        <div className="flex items-center justify-center gap-3">
+      <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
+        <div className="flex items-center gap-3">
           <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-neon-cyan"></div>
           <p className="text-gray-300">Calculating cost...</p>
         </div>
@@ -92,7 +92,7 @@ export function WalrusCostCalculator({
 
   if (error) {
     return (
-      <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-6">
+      <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-6 min-h-[400px] flex items-center justify-center">
         <p className="text-red-400 text-sm">{error}</p>
       </div>
     );
@@ -103,7 +103,7 @@ export function WalrusCostCalculator({
   }
 
   return (
-    <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4">
+    <div className="bg-blobbuster-navy/50 border border-neon-cyan/30 rounded-lg p-6 space-y-4 min-h-[400px]">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-heading text-blobbuster-gold">
           Storage Cost Estimate
