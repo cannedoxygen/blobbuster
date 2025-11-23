@@ -189,9 +189,12 @@ router.post(
 
       // Register content on blockchain
       const { contentId: blockchainContentId, txDigest } = await suiBlockchainService.registerContent(
-        uploaderProfile.blockchainAccountId,
         title,
-        durationSeconds
+        description || '',
+        parseInt(genre) || 0,
+        durationSeconds,
+        JSON.stringify(walrusBlobIds),
+        thumbnailUrl || ''
       );
 
       // Create content in database

@@ -9,7 +9,7 @@
  *   npm run wake-db
  */
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://bedding-mega-zen-perl.trycloudflare.com';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://blockbuster.simp.wtf';
 
 async function wakeDatabase() {
   console.log('🔄 Waking up database...\n');

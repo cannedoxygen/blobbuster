@@ -89,9 +89,10 @@ export class SuiBlockchainService {
         options: { showEffects: true, showObjectChanges: true },
       });
 
-      const nftId = result.objectChanges?.find(
+      const nftObject = result.objectChanges?.find(
         (c) => c.type === 'created' && c.objectType.includes('MembershipNFT')
-      )?.objectId || '';
+      );
+      const nftId = (nftObject && 'objectId' in nftObject) ? nftObject.objectId : '';
 
       logger.info(`Membership minted: ${nftId} (2.5 SUI for ${durationDays} days)`);
 
@@ -190,9 +191,10 @@ export class SuiBlockchainService {
         options: { showObjectChanges: true },
       });
 
-      const accountId = result.objectChanges?.find(
+      const accountObject = result.objectChanges?.find(
         (c: any) => c.type === 'created' && c.objectType?.includes('UploaderAccount')
-      )?.objectId || '';
+      );
+      const accountId = (accountObject && 'objectId' in accountObject) ? accountObject.objectId : '';
 
       logger.info(`Uploader registered: ${address} -> ${accountId}`);
 
@@ -330,9 +332,10 @@ export class SuiBlockchainService {
         options: { showObjectChanges: true },
       });
 
-      const contentId = result.objectChanges?.find(
+      const contentObject = result.objectChanges?.find(
         (c: any) => c.type === 'created' && c.objectType?.includes('ContentItem')
-      )?.objectId || '';
+      );
+      const contentId = (contentObject && 'objectId' in contentObject) ? contentObject.objectId : '';
 
       logger.info(`Content registered on-chain: ${contentId}`);
 
