@@ -1,8 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.install]
+cmds = ["npm ci"]
+
 [phases.build]
 cmds = ["npm run build -- --filter=@blobbuster/backend..."]
 
 [start]
-cmd = "cd apps/backend && node dist/index.js"
-
-[variables]
-NPM_CONFIG_PRODUCTION = "false"
+cmd = "cd apps/backend && exec node dist/index.js"
