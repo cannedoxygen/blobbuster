@@ -54,6 +54,7 @@ export function ExtendStorageModal({
   const suiClient = useSuiClient();
 
   const [additionalEpochs, setAdditionalEpochs] = useState(52); // Default: ~1 year
+  const [sliderValue, setSliderValue] = useState(52); // Temporary value while sliding
   const [costEstimate, setCostEstimate] = useState<CostEstimate | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
@@ -67,8 +68,8 @@ export function ExtendStorageModal({
     ? Math.ceil((currentExpiration.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     : 0;
   const newExpiration = currentExpiration
-    ? new Date(currentExpiration.getTime() + additionalEpochs * 14 * 24 * 60 * 60 * 1000)
-    : new Date(Date.now() + additionalEpochs * 14 * 24 * 60 * 60 * 1000);
+    ? new Date(currentExpiration.getTime() + sliderValue * 14 * 24 * 60 * 60 * 1000)
+    : new Date(Date.now() + sliderValue * 14 * 24 * 60 * 60 * 1000);
 
   // Estimate file size (2GB average for movies)
   // In production, this should be stored in the database or queried from Walrus
@@ -263,8 +264,10 @@ export function ExtendStorageModal({
                   type="range"
                   min="1"
                   max="365"
-                  value={additionalEpochs}
-                  onChange={(e) => setAdditionalEpochs(parseInt(e.target.value))}
+                  value={sliderValue}
+                  onChange={(e) => setSliderValue(parseInt(e.target.value))}
+                  onMouseUp={(e) => setAdditionalEpochs(parseInt((e.target as HTMLInputElement).value))}
+                  onTouchEnd={(e) => setAdditionalEpochs(parseInt((e.target as HTMLInputElement).value))}
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -277,15 +280,19 @@ export function ExtendStorageModal({
                   type="number"
                   min="1"
                   max="365"
-                  value={additionalEpochs}
-                  onChange={(e) => setAdditionalEpochs(Math.min(365, Math.max(1, parseInt(e.target.value) || 1)))}
+                  value={sliderValue}
+                  onChange={(e) => {
+                    const value = Math.min(365, Math.max(1, parseInt(e.target.value) || 1));
+                    setSliderValue(value);
+                    setAdditionalEpochs(value);
+                  }}
                   className="w-full px-3 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white text-center"
                 />
                 <p className="text-xs text-gray-400 mt-1 text-center uppercase">epochs</p>
               </div>
             </div>
             <p className="text-sm text-gray-400 mt-2">
-              Add {additionalEpochs} epochs ({additionalEpochs * 14} days) to your storage
+              Add {sliderValue} epochs ({sliderValue * 14} days) to your storage
             </p>
           </div>
 
