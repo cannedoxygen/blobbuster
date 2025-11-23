@@ -41,9 +41,11 @@ app.use(cors({
         origin.endsWith('.vercel.app') ||
         origin.endsWith('.simp.wtf') ||
         origin.includes('.ngrok') ||
-        origin.includes('.ngrok-free.dev')) {
+        origin.includes('.ngrok-free.dev') ||
+        origin.includes('.trycloudflare.com')) {
       callback(null, true);
     } else {
+      logger.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
