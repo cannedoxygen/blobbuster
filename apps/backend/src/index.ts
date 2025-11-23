@@ -10,7 +10,7 @@ import { initializeJobs, shutdownJobs } from './jobs';
 import fs from 'fs';
 import path from 'path';
 
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT) || 3001;
 
 async function startServer() {
   try {
