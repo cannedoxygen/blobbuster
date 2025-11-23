@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [previousWallet, setPreviousWallet] = useState<string | null>(null);
+  const [walletConnectedThisSession, setWalletConnectedThisSession] = useState(false);
 
   // Load tokens from localStorage on mount
   useEffect(() => {
@@ -81,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (currentAccount) {
       setPreviousWallet(currentAccount.address);
+      setWalletConnectedThisSession(true);
     }
   }, [currentAccount]);
 
@@ -89,8 +91,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hasInitialized || isLoading) return;
 
-    // If user was logged in and they disconnected their wallet
-    if (user && previousWallet && !currentAccount) {
+    // Only logout if wallet was connected this session and is now disconnected
+    // (not if page just loaded and wallet hasn't connected yet)
+    if (user && walletConnectedThisSession && !currentAccount) {
       console.log('[Auth] Wallet disconnected, logging out');
       logout();
     }
@@ -100,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('[Auth] Wallet changed, logging out');
       logout();
     }
-  }, [currentAccount, user, hasInitialized, isLoading, previousWallet]);
+  }, [currentAccount, user, hasInitialized, isLoading, walletConnectedThisSession]);
 
   const login = useCallback(async () => {
     if (!currentAccount) {
@@ -151,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(null);
     setError(null);
     setPreviousWallet(null);
+    setWalletConnectedThisSession(false);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   }, []);
