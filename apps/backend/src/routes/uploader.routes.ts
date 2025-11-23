@@ -19,8 +19,8 @@ router.post('/register', authMiddleware, async (req: Request, res: Response) => 
     const walletAddress = req.user!.walletAddress;
 
     // Check if user is already an uploader
-    const existingUploader = await prisma.uploaderProfile.findUnique({
-      where: { userId },
+    const existingUploader = await prisma.uploader_profiles.findUnique({
+      where: { user_id: userId },
     });
 
     if (existingUploader) {
@@ -31,12 +31,12 @@ router.post('/register', authMiddleware, async (req: Request, res: Response) => 
     const { accountId, txDigest } = await suiBlockchainService.registerUploader(walletAddress);
 
     // Create uploader profile in database
-    const uploaderProfile = await prisma.uploaderProfile.create({
+    const uploaderProfile = await prisma.uploader_profiles.create({
       data: {
         id: uuidv4(),
-        userId,
-        blockchainAccountId: accountId,
-        updatedAt: new Date(),
+        user_id: userId,
+        blockchain_account_id: accountId,
+        updated_at: new Date(),
       },
     });
 
@@ -46,11 +46,11 @@ router.post('/register', authMiddleware, async (req: Request, res: Response) => 
       success: true,
       uploader: {
         id: uploaderProfile.id,
-        blockchainAccountId: uploaderProfile.blockchainAccountId,
-        totalEarnings: uploaderProfile.totalEarnings,
-        pendingEarnings: uploaderProfile.pendingEarnings,
-        totalStreams: uploaderProfile.totalStreams,
-        totalContentUploaded: uploaderProfile.totalContentUploaded,
+        blockchainAccountId: uploaderProfile.blockchain_account_id,
+        totalEarnings: uploaderProfile.total_earnings,
+        pendingEarnings: uploaderProfile.pending_earnings,
+        totalStreams: uploaderProfile.total_streams,
+        totalContentUploaded: uploaderProfile.total_content_uploaded,
       },
       txDigest,
     });
@@ -69,14 +69,14 @@ router.get('/profile', authMiddleware, requireUploader, async (req: Request, res
   try {
     const userId = req.user!.userId;
 
-    const uploaderProfile = await prisma.uploaderProfile.findUnique({
-      where: { userId },
+    const uploaderProfile = await prisma.uploader_profiles.findUnique({
+      where: { user_id: userId },
       include: {
-        user: {
+        users: {
           select: {
             username: true,
-            walletAddress: true,
-            avatarUrl: true,
+            wallet_address: true,
+            avatar_url: true,
           },
         },
       },
@@ -90,15 +90,15 @@ router.get('/profile', authMiddleware, requireUploader, async (req: Request, res
       success: true,
       uploader: {
         id: uploaderProfile.id,
-        username: uploaderProfile.user.username,
-        walletAddress: uploaderProfile.user.walletAddress,
-        avatarUrl: uploaderProfile.user.avatarUrl,
-        blockchainAccountId: uploaderProfile.blockchainAccountId,
-        totalEarnings: uploaderProfile.totalEarnings.toString(),
-        pendingEarnings: uploaderProfile.pendingEarnings.toString(),
-        totalStreams: uploaderProfile.totalStreams.toString(),
-        totalContentUploaded: uploaderProfile.totalContentUploaded,
-        createdAt: uploaderProfile.createdAt,
+        username: uploaderProfile.users.username,
+        walletAddress: uploaderProfile.users.wallet_address,
+        avatarUrl: uploaderProfile.users.avatar_url,
+        blockchainAccountId: uploaderProfile.blockchain_account_id,
+        totalEarnings: uploaderProfile.total_earnings.toString(),
+        pendingEarnings: uploaderProfile.pending_earnings.toString(),
+        totalStreams: uploaderProfile.total_streams.toString(),
+        totalContentUploaded: uploaderProfile.total_content_uploaded,
+        createdAt: uploaderProfile.created_at,
       },
     });
   } catch (error) {
@@ -118,8 +118,8 @@ router.get('/content', authMiddleware, requireUploader, async (req: Request, res
     const limit = parseInt(req.query.limit as string) || 20;
     const offset = parseInt(req.query.offset as string) || 0;
 
-    const uploaderProfile = await prisma.uploaderProfile.findUnique({
-      where: { userId },
+    const uploaderProfile = await prisma.uploader_profiles.findUnique({
+      where: { user_id: userId },
     });
 
     if (!uploaderProfile) {
@@ -128,12 +128,12 @@ router.get('/content', authMiddleware, requireUploader, async (req: Request, res
 
     const [content, total] = await Promise.all([
       prisma.content.findMany({
-        where: { uploaderId: uploaderProfile.id },
-        orderBy: { createdAt: 'desc' },
+        where: { uploader_id: uploaderProfile.id },
+        orderBy: { created_at: 'desc' },
         take: limit,
         skip: offset,
       }),
-      prisma.content.count({ where: { uploaderId: uploaderProfile.id } }),
+      prisma.content.count({ where: { uploader_id: uploaderProfile.id } }),
     ]);
 
     res.json({
@@ -179,8 +179,8 @@ router.post(
       const userId = req.user!.userId;
       const { title, description, genre, durationSeconds, walrusBlobIds, thumbnailUrl } = req.body;
 
-      const uploaderProfile = await prisma.uploaderProfile.findUnique({
-        where: { userId },
+      const uploaderProfile = await prisma.uploader_profiles.findUnique({
+        where: { user_id: userId },
       });
 
       if (!uploaderProfile) {
@@ -201,25 +201,25 @@ router.post(
       const content = await prisma.content.create({
         data: {
           id: uuidv4(),
-          blockchainId: blockchainContentId,
-          uploaderId: uploaderProfile.id,
+          blockchain_id: blockchainContentId,
+          uploader_id: uploaderProfile.id,
           title,
           description,
           genre,
-          durationSeconds,
-          walrusBlobIds,
-          thumbnailUrl,
+          duration_seconds: durationSeconds,
+          walrus_blob_ids: walrusBlobIds,
+          thumbnail_url: thumbnailUrl,
           status: 1, // 1 = Active
-          updatedAt: new Date(),
+          updated_at: new Date(),
         },
       });
 
       // Update uploader's content count
-      await prisma.uploaderProfile.update({
+      await prisma.uploader_profiles.update({
         where: { id: uploaderProfile.id },
         data: {
-          totalContentUploaded: { increment: 1 },
-          updatedAt: new Date(),
+          total_content_uploaded: { increment: 1 },
+          updated_at: new Date(),
         },
       });
 
@@ -229,14 +229,14 @@ router.post(
         success: true,
         content: {
           id: content.id,
-          blockchainId: content.blockchainId,
+          blockchainId: content.blockchain_id,
           title: content.title,
           description: content.description,
           genre: content.genre,
-          durationSeconds: content.durationSeconds,
-          thumbnailUrl: content.thumbnailUrl,
+          durationSeconds: content.duration_seconds,
+          thumbnailUrl: content.thumbnail_url,
           status: content.status,
-          createdAt: content.createdAt,
+          createdAt: content.created_at,
         },
         txDigest,
       });
@@ -258,8 +258,8 @@ router.get('/earnings', authMiddleware, requireUploader, async (req: Request, re
     const limit = parseInt(req.query.limit as string) || 20;
     const offset = parseInt(req.query.offset as string) || 0;
 
-    const uploaderProfile = await prisma.uploaderProfile.findUnique({
-      where: { userId },
+    const uploaderProfile = await prisma.uploader_profiles.findUnique({
+      where: { user_id: userId },
     });
 
     if (!uploaderProfile) {
@@ -267,30 +267,30 @@ router.get('/earnings', authMiddleware, requireUploader, async (req: Request, re
     }
 
     const [distributions, total] = await Promise.all([
-      prisma.distribution.findMany({
-        where: { uploaderId: uploaderProfile.id },
-        orderBy: { createdAt: 'desc' },
+      prisma.distributions.findMany({
+        where: { uploader_id: uploaderProfile.id },
+        orderBy: { created_at: 'desc' },
         take: limit,
         skip: offset,
       }),
-      prisma.distribution.count({ where: { uploaderId: uploaderProfile.id } }),
+      prisma.distributions.count({ where: { uploader_id: uploaderProfile.id } }),
     ]);
 
     res.json({
       success: true,
       summary: {
-        totalEarnings: uploaderProfile.totalEarnings.toString(),
-        pendingEarnings: uploaderProfile.pendingEarnings.toString(),
+        totalEarnings: uploaderProfile.total_earnings.toString(),
+        pendingEarnings: uploaderProfile.pending_earnings.toString(),
       },
       distributions: distributions.map((d) => ({
         id: d.id,
-        weekStartDate: d.weekStartDate,
-        weekEndDate: d.weekEndDate,
+        weekStartDate: d.week_start_date,
+        weekEndDate: d.week_end_date,
         amount: d.amount.toString(),
-        weightedScore: d.weightedScore.toString(),
-        totalStreams: d.totalStreams,
-        blockchainTxDigest: d.blockchainTxDigest,
-        createdAt: d.createdAt,
+        weightedScore: d.weighted_score.toString(),
+        totalStreams: d.total_streams,
+        blockchainTxDigest: d.blockchain_tx_digest,
+        createdAt: d.created_at,
       })),
       pagination: {
         total,
