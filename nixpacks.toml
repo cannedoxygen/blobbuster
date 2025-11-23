@@ -2,4 +2,4 @@
 cmds = ["npm run build -- --filter=@blobbuster/backend..."]
 
 [start]
-cmd = "npm run start --workspace=@blobbuster/backend"
+cmd = "cd apps/backend && node dist/index.js 2>&1"
