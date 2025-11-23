@@ -277,7 +277,6 @@ router.post('/refresh/:contentId', async (req: Request, res: Response) => {
         id: true,
         title: true,
         uploader_id: true,
-        type: true,
       },
     });
 
