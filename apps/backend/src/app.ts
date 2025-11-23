@@ -35,11 +35,13 @@ app.use(cors({
       process.env.CORS_ORIGIN
     ];
 
-    // Allow any Vercel domain, ngrok domain, or simp.wtf
+    // Allow any Vercel domain, ngrok domain, simp.wtf, or blobbuster.com
     if (!origin ||
         allowedOrigins.includes(origin) ||
         origin.endsWith('.vercel.app') ||
         origin.endsWith('.simp.wtf') ||
+        origin.endsWith('.blobbuster.com') ||
+        origin === 'https://blobbuster.com' ||
         origin.includes('.ngrok') ||
         origin.includes('.ngrok-free.dev') ||
         origin.includes('.trycloudflare.com')) {
