@@ -1,7 +1,7 @@
 {
-  "name": "@blockbuster/backend",
+  "name": "@blobbuster/backend",
   "version": "1.0.0",
-  "description": "Blockbuster backend API server",
+  "description": "BlobBuster backend API server",
   "main": "dist/index.js",
   "scripts": {
     "dev": "npx tsx watch src/index.ts",

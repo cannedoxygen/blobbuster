@@ -1,5 +1,5 @@
 {
-  "name": "blockbuster-monorepo",
+  "name": "blobbuster-monorepo",
   "version": "1.0.0",
   "private": true,
   "description": "Decentralized streaming platform on Sui blockchain",
@@ -18,8 +18,8 @@
     "contracts:build": "cd contracts/sui-contracts && sui move build",
     "contracts:test": "cd contracts/sui-contracts && sui move test",
     "contracts:deploy": "cd contracts/sui-contracts && sui client publish --gas-budget 100000000",
-    "backend:dev": "turbo run dev --filter=@blockbuster/backend",
-    "frontend:dev": "turbo run dev --filter=@blockbuster/frontend",
+    "backend:dev": "turbo run dev --filter=@blobbuster/backend",
+    "frontend:dev": "turbo run dev --filter=@blobbuster/frontend",
     "db:migrate": "cd apps/backend && npm run db:migrate",
     "db:seed": "cd apps/backend && npm run db:seed",
     "wake-db": "node wake-db.js"
