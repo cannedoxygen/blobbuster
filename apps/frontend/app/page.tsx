@@ -1,5 +1,6 @@
 'use client';
 
+// BlobBuster Homepage - Updated branding
 import Link from 'next/link';
 import Header from '@/components/Header';
 
