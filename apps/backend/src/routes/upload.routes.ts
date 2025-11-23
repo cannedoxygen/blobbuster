@@ -1061,13 +1061,18 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
       throw new Error('Uploader profile not found');
     }
 
+    const blobIdsString = JSON.stringify({
+      video: videoUploadResult.blobId,
+      thumbnail: thumbnailUploadResult.blobId,
+    });
+
     const blockchainResult = await suiService.registerContent(
-      uploaderProfile.blockchain_account_id,
       session.title,
       session.description || '',
       Number(session.genre),
       Math.floor(metadata.duration),
-      [videoUploadResult.blobId, thumbnailUploadResult.blobId]
+      blobIdsString,
+      thumbnailUploadResult.blobId
     );
 
     // STEP 6: Fetch TMDB metadata (optional)
