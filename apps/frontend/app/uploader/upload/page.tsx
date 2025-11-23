@@ -75,6 +75,7 @@ export default function UploadPage() {
   const [success, setSuccess] = useState(false);
 
   const [storageEpochs, setStorageEpochs] = useState(30);
+  const [sliderValue, setSliderValue] = useState(30); // Temporary value while sliding
   const [isAboutWalrusOpen, setIsAboutWalrusOpen] = useState(false);
   const [costEstimate, setCostEstimate] = useState<any>(null);
   const [isPaying, setIsPaying] = useState(false);
@@ -749,8 +750,10 @@ export default function UploadPage() {
                       type="range"
                       min="1"
                       max="365"
-                      value={storageEpochs}
-                      onChange={(e) => setStorageEpochs(parseInt(e.target.value))}
+                      value={sliderValue}
+                      onChange={(e) => setSliderValue(parseInt(e.target.value))}
+                      onMouseUp={(e) => setStorageEpochs(parseInt((e.target as HTMLInputElement).value))}
+                      onTouchEnd={(e) => setStorageEpochs(parseInt((e.target as HTMLInputElement).value))}
                       className="w-full"
                     />
                     <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -763,15 +766,19 @@ export default function UploadPage() {
                       type="number"
                       min="1"
                       max="365"
-                      value={storageEpochs}
-                      onChange={(e) => setStorageEpochs(Math.min(365, Math.max(1, parseInt(e.target.value) || 1)))}
+                      value={sliderValue}
+                      onChange={(e) => {
+                        const value = Math.min(365, Math.max(1, parseInt(e.target.value) || 1));
+                        setSliderValue(value);
+                        setStorageEpochs(value);
+                      }}
                       className="w-full px-3 py-2 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg focus:border-blobbuster-yellow focus:outline-none text-white text-center"
                     />
                     <p className="text-xs text-gray-400 mt-1 text-center uppercase">epochs</p>
                   </div>
                 </div>
                 <p className="text-sm text-gray-400 mt-2">
-                  Each epoch ≈ 14 days on mainnet. Your content will be stored for {storageEpochs * 14} days.
+                  Each epoch ≈ 14 days on mainnet. Your content will be stored for {sliderValue * 14} days.
                 </p>
               </div>
 
