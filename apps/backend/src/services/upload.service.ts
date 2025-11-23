@@ -7,7 +7,7 @@ import { getSuiBlockchainService } from './suiBlockchain.service';
 import { getMetadataService } from './metadata.service';
 import { prisma } from '../config/database';
 import { logger } from '../utils/logger';
-import type { WalrusUploadResult, ContentGenre, WalrusQualitySet } from '@blockbuster/shared-types';
+import type { WalrusUploadResult, ContentGenre, WalrusQualitySet } from '@blobbuster/shared-types';
 
 /**
  * Upload Service

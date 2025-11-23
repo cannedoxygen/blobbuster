@@ -1,7 +1,7 @@
 {
-  "name": "@blockbuster/shared-types",
+  "name": "@blobbuster/shared-types",
   "version": "1.0.0",
-  "description": "Shared TypeScript types for Blockbuster platform",
+  "description": "Shared TypeScript types for BlobBuster platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
