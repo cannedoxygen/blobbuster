@@ -29,6 +29,7 @@ interface ContentDetailsModalProps {
     externalRating?: number;
   };
   onExtendStorage?: () => void;
+  onDelete?: (contentId: string) => void;
 }
 
 const GENRE_MAP: { [key: number]: string } = {
@@ -50,8 +51,10 @@ export function ContentDetailsModal({
   onClose,
   content,
   onExtendStorage,
+  onDelete,
 }: ContentDetailsModalProps) {
   const router = useRouter();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!isOpen) return null;
 
@@ -95,6 +98,13 @@ export function ContentDetailsModal({
   const handleWatch = () => {
     router.push(`/watch/${content.id}`);
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete(content.id);
+      onClose();
+    }
   };
 
   return (
@@ -338,6 +348,14 @@ export function ContentDetailsModal({
             >
               Close
             </button>
+            {onDelete && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex-1 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition uppercase border-3 border-red-500 text-white"
+              >
+                🗑️ Delete Movie
+              </button>
+            )}
             <button
               onClick={handleWatch}
               className="btn-primary flex-1 py-3 rounded-lg justify-center gap-2 text-lg"
@@ -347,6 +365,39 @@ export function ContentDetailsModal({
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/90"
+            onClick={() => setShowDeleteConfirm(false)}
+          />
+          <div className="relative z-10 bg-blobbuster-navy border-3 border-red-500 rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-2xl font-heading text-red-500 uppercase mb-4">
+              ⚠️ Delete Content?
+            </h3>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete "{content.title}"? This action cannot be undone.
+              The content will be removed from the platform but your analytics history will be preserved.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition uppercase"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-bold transition uppercase text-white"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

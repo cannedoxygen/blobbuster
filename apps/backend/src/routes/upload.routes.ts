@@ -411,15 +411,23 @@ router.get('/my-content', authMiddleware, requireUploader, async (req: Request, 
       });
     }
 
-    // Get all content for this uploader
+    // Get all content for this uploader (excluding deleted)
     const [content, total] = await Promise.all([
       prisma.content.findMany({
-        where: { uploader_id: uploaderProfile.id },
+        where: {
+          uploader_id: uploaderProfile.id,
+          status: { not: 3 }, // Exclude deleted content
+        },
         orderBy: { created_at: 'desc' },
         take: limit,
         skip: offset,
       }),
-      prisma.content.count({ where: { uploader_id: uploaderProfile.id } }),
+      prisma.content.count({
+        where: {
+          uploader_id: uploaderProfile.id,
+          status: { not: 3 }, // Exclude deleted content
+        },
+      }),
     ]);
 
     // Convert BigInt fields to Numbers and normalize to camelCase for frontend
@@ -698,6 +706,88 @@ router.post('/extend-storage/:contentId', authMiddleware, requireUploader, async
     res.status(500).json({
       success: false,
       error: 'Failed to extend storage',
+      details: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+/**
+ * DELETE /api/upload/:contentId
+ * Soft delete content by setting status to 3 (deleted)
+ * Requires: Authentication + Uploader status + Content ownership
+ */
+router.delete('/:contentId', authMiddleware, requireUploader, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const { contentId } = req.params;
+
+    // Get uploader profile
+    const uploaderProfile = await prisma.uploader_profiles.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!uploaderProfile) {
+      return res.status(404).json({
+        success: false,
+        error: 'Uploader profile not found',
+      });
+    }
+
+    // Find content and verify ownership
+    const content = await prisma.content.findUnique({
+      where: { id: contentId },
+    });
+
+    if (!content) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found',
+      });
+    }
+
+    // Verify user owns this content
+    if (content.uploader_id !== uploaderProfile.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'You do not have permission to delete this content',
+      });
+    }
+
+    // Check if already deleted
+    if (content.status === 3) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content is already deleted',
+      });
+    }
+
+    // Soft delete - set status to 3
+    await prisma.content.update({
+      where: { id: contentId },
+      data: {
+        status: 3,
+        updated_at: new Date(),
+      },
+    });
+
+    logger.info('Content soft deleted', {
+      contentId,
+      userId,
+      uploaderId: uploaderProfile.id,
+      title: content.title,
+    });
+
+    res.json({
+      success: true,
+      message: 'Content deleted successfully',
+    });
+  } catch (error) {
+    logger.error('Failed to delete content', {
+      error: error instanceof Error ? error.message : error,
+    });
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete content',
       details: error instanceof Error ? error.message : String(error),
     });
   }
