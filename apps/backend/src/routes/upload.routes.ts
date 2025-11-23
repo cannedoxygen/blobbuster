@@ -1086,11 +1086,6 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
     }
 
     // STEP 7: Save to database
-    const blobIdsString = JSON.stringify({
-      video: videoUploadResult.blobId,
-      thumbnail: thumbnailUploadResult.blobId,
-    });
-
     await prisma.content.create({
       data: {
         id: blockchainResult.contentId,
