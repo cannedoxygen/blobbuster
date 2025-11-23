@@ -28,6 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [previousWallet, setPreviousWallet] = useState<string | null>(null);
 
   // Load tokens from localStorage on mount
   useEffect(() => {
@@ -42,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (valid) {
             setAccessToken(storedToken);
             setUser(userData);
+            setPreviousWallet(userData.walletAddress);
           } else {
             // Try to refresh token
             const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
@@ -53,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Get user with new token
               const { user: userData } = await verifyToken(newToken);
               setUser(userData);
+              setPreviousWallet(userData.walletAddress);
             } else {
               // Clear invalid tokens
               localStorage.removeItem(TOKEN_KEY);
@@ -66,18 +70,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem(REFRESH_TOKEN_KEY);
       } finally {
         setIsLoading(false);
+        setHasInitialized(true);
       }
     };
 
     loadAuth();
   }, []);
 
-  // Auto-logout if wallet disconnects
+  // Track current wallet
   useEffect(() => {
-    if (!currentAccount && user) {
+    if (currentAccount) {
+      setPreviousWallet(currentAccount.address);
+    }
+  }, [currentAccount]);
+
+  // Auto-logout only if user explicitly disconnected their wallet
+  // (not on page load when wallet hasn't connected yet)
+  useEffect(() => {
+    if (!hasInitialized || isLoading) return;
+
+    // If user was logged in and they disconnected their wallet
+    if (user && previousWallet && !currentAccount) {
+      console.log('[Auth] Wallet disconnected, logging out');
       logout();
     }
-  }, [currentAccount, user]);
+
+    // If user logged in but wallet changed to different address
+    if (user && currentAccount && currentAccount.address !== user.walletAddress) {
+      console.log('[Auth] Wallet changed, logging out');
+      logout();
+    }
+  }, [currentAccount, user, hasInitialized, isLoading, previousWallet]);
 
   const login = useCallback(async () => {
     if (!currentAccount) {
@@ -127,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setAccessToken(null);
     setError(null);
+    setPreviousWallet(null);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   }, []);
