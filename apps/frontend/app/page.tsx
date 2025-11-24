@@ -1,10 +1,50 @@
 'use client';
 
 // BlobBuster Homepage - Updated branding
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+interface PlatformStats {
+  activeMembers: number;
+  totalContent: number;
+  contentCreators: number;
+  creatorEarnings: {
+    totalSUI: number;
+    monthlyEstimate: number;
+    formatted: string;
+  };
+}
+
 export default function HomePage() {
+  const [stats, setStats] = useState<PlatformStats | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/stats/platform`);
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // Format numbers with commas
+  const formatNumber = (num: number) => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+    }
+    return num.toLocaleString();
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -15,7 +55,7 @@ export default function HomePage() {
           <h1 className="text-6xl md:text-8xl font-heading uppercase mb-4">
             <span className="relative inline-block">
               <span
-                className="absolute top-0 left-0 text-blobbuster-navy"
+                className="absolute top-0 left-0 text-blobbuster-blue"
                 style={{ transform: 'translate(4px, 4px)', zIndex: 0 }}
               >
                 BLOBBUSTER
@@ -58,22 +98,52 @@ export default function HomePage() {
       {/* Stats Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {[
-            { label: 'Active Members', value: '10,000+' },
-            { label: 'Movies & Shows', value: '5,000+' },
-            { label: 'Content Creators', value: '500+' },
-            { label: 'Creator Earnings', value: '$350k/mo' },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="blobbuster-card p-6 text-center rounded-lg"
-            >
-              <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
-                {stat.value}
+          {stats ? (
+            <>
+              <div className="blobbuster-card p-6 text-center rounded-lg">
+                <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
+                  {formatNumber(stats.activeMembers)}
+                </div>
+                <div className="text-gray-300 uppercase font-bold text-sm">Active Members</div>
               </div>
-              <div className="text-gray-300 uppercase font-bold text-sm">{stat.label}</div>
-            </div>
-          ))}
+              <div className="blobbuster-card p-6 text-center rounded-lg">
+                <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
+                  {formatNumber(stats.totalContent)}
+                </div>
+                <div className="text-gray-300 uppercase font-bold text-sm">Movies & Shows</div>
+              </div>
+              <div className="blobbuster-card p-6 text-center rounded-lg">
+                <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
+                  {formatNumber(stats.contentCreators)}
+                </div>
+                <div className="text-gray-300 uppercase font-bold text-sm">Content Creators</div>
+              </div>
+              <div className="blobbuster-card p-6 text-center rounded-lg">
+                <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
+                  {stats.creatorEarnings.formatted}
+                </div>
+                <div className="text-gray-300 uppercase font-bold text-sm">Creator Earnings</div>
+              </div>
+            </>
+          ) : (
+            // Loading placeholders
+            [
+              { label: 'Active Members', value: '...' },
+              { label: 'Movies & Shows', value: '...' },
+              { label: 'Content Creators', value: '...' },
+              { label: 'Creator Earnings', value: '...' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="blobbuster-card p-6 text-center rounded-lg"
+              >
+                <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
+                  {stat.value}
+                </div>
+                <div className="text-gray-300 uppercase font-bold text-sm">{stat.label}</div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 

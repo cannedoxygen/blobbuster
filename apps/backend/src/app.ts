@@ -17,6 +17,7 @@ import analyticsRoutes from './routes/analytics.routes';
 import walrusRoutes from './routes/walrus.routes';
 import metadataRoutes from './routes/metadata.routes';
 import referralRoutes from './routes/referral.routes';
+import statsRoutes from './routes/stats.routes';
 
 // Create Express app
 export const app: Application = express();
@@ -117,6 +118,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/walrus', walrusRoutes);
 app.use('/api/metadata', metadataRoutes);
 app.use('/api/referral', referralRoutes);
+app.use('/api/stats', statsRoutes);
 
 // ===== 404 Handler =====
 
