@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "npx tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && tsc && mkdir -p dist/assets && cp -r src/assets/* dist/assets/",
     "start": "node dist/index.js",
     "postinstall": "prisma generate",
     "test": "jest --coverage",
@@ -45,6 +45,7 @@
     "nft.storage": "^7.2.0",
     "node-cron": "^3.0.3",
     "pg": "^8.11.3",
+    "pinata": "^2.5.1",
     "sharp": "^0.34.5",
     "triple-beam": "^1.4.1",
     "uuid": "^9.0.1",
