@@ -20,17 +20,26 @@ interface PlatformStats {
 
 export default function HomePage() {
   const [stats, setStats] = useState<PlatformStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        console.log('[STATS] Fetching from:', `${API_URL}/api/stats/platform`);
         const response = await fetch(`${API_URL}/api/stats/platform`);
+        console.log('[STATS] Response status:', response.status);
+
         if (response.ok) {
           const data = await response.json();
+          console.log('[STATS] Data received:', data);
           setStats(data);
+        } else {
+          console.error('[STATS] Response not OK:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Failed to fetch stats:', error);
+        console.error('[STATS] Failed to fetch stats:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
