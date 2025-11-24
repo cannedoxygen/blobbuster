@@ -64,8 +64,12 @@ export default function HomePage() {
           <h1 className="text-6xl md:text-8xl font-heading uppercase mb-4">
             <span className="relative inline-block">
               <span
-                className="absolute top-0 left-0 text-blobbuster-blue"
-                style={{ transform: 'translate(6px, 6px)', zIndex: 0 }}
+                className="absolute top-0 left-0"
+                style={{
+                  transform: 'translate(6px, 6px)',
+                  zIndex: 0,
+                  color: '#000033'
+                }}
               >
                 BLOBBUSTER
               </span>
@@ -76,7 +80,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-2xl md:text-3xl text-white font-bold mb-8">
-            Your media | Your locker | Your control
+            Your media <span className="text-blobbuster-yellow">|</span> Your locker <span className="text-blobbuster-yellow">|</span> Your control
           </p>
 
           <p className="text-xl md:text-2xl text-blobbuster-yellow font-bold mb-8 uppercase">
