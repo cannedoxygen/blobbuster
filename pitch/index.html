@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOCKBUSTER - Walrus Hackathon Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0E27;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        .slide {
+            min-height: 100vh;
+            padding: 80px 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            page-break-after: always;
+            background: linear-gradient(135deg, #0A0E27 0%, #1A2456 100%);
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(0deg, transparent 24%, rgba(255, 16, 240, 0.05) 25%, rgba(255, 16, 240, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 16, 240, 0.05) 75%, rgba(255, 16, 240, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 242, 0.05) 25%, rgba(0, 255, 242, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 242, 0.05) 75%, rgba(0, 255, 242, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 72px;
+            background: linear-gradient(135deg, #FF10F0 0%, #00FFF2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-shadow: 0 0 30px rgba(255, 16, 240, 0.5);
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: 64px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            color: #FFFFFF;
+            text-shadow: 0 0 20px rgba(255, 16, 240, 0.3);
+        }
+
+        h2 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #FF10F0 0%, #00FFF2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h3 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #00FFF2;
+        }
+
+        .subtitle {
+            font-size: 32px;
+            color: #00FFF2;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            min-width: 60px;
+        }
+
+        .feature-content h4 {
+            font-size: 24px;
+            color: #00FFF2;
+            margin-bottom: 10px;
+        }
+
+        .feature-content p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 40px;
+            left: 100px;
+            right: 100px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        ul {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        ul li {
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-left: 40px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #FF10F0;
+            font-size: 28px;
+        }
+
+        .highlight {
+            color: #FF10F0;
+            font-weight: 700;
+        }
+
+        .highlight-cyan {
+            color: #00FFF2;
+            font-weight: 700;
+        }
+
+        .box {
+            background: rgba(157, 0, 255, 0.1);
+            border: 2px solid #9D00FF;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .box h3 {
+            color: #9D00FF;
+            margin-bottom: 20px;
+        }
+
+        .box p, .box pre {
+            font-size: 18px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        code {
+            background: rgba(0, 255, 242, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #00FFF2;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #FF10F0;
+        }
+
+        .architecture-diagram {
+            background: rgba(255, 16, 240, 0.05);
+            border: 2px solid #FF10F0;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .flow-step {
+            display: inline-block;
+            background: rgba(0, 255, 242, 0.1);
+            border: 2px solid #00FFF2;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin: 10px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .arrow {
+            display: inline-block;
+            color: #FF10F0;
+            font-size: 32px;
+            margin: 0 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 16, 240, 0.1);
+            border: 2px solid #FF10F0;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 16, 240, 0.2);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: #FF10F0;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: #FFFFFF;
+            opacity: 0.9;
+        }
+
+        .vhs-badge {
+            display: inline-block;
+            background: #FF10F0;
+            color: #0A0E27;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 18px;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(255, 16, 240, 0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(255, 16, 240, 0.2);
+            font-size: 18px;
+            font-weight: 700;
+            color: #00FFF2;
+        }
+
+        td {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<div class="slide">
+    <div class="content">
+        <div class="logo">BLOCKBUSTER</div>
+        <h1>Decentralized Streaming<br>Powered by Walrus</h1>
+        <div class="subtitle">Full-Stack Video Platform on Sui + Walrus Protocol</div>
+        <div class="vhs-badge">⏮ WALRUS HACKATHON DEMO ⏭</div>
+
+        <div class="features" style="margin-top: 60px;">
+            <div class="feature">
+                <div class="feature-icon">🎬</div>
+                <div class="feature-content">
+                    <h4>What is it?</h4>
+                    <p>A streaming platform where videos are stored permanently on Walrus and managed via Sui smart contracts</p>
+                </div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔧</div>
+                <div class="feature-content">
+                    <h4>Tech Stack</h4>
+                    <p>Sui Move contracts + Walrus storage + Next.js frontend + Node.js transcoding</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <span>BLOCKBUSTER - WALRUS HACKATHON</span>
+        <span>SLIDE 1 OF 7</span>
+    </div>
+</div>
+
+<!-- SLIDE 2: THE PROBLEM WE SOLVED -->
+<div class="slide">
+    <div class="content">
+        <h2>💡 The Challenge</h2>
+
+        <h3>How do you build a streaming platform that:</h3>
+        <ul>
+            <li>Stores <span class="highlight">multi-gigabyte video files</span> on decentralized storage?</li>
+            <li>Handles <span class="highlight">multi-quality transcoding</span> (480p, 720p, 1080p, 4K)?</li>
+            <li>Serves video via <span class="highlight">HTTP streaming</span> with adaptive quality?</li>
+            <li>Manages content <span class="highlight">on-chain</span> (registry, metadata, permissions)?</li>
+            <li>Generates <span class="highlight">dynamic NFT membership cards</span> stored on IPFS?</li>
+        </ul>
+
+        <div class="box" style="margin-top: 40px;">
+            <h3>Why Walrus?</h3>
+            <p>Traditional IPFS has slow retrieval and requires pinning services. Centralized storage (S3, GCS) defeats the purpose of Web3. <strong style="color: #00FFF2;">Walrus Protocol</strong> provides decentralized storage with HTTP-based retrieval, erasure coding for redundancy, and native Sui integration.</p>
+        </div>
+    </div>
+    <div class="footer">
+        <span>THE CHALLENGE</span>
+        <span>SLIDE 2 OF 7</span>
+    </div>
+</div>
+
+<!-- SLIDE 3: ARCHITECTURE -->
+<div class="slide">
+    <div class="content">
+        <h2>🏗️ System Architecture</h2>
+
+        <div class="architecture-diagram">
+            <div style="margin-bottom: 30px;">
+                <div class="flow-step">User Uploads Video</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">FFmpeg Transcoding</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">Walrus CLI Upload</div>
+            </div>
+            <div>
+                <div class="flow-step">Get Blob IDs</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">Register on Sui</div>
+                <span class="arrow">→</span>
+                <div class="flow-step">Streaming Ready</div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="box">
+                <h3>Frontend (Next.js)</h3>
+                <ul style="font-size: 16px;">
+                    <li>Sui Wallet Kit integration</li>
+                    <li>Video.js player (HLS adaptive streaming)</li>
+                    <li>Content library browsing</li>
+                    <li>NFT membership cards (IPFS)</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <h3>Backend (Node.js + TypeScript)</h3>
+                <ul style="font-size: 16px;">
+                    <li>FFmpeg transcoding pipeline</li>
+                    <li>Walrus CLI integration (bypass 10MB limit)</li>
+                    <li>PostgreSQL (content metadata)</li>
+                    <li>Sui SDK (@mysten/sui.js)</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <h3>Blockchain (Sui Move)</h3>
+                <ul style="font-size: 16px;">
+                    <li>MembershipNFT (dynamic display)</li>
+                    <li>ContentRegistry (on-chain catalog)</li>
+                    <li>Admin moderation (Pending → Active)</li>
+                    <li>Streaming metrics tracking</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <h3>Storage (Walrus + IPFS)</h3>
+                <ul style="font-size: 16px;">
+                    <li>Walrus: Video files (all qualities)</li>
+                    <li>IPFS/Pinata: NFT card images</li>
+                    <li>HTTP aggregators for retrieval</li>
+                    <li>52-epoch storage windows</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <span>ARCHITECTURE</span>
+        <span>SLIDE 3 OF 7</span>
+    </div>
+</div>
+
+<!-- SLIDE 4: WALRUS INTEGRATION -->
+<div class="slide">
+    <div class="content">
+        <h2>🦭 Walrus Integration Deep Dive</h2>
+
+        <h3>Challenge: Uploading Large Video Files</h3>
+        <div class="box">
+            <p><strong>Problem:</strong> Walrus HTTP API has a 10MB upload limit. Video files are often 1GB+.</p>
+            <p style="margin-top: 15px;"><strong>Solution:</strong> Use Walrus CLI directly via Node.js child process with retry logic.</p>
+        </div>
+
+        <pre><code>// Walrus CLI Upload (walrus.service.ts)
+async uploadFile(filePath: string, options) {
+  const cmd = `walrus store \\
+    --config ${this.configPath} \\
+    --epochs ${options.epochs || 52} \\
+    ${options.permanent ? '--permanent' : ''} \\
+    "${filePath}"`;
+
+  const result = await execAsync(cmd, {
+    timeout: 600000,  // 10 minute timeout
+    maxBuffer: 50 * 1024 * 1024
+  });
+
+  // Parse: "Blob ID: 1vwtsnn3dPnDqouEHcTfG5aV..."
+  const blobId = this.parseBlobId(result.stdout);
+
+  return {
+    blobId,
+    url: `${this.aggregatorUrl}/v1/${blobId}`,
+    permanent: options.permanent
+  };
+}</code></pre>
+
+        <h3 style="margin-top: 40px;">Retrieval via HTTP Aggregator</h3>
+        <pre><code>// Generate streaming URL
+const streamingUrl = `https://aggregator.walrus.atalma.io/v1/${blobId}`;
+
+// Video.js HLS player consumes this directly
+&lt;video src={streamingUrl} controls /&gt;</code></pre>
+    </div>
+    <div class="footer">
+        <span>WALRUS INTEGRATION</span>
+        <span>SLIDE 4 OF 7</span>
+    </div>
+</div>
+
+<!-- SLIDE 5: TECHNICAL CHALLENGES -->
+<div class="slide">
+    <div class="content">
+        <h2>⚡ Technical Challenges & Solutions</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Challenge</th>
+                    <th>Solution</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>10MB HTTP upload limit</strong></td>
+                    <td>Used Walrus CLI via child process</td>
+                    <td>✅ Uploaded 5GB+ files successfully</td>
+                </tr>
+                <tr>
+                    <td><strong>Multi-quality transcoding</strong></td>
+                    <td>FFmpeg pipeline (480p/720p/1080p/4K)</td>
+                    <td>✅ Adaptive streaming working</td>
+                </tr>
+                <tr>
+                    <td><strong>CLI timeout on large files</strong></td>
+                    <td>Increased maxBuffer + 10min timeout</td>
+                    <td>✅ No more buffer overflow errors</td>
+                </tr>
+                <tr>
+                    <td><strong>Blob ID parsing from CLI output</strong></td>
+                    <td>Regex extraction + error handling</td>
+                    <td>✅ Reliable blob ID capture</td>
+                </tr>
+                <tr>
+                    <td><strong>Dynamic NFT images</strong></td>
+                    <td>Sharp image processing + IPFS upload</td>
+                    <td>✅ Personalized cards with member #</td>
+                </tr>
+                <tr>
+                    <td><strong>On-chain content registry</strong></td>
+                    <td>Move smart contracts (3 packages)</td>
+                    <td>✅ Deployed on Sui mainnet</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="box" style="margin-top: 30px;">
+            <h3>Key Insight: CLI > HTTP API</h3>
+            <p>For production streaming platforms, the Walrus CLI is essential. It handles large files reliably and provides better error messages than the HTTP API. We built a robust wrapper service with exponential backoff retry logic.</p>
+        </div>
+    </div>
+    <div class="footer">
+        <span>TECHNICAL CHALLENGES</span>
+        <span>SLIDE 5 OF 7</span>
+    </div>
+</div>
+
+<!-- SLIDE 6: SMART CONTRACTS -->
+<div class="slide">
+    <div class="content">
+        <h2>📜 Sui Smart Contracts</h2>
+
+        <h3>Three Move Packages (Deployed on Mainnet)</h3>
+
+        <div class="box">
+            <h3>1. Membership Package</h3>
+            <pre style="font-size: 14px;"><code>public struct MembershipNFT has key, store {
+    id: UID,
+    member_number: u64,        // Unique ID: #000042
+    image_url: String,         // IPFS URL (active/expired card)
+    expires_at: u64,           // Timestamp
+    streams_used: u64,
+    total_watch_time: u64,
+}
+
+// Dynamic NFT: image_url changes based on expiration
+public fun get_display_url(nft: &MembershipNFT): String {
+    if (clock::timestamp_ms() < nft.expires_at) {
+        nft.active_card_url  // Green "ACTIVE" card
+    } else {
+        nft.expired_card_url // Red "EXPIRED" card
+    }
+}</code></pre>
+        </div>
+
+        <div class="box">
+            <h3>2. Content Registry Package</h3>
+            <pre style="font-size: 14px;"><code>public struct ContentItem has key, store {
+    id: UID,
+    blockchain_id: String,     // UUID reference
+    uploader: address,
+    title: String,
+    walrus_blob_ids: vector&lt;String&gt;,  // [480p, 720p, 1080p, 4K]
+    status: u8,                // 0=Pending, 1=Active, 2=Removed
+    total_streams: u64,
+    average_completion_rate: u64,
+}
+
+// Admin approval workflow
+public entry fun approve_content(
+    admin_cap: &AdminCap,
+    registry: &mut ContentRegistry,
+    content_id: String
+) { /* ... */ }</code></pre>
+        </div>
+    </div>
+    <div class="footer">
+        <span>SMART CONTRACTS</span>
+        <span>SLIDE 6 OF 7</span>
+    </div>
+</div>
+
+<!-- SLIDE 7: DEMO & RESULTS -->
+<div class="slide">
+    <div class="content">
+        <h2>🎬 Live Demo & Results</h2>
+
+        <h3>What Works Today</h3>
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number">✅</div>
+                <div class="stat-label">Deployed on Sui Mainnet</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">5GB+</div>
+                <div class="stat-label">Max File Size Tested</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">4K</div>
+                <div class="stat-label">Max Quality Support</div>
+            </div>
+        </div>
+
+        <h3>Core Functionality</h3>
+        <ul>
+            <li>✅ User connects Sui wallet (authentication)</li>
+            <li>✅ Mints membership NFT with personalized card (IPFS-backed)</li>
+            <li>✅ Uploader uploads video → FFmpeg transcodes → Walrus stores</li>
+            <li>✅ Content registered on-chain with all blob IDs</li>
+            <li>✅ Admin approves content (Pending → Active)</li>
+            <li>✅ Video.js player streams from Walrus HTTP aggregator</li>
+            <li>✅ Adaptive quality switching (HLS)</li>
+            <li>✅ On-chain tracking of views and completion rates</li>
+        </ul>
+
+        <div class="box" style="margin-top: 40px;">
+            <h3>🔗 Transaction Hash (Mainnet Deployment)</h3>
+            <p style="font-family: 'Courier New', monospace; color: #00FFF2; font-size: 20px;">
+                F34RuAQy6y7HuFvBsmaJJanXQ6GsUHYA3yRKSPAMgf4F
+            </p>
+            <p style="margin-top: 10px;">View on SuiScan: <span style="color: #FF10F0;">suiscan.xyz/mainnet/tx/F34RuAQy...</span></p>
+        </div>
+
+        <div class="vhs-badge" style="display: block; text-align: center; font-size: 24px; margin-top: 40px;">
+            WALRUS-POWERED STREAMING IS READY 🦭
+        </div>
+    </div>
+    <div class="footer">
+        <span>DEMO & RESULTS</span>
+        <span>SLIDE 7 OF 7</span>
+    </div>
+</div>
+
+<script>
+    console.log('%c🦭 BLOCKBUSTER WALRUS HACKATHON DEMO', 'color: #FF10F0; font-size: 24px; font-weight: bold;');
+    console.log('%cTo export as PDF: Press Ctrl/Cmd+P → Save as PDF', 'color: #00FFF2; font-size: 14px;');
+    console.log('%c7 slides loaded successfully!', 'color: #00FFF2; font-size: 14px;');
+</script>
+
+</body>
+</html>
