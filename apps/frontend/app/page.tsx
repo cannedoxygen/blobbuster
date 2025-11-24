@@ -15,7 +15,7 @@ export default function HomePage() {
           <h1 className="text-6xl md:text-8xl font-heading uppercase mb-4">
             <span className="relative inline-block">
               <span
-                className="absolute top-0 left-0 text-blobbuster-blue"
+                className="absolute top-0 left-0 text-blobbuster-navy"
                 style={{ transform: 'translate(4px, 4px)', zIndex: 0 }}
               >
                 BLOBBUSTER
