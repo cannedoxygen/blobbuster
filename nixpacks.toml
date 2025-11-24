@@ -1,18 +1,2 @@
-# Nixpacks build configuration for Railway
-# Ensures all required build dependencies are available
-
 [phases.setup]
-nixPkgs = ['nodejs_22', 'npm-9_x', 'python3', 'gcc', 'gnumake', 'openssl']
-
-[phases.install]
-cmds = ['npm ci']
-
-[phases.build]
-cmds = [
-  'npm run build --workspace=@blobbuster/shared-types',
-  'npm run build --workspace=@blobbuster/backend',
-  'cd apps/backend && npx prisma generate'
-]
-
-[start]
-cmd = 'node apps/backend/start.js'
+nixPkgs = ["nodejs_22", "npm-9_x", "python3", "gcc", "gnumake", "openssl", "ffmpeg"]
