@@ -42,7 +42,7 @@ export default function Header() {
   }, [userClickedSignIn, currentAccount, isAuthenticated, isLoading]);
 
   return (
-    <header className="border-b border-neon-cyan/20 backdrop-blur-sm">
+    <header className="bg-blobbuster-blue border-b border-blobbuster-yellow/30">
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition">
@@ -61,13 +61,13 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex space-x-8">
-            <Link href="/library" className="hover:text-neon-cyan transition">
+            <Link href="/library" className="text-white hover:text-blobbuster-yellow transition font-bold uppercase">
               Library
             </Link>
-            <Link href="/membership" className="hover:text-neon-cyan transition">
+            <Link href="/membership" className="text-white hover:text-blobbuster-yellow transition font-bold uppercase">
               Membership
             </Link>
-            <Link href="/uploader" className="hover:text-neon-cyan transition">
+            <Link href="/uploader" className="text-white hover:text-blobbuster-yellow transition font-bold uppercase">
               Providers
             </Link>
           </nav>
@@ -75,12 +75,12 @@ export default function Header() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-blobbuster-yellow font-bold">
                   {user?.username || currentAccount?.address.slice(0, 6) + '...'}
                 </span>
                 <button
                   onClick={logout}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition text-sm"
+                  className="px-4 py-2 bg-blobbuster-yellow text-blobbuster-blue hover:bg-blobbuster-yellow/90 rounded-lg font-bold transition text-sm uppercase"
                 >
                   Sign Out
                 </button>
@@ -89,7 +89,7 @@ export default function Header() {
               <button
                 onClick={handleSignIn}
                 disabled={isSigningIn || isLoading}
-                className="px-6 py-2 bg-neon-cyan text-black hover:bg-neon-cyan/80 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-blobbuster-yellow text-blobbuster-blue hover:bg-blobbuster-yellow/90 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed uppercase"
               >
                 {isSigningIn ? 'Signing In...' : 'Sign In'}
               </button>
@@ -97,7 +97,7 @@ export default function Header() {
               <div onClick={() => setUserClickedSignIn(true)}>
                 <ConnectButton
                   connectText="Sign In"
-                  className="px-6 py-2 bg-neon-cyan text-black hover:bg-neon-cyan/80 rounded-lg font-bold transition"
+                  className="px-6 py-2 bg-blobbuster-yellow text-blobbuster-blue hover:bg-blobbuster-yellow/90 rounded-lg font-bold transition uppercase"
                 />
               </div>
             )}
