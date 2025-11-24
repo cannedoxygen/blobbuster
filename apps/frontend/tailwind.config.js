@@ -15,9 +15,9 @@ module.exports = {
           blue: '#002D72', // Primary BlobBuster Blue
           navy: '#1E3A8A', // Solid Navy Blue (for text shadows/duplicates)
           darkBlue: '#001144', // Darker Blue
-          yellow: '#FFD700', // BlobBuster Yellow/Gold
-          gold: '#FFD700', // Alias for yellow
-          lightYellow: '#FFC700', // Lighter Yellow
+          yellow: '#F5E6B3', // BlobBuster Yellow/Gold - Pale cream yellow
+          gold: '#F5E6B3', // Alias for yellow
+          lightYellow: '#F9EDD4', // Lighter Yellow
           black: '#000033', // Deep Black/Blue
           white: '#FFFFFF',
         },
@@ -59,8 +59,8 @@ module.exports = {
 
       keyframes: {
         neonPulse: {
-          '0%, 100%': { textShadow: '0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700' },
-          '50%': { textShadow: '0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFD700' },
+          '0%, 100%': { textShadow: '0 0 10px #F5E6B3, 0 0 20px #F5E6B3, 0 0 30px #F5E6B3' },
+          '50%': { textShadow: '0 0 20px #F5E6B3, 0 0 30px #F5E6B3, 0 0 40px #F5E6B3' },
         },
         blobbusterHover: {
           '0%': { transform: 'translate(0, 0)' },

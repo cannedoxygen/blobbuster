@@ -27,7 +27,7 @@
 @layer components {
   /* Primary Button - Bold BlobBuster Style */
   .btn-primary {
-    background: #FFD700;
+    background: #F5E6B3;
     color: #002D72;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
@@ -47,13 +47,13 @@
   .btn-primary:hover {
     transform: translate(-3px, -3px);
     box-shadow: 6px 6px 0 #000033;
-    background: #FFC700;
+    background: #F9EDD4;
   }
 
   /* BlobBuster Card */
   .blobbuster-card {
     background: #001144;
-    border: 3px solid #FFD700;
+    border: 3px solid #F5E6B3;
     border-radius: 0.5rem;
     box-shadow: 4px 4px 0 #000033;
     transition: all 0.1s ease;
@@ -66,7 +66,7 @@
 
   /* BlobBuster Title - Yellow with shadow */
   .blobbuster-title {
-    color: #FFD700;
+    color: #F5E6B3;
     text-transform: uppercase;
     font-family: 'Archivo Black', sans-serif;
     text-shadow: 3px 3px 0 #001144;
@@ -80,16 +80,16 @@
 
   @keyframes neon-pulse {
     0%, 100% {
-      text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
+      text-shadow: 0 0 10px #F5E6B3, 0 0 20px #F5E6B3, 0 0 30px #F5E6B3;
     }
     50% {
-      text-shadow: 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFD700;
+      text-shadow: 0 0 20px #F5E6B3, 0 0 30px #F5E6B3, 0 0 40px #F5E6B3;
     }
   }
 
   /* Text Gradient */
   .text-gradient {
-    background: #FFD700;
+    background: #F5E6B3;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -101,7 +101,7 @@
   }
 
   .video-js .vjs-big-play-button {
-    background-color: #FFD700;
+    background-color: #F5E6B3;
     border-color: #002D72;
     border-width: 3px;
     border-radius: 0.5rem;
@@ -112,14 +112,14 @@
   }
 
   .video-js .vjs-progress-holder .vjs-play-progress {
-    background-color: #FFD700;
+    background-color: #F5E6B3;
   }
 }
 
 @layer utilities {
   /* BlobBuster link styling */
   .blobbuster-link {
-    color: #FFD700;
+    color: #F5E6B3;
     text-decoration: none;
     font-weight: bold;
     text-transform: uppercase;
@@ -127,7 +127,7 @@
   }
 
   .blobbuster-link:hover {
-    color: #FFC700;
+    color: #F9EDD4;
     text-shadow: 2px 2px 0 #001144;
   }
 }

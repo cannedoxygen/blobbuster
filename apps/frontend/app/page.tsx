@@ -61,7 +61,16 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-heading font-black uppercase mb-4">
+          <h1
+            className="text-8xl md:text-9xl font-heading font-black uppercase mb-4"
+            style={{
+              fontWeight: 900,
+              fontSize: 'clamp(4rem, 12vw, 10rem)',
+              lineHeight: 0.9,
+              fontFamily: "'Archivo Black', Impact, 'Arial Black', sans-serif",
+              WebkitTextStroke: '2px rgba(0, 0, 0, 0.3)'
+            }}
+          >
             <span className="relative inline-block">
               <span
                 className="absolute top-0 left-0"
