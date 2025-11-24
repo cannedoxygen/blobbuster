@@ -65,7 +65,7 @@ export default function HomePage() {
             <span className="relative inline-block">
               <span
                 className="absolute top-0 left-0 text-blobbuster-blue"
-                style={{ transform: 'translate(4px, 4px)', zIndex: 0 }}
+                style={{ transform: 'translate(6px, 6px)', zIndex: 0 }}
               >
                 BLOBBUSTER
               </span>
@@ -125,7 +125,7 @@ export default function HomePage() {
                 <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
                   {formatNumber(stats.contentCreators)}
                 </div>
-                <div className="text-gray-300 uppercase font-bold text-sm">Content Creators</div>
+                <div className="text-gray-300 uppercase font-bold text-sm">Content Providers</div>
               </div>
               <div className="blobbuster-card p-6 text-center rounded-lg">
                 <div className="text-4xl font-heading text-blobbuster-yellow mb-2 font-black">
@@ -139,7 +139,7 @@ export default function HomePage() {
             [
               { label: 'Active Members', value: '...' },
               { label: 'Movies & Shows', value: '...' },
-              { label: 'Content Creators', value: '...' },
+              { label: 'Content Providers', value: '...' },
               { label: 'Creator Earnings', value: '...' },
             ].map((stat) => (
               <div

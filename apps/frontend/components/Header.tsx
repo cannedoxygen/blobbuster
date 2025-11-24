@@ -50,7 +50,7 @@ export default function Header() {
             <h1 className="text-2xl font-heading relative inline-block">
               <span
                 className="absolute top-0 left-0 text-blobbuster-blue"
-                style={{ transform: 'translate(2px, 2px)', zIndex: 0 }}
+                style={{ transform: 'translate(4px, 4px)', zIndex: 0 }}
               >
                 BLOBBUSTER
               </span>
