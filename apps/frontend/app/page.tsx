@@ -87,7 +87,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/library"
-              className="px-8 py-4 border-3 border-blobbuster-yellow text-blobbuster-yellow hover:bg-blobbuster-yellow hover:text-blobbuster-blue font-bold text-lg transition uppercase shadow-blobbuster hover:shadow-blobbuster-hover hover:transform hover:-translate-x-0.5 hover:-translate-y-0.5 rounded-lg"
+              className="btn-primary rounded-lg"
             >
               Browse Library
             </Link>
@@ -159,7 +159,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto">
           <div className="blobbuster-card p-8 rounded-lg">
             <div className="text-center mb-6">
-              <div className="text-5xl font-black text-blobbuster-yellow neon-text mb-2">
+              <div className="text-5xl font-black text-blobbuster-yellow mb-2">
                 $5
               </div>
               <div className="text-lg text-gray-300 uppercase font-bold">2.5 SUI per month</div>
