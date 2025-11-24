@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ConnectButton } from '@mysten/dapp-kit';
 import { useCurrentAccount } from '@mysten/dapp-kit';
 import { useAuth } from '@/lib/auth/AuthContext';
@@ -46,19 +47,29 @@ export default function Header() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition">
-            <div className="w-10 h-10 bg-blobbuster-gold rounded-sm" />
-            <h1 className="text-2xl font-heading relative inline-block">
+            <div className="w-12 h-12 bg-blobbuster-gold rounded-sm overflow-hidden flex items-center justify-center p-1">
+              <Image
+                src="/header.png"
+                alt="BLOBBUSTER"
+                width={48}
+                height={48}
+                className="object-contain w-full h-full"
+                priority
+              />
+            </div>
+            <h1 className="text-3xl font-heading font-black relative inline-block" style={{ fontWeight: 900, letterSpacing: '0.02em' }}>
               <span
                 className="absolute top-0 left-0"
                 style={{
                   transform: 'translate(4px, 4px)',
                   zIndex: 0,
-                  color: '#000033'
+                  color: '#000033',
+                  fontWeight: 900
                 }}
               >
                 BLOBBUSTER
               </span>
-              <span className="relative text-blobbuster-yellow" style={{ zIndex: 1 }}>
+              <span className="relative text-blobbuster-yellow" style={{ zIndex: 1, fontWeight: 900 }}>
                 BLOBBUSTER
               </span>
             </h1>

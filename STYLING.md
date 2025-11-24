@@ -22,8 +22,8 @@ Bold 80s Blockbuster branding - chunky, graphic, high-contrast
 |-------|-----|-------|
 | **Blockbuster Blue** | `#002D72` | Primary background, text on yellow buttons |
 | **Blockbuster Dark Blue** | `#001144` | Card backgrounds, darker elements |
-| **Blockbuster Yellow/Gold** | `#FFD700` | Primary accent, buttons, headings, borders |
-| **Light Yellow** | `#FFC700` | Hover states |
+| **Blockbuster Yellow/Gold** | `#F5E6B3` | Primary accent, buttons, headings, borders (pale cream yellow) |
+| **Light Yellow** | `#F9EDD4` | Hover states |
 | **Deep Black/Blue** | `#000033` | Shadows |
 | **White** | `#FFFFFF` | Body text |
 
@@ -52,18 +52,18 @@ All UI elements follow classic Blockbuster branding:
 ### Buttons
 
 - **Shape:** Rounded rectangle (border-radius: 0.5rem)
-- **Fill:** `#FFD700` yellow
+- **Fill:** `#F5E6B3` pale cream yellow
 - **Text:** `#002D72` blue, uppercase, bold
 - **Border:** 3px solid `#002D72`
 - **Shadow:** `4px 4px 0 #000033`
 - **Hover:**
   - Transform: `translate(-3px, -3px)`
   - Shadow: `6px 6px 0 #000033`
-  - Background: `#FFC700`
+  - Background: `#F9EDD4`
 
 ### Headers/Titles
 
-- Color: `#FFD700`
+- Color: `#F5E6B3`
 - Text-shadow: `3px 3px 0 #001144`
 - Text-transform: uppercase
 - Letter-spacing: 2px
@@ -72,23 +72,23 @@ All UI elements follow classic Blockbuster branding:
 ### Cards
 
 - Background: `#001144`
-- Border: `3px solid #FFD700`
+- Border: `3px solid #F5E6B3`
 - Border-radius: 0.5rem (rounded corners)
 - Shadow: `4px 4px 0 #000033`
 - Hover: `6px 6px 0 #000033` + translate
 
 ### Dividers / Lines
 
-- Color: `#FFD700`
+- Color: `#F5E6B3`
 - Height: 1-4px solid line
 - No decorative elements
 
 ### Links
 
-- Color: `#FFD700`
+- Color: `#F5E6B3`
 - Text-transform: uppercase
 - Font-weight: bold
-- Hover: `#FFC700` with `2px 2px 0 #001144` text-shadow
+- Hover: `#F9EDD4` with `2px 2px 0 #001144` text-shadow
 
 ---
 
@@ -98,10 +98,10 @@ All UI elements follow classic Blockbuster branding:
 ```css
 @keyframes neon-pulse {
   0%, 100% {
-    text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
+    text-shadow: 0 0 10px #F5E6B3, 0 0 20px #F5E6B3, 0 0 30px #F5E6B3;
   }
   50% {
-    text-shadow: 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFD700;
+    text-shadow: 0 0 20px #F5E6B3, 0 0 30px #F5E6B3, 0 0 40px #F5E6B3;
   }
 }
 ```
