@@ -61,19 +61,20 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-heading uppercase mb-4">
+          <h1 className="text-6xl md:text-8xl font-heading font-black uppercase mb-4">
             <span className="relative inline-block">
               <span
                 className="absolute top-0 left-0"
                 style={{
-                  transform: 'translate(6px, 6px)',
+                  transform: 'translate(8px, 8px)',
                   zIndex: 0,
-                  color: '#000033'
+                  color: '#002D72',
+                  fontWeight: 900
                 }}
               >
                 BLOBBUSTER
               </span>
-              <span className="relative text-blobbuster-yellow" style={{ zIndex: 1 }}>
+              <span className="relative text-blobbuster-yellow" style={{ zIndex: 1, fontWeight: 900 }}>
                 BLOBBUSTER
               </span>
             </span>
