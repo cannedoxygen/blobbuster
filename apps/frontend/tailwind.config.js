@@ -13,8 +13,10 @@ module.exports = {
       colors: {
         blobbuster: {
           blue: '#002D72', // Primary BlobBuster Blue
+          navy: '#1E3A8A', // Solid Navy Blue (for text shadows/duplicates)
           darkBlue: '#001144', // Darker Blue
           yellow: '#FFD700', // BlobBuster Yellow/Gold
+          gold: '#FFD700', // Alias for yellow
           lightYellow: '#FFC700', // Lighter Yellow
           black: '#000033', // Deep Black/Blue
           white: '#FFFFFF',
