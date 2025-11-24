@@ -648,10 +648,8 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 
 ## Support
 
-- **Documentation**: [docs.blobbu.st](https://docs.blobbu.st)
-- **Discord**: [discord.gg/blobbu](https://discord.gg/blobbu)
-- **Twitter**: [@BlobBusterHQ](https://twitter.com/BlobBusterHQ)
-- **Email**: support@blobbu.st
+- **Telegram**: [@cannedoxygen](https://t.me/cannedoxygen)
+- **X (Twitter)**: [@cannedoxygen83](https://x.com/cannedoxygen83)
 
 ---
 
