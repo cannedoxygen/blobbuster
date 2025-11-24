@@ -71,8 +71,11 @@ router.get('/platform', async (req, res) => {
     });
   } catch (error) {
     logger.error('Error fetching platform stats:', error);
+    logger.error('Stats error details:', error instanceof Error ? error.message : error);
+    logger.error('Stats error stack:', error instanceof Error ? error.stack : 'No stack');
     res.status(500).json({
-      error: 'Failed to fetch platform statistics'
+      error: 'Failed to fetch platform statistics',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
