@@ -212,16 +212,42 @@ router.post(
         },
       });
 
-      // Update content statistics
-      await prisma.content.update({
+      // Get content with uploader info
+      const contentWithUploader = await prisma.content.findUnique({
         where: { id: contentId },
-        data: {
-          total_streams: { increment: 1 },
-          total_watch_time: { increment: BigInt(watchDuration) },
-          // Update average completion rate
-          // This is simplified - in production, calculate properly
+        select: {
+          uploader_id: true,
+          average_completion_rate: true,
+          total_streams: true,
         },
       });
+
+      if (contentWithUploader) {
+        // Calculate new average completion rate
+        const currentAvg = contentWithUploader.average_completion_rate || 0;
+        const currentStreams = Number(contentWithUploader.total_streams) || 0;
+        const newAvg = Math.round(
+          ((currentAvg * currentStreams) + completionPercentage) / (currentStreams + 1)
+        );
+
+        // Update content statistics
+        await prisma.content.update({
+          where: { id: contentId },
+          data: {
+            total_streams: { increment: 1 },
+            total_watch_time: { increment: BigInt(watchDuration) },
+            average_completion_rate: newAvg,
+          },
+        });
+
+        // Update uploader profile total streams
+        await prisma.uploader_profiles.update({
+          where: { id: contentWithUploader.uploader_id },
+          data: {
+            total_streams: { increment: 1 },
+          },
+        });
+      }
 
       // TODO: Record metrics on blockchain for revenue distribution
       // This would call suiBlockchainService.recordStreamMetrics()
