@@ -59,6 +59,7 @@ export function ExtendStorageModal({
   const [isCalculating, setIsCalculating] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
   const [isExtending, setIsExtending] = useState(false);
+  const [isWaitingForBlockchain, setIsWaitingForBlockchain] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentDigest, setPaymentDigest] = useState<string | null>(null);
 
@@ -139,6 +140,12 @@ export function ExtendStorageModal({
         setPaymentDigest(paymentResult.digest || null);
         setError(null);
         console.log('Payment successful:', paymentResult.digest);
+
+        // Wait for blockchain to finalize transaction (3 seconds)
+        setIsWaitingForBlockchain(true);
+        console.log('Waiting for blockchain to finalize transaction...');
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        setIsWaitingForBlockchain(false);
 
         // Auto-extend storage after successful payment
         await handleExtendStorage(paymentResult.digest || '');
@@ -380,8 +387,21 @@ export function ExtendStorageModal({
             </div>
           )}
 
+          {/* Waiting for Blockchain */}
+          {isWaitingForBlockchain && (
+            <div className="bg-blue-900/20 border-3 border-blue-500/50 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-blue-400"></div>
+                <p className="text-blue-400 font-semibold uppercase">Waiting for blockchain confirmation...</p>
+              </div>
+              <p className="text-sm text-gray-300 mt-2">
+                This usually takes 2-3 seconds
+              </p>
+            </div>
+          )}
+
           {/* Payment Success */}
-          {paymentDigest && (
+          {paymentDigest && !isWaitingForBlockchain && (
             <div className="bg-green-900/20 border-3 border-green-500/50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,13 +423,13 @@ export function ExtendStorageModal({
               <button
                 onClick={onClose}
                 className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition uppercase border-3 border-gray-600"
-                disabled={isPaying || isExtending}
+                disabled={isPaying || isExtending || isWaitingForBlockchain}
               >
                 Cancel
               </button>
               <button
                 onClick={handlePayment}
-                disabled={isPaying || isExtending || !costEstimate || !currentAccount}
+                disabled={isPaying || isExtending || isWaitingForBlockchain || !costEstimate || !currentAccount}
                 className="btn-primary flex-1 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed justify-center gap-2"
               >
                 {isPaying ? (
