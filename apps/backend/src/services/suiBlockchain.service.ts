@@ -35,10 +35,19 @@ export class SuiBlockchainService {
         const decoded = decodeSuiPrivateKey(privateKey);
         this.platformKeypair = Ed25519Keypair.fromSecretKey(decoded.secretKey);
       } else {
-        // Assume base64 or hex format
-        this.platformKeypair = Ed25519Keypair.fromSecretKey(
-          Buffer.from(privateKey, 'base64')
-        );
+        // Assume base64 format (33 bytes: flag || 32-byte private key)
+        // Sui keystore format includes 1-byte flag prefix, but Ed25519Keypair expects only 32 bytes
+        const fullKey = Buffer.from(privateKey, 'base64');
+        if (fullKey.length === 33) {
+          // Strip the first byte (flag) to get the 32-byte private key
+          const secretKeyOnly = fullKey.slice(1);
+          this.platformKeypair = Ed25519Keypair.fromSecretKey(secretKeyOnly);
+        } else if (fullKey.length === 32) {
+          // Already 32 bytes, use as-is
+          this.platformKeypair = Ed25519Keypair.fromSecretKey(fullKey);
+        } else {
+          throw new Error(`Invalid private key length: ${fullKey.length} bytes (expected 32 or 33)`);
+        }
       }
       logger.info('Sui blockchain service initialized');
       logger.info(`Platform address: ${this.getPlatformAddress()}`);
