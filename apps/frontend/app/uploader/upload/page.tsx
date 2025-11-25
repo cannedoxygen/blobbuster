@@ -83,6 +83,7 @@ export default function UploadPage() {
   const [isPaying, setIsPaying] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [paymentDigest, setPaymentDigest] = useState<string | null>(null);
+  const [showBetaModal, setShowBetaModal] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const PLATFORM_WALLET = process.env.NEXT_PUBLIC_PLATFORM_WALLET || '0x0';
@@ -832,7 +833,7 @@ export default function UploadPage() {
               {!paymentComplete ? (
                 <button
                   type="button"
-                  onClick={handlePayment}
+                  onClick={() => setShowBetaModal(true)}
                   disabled={isPaying || !videoFile || !costEstimate || !currentAccount || isDuplicate}
                   className="btn-primary w-full py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed justify-center gap-2"
                 >
@@ -879,6 +880,32 @@ export default function UploadPage() {
         isOpen={isAboutWalrusOpen}
         onClose={() => setIsAboutWalrusOpen(false)}
       />
+
+      {/* Beta Upload Modal */}
+      {showBetaModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="blobbuster-card rounded-lg max-w-md w-full p-8">
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">🚧</div>
+              <h2 className="text-3xl font-heading text-blobbuster-yellow mb-4 uppercase">
+                Coming Soon!
+              </h2>
+              <p className="text-lg text-white mb-2">
+                We're in beta and the upload function is not ready for users yet.
+              </p>
+              <p className="text-gray-400 text-sm">
+                Stay tuned for updates!
+              </p>
+            </div>
+            <button
+              onClick={() => setShowBetaModal(false)}
+              className="btn-primary w-full py-3 rounded-lg justify-center"
+            >
+              Got It
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
