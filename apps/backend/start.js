@@ -120,16 +120,17 @@ active_address: "${platformWallet}"
   fs.writeFileSync(suiConfigPath, suiConfig);
   console.log('  ✓ Sui wallet config created at:', suiConfigPath);
 
-  // Create empty keystore if SUI_PRIVATE_KEY is provided
+  // Create keystore if SUI_PRIVATE_KEY is provided
   const keystorePath = path.join(suiConfigDir, 'sui.keystore');
   if (process.env.SUI_PRIVATE_KEY) {
-    // Keystore format: array of private keys in hex
+    // Keystore format: array of private keys with proper JSON formatting (newlines required!)
     const keystore = [process.env.SUI_PRIVATE_KEY];
-    fs.writeFileSync(keystorePath, JSON.stringify(keystore));
+    const formattedKeystore = JSON.stringify(keystore, null, 2);
+    fs.writeFileSync(keystorePath, formattedKeystore);
     console.log('  ✓ Sui keystore created from SUI_PRIVATE_KEY');
   } else {
-    // Create empty keystore (CLI will work without signing)
-    fs.writeFileSync(keystorePath, '[]');
+    // Create empty keystore with proper formatting
+    fs.writeFileSync(keystorePath, '[\n]');
     console.log('  ⚠ Warning: No SUI_PRIVATE_KEY set, created empty keystore');
     console.log('    Walrus CLI will work for uploads but cannot sign transactions');
   }
