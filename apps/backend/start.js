@@ -123,14 +123,34 @@ active_address: "${platformWallet}"
   // Create keystore if SUI_PRIVATE_KEY is provided
   const keystorePath = path.join(suiConfigDir, 'sui.keystore');
   if (process.env.SUI_PRIVATE_KEY) {
+    let privateKey = process.env.SUI_PRIVATE_KEY.trim();
+
+    // Convert bech32 format (suiprivkey1...) to base64 format if needed
+    if (privateKey.startsWith('suiprivkey1')) {
+      console.log('  Converting bech32 private key to base64 format...');
+      try {
+        // Import Sui SDK to decode bech32
+        const { decodeSuiPrivateKey } = require('@mysten/sui.js/cryptography');
+        const { toB64 } = require('@mysten/sui.js/bcs');
+
+        // Decode bech32 to get the 33-byte array (flag || privkey)
+        const decoded = decodeSuiPrivateKey(privateKey);
+        // Encode to base64
+        privateKey = toB64(decoded.secretKey);
+        console.log('  ✓ Converted bech32 to base64');
+      } catch (error) {
+        console.error('  ✗ Failed to convert bech32 key:', error.message);
+        console.error('    Will try using the key as-is...');
+      }
+    }
+
     // Keystore format: array of private keys with proper JSON formatting (newlines required!)
-    const privateKey = process.env.SUI_PRIVATE_KEY.trim();
     const keystore = [privateKey];
     const formattedKeystore = JSON.stringify(keystore, null, 2);
     fs.writeFileSync(keystorePath, formattedKeystore);
     console.log('  ✓ Sui keystore created from SUI_PRIVATE_KEY');
+    console.log('    Key format:', privateKey.startsWith('suiprivkey1') ? 'bech32' : 'base64');
     console.log('    Key length:', privateKey.length);
-    console.log('    Keystore preview:', formattedKeystore.substring(0, 50) + '...');
 
     // Validate the keystore was written correctly
     const writtenContent = fs.readFileSync(keystorePath, 'utf8');
