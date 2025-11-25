@@ -29,7 +29,7 @@ export class NFTCardService {
   };
 
   private readonly FONT_SIZE = 20;
-  private readonly FONT_FAMILY = 'Courier New, monospace';
+  private readonly FONT_FAMILY = 'Courier';
 
   constructor() {
     this.ipfsService = getIPFSService();
