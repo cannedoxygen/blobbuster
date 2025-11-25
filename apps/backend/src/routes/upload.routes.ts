@@ -747,19 +747,39 @@ router.post('/initiate', authMiddleware, requireUploader, async (req: Request, r
       });
     }
 
-    // Verify payment digest hasn't been used before
+    // Check if payment digest was already used for a completed upload
     const existingPayment = await prisma.content.findUnique({
       where: { payment_tx_digest: paymentDigest },
     });
 
+    if (existingPayment) {
+      return res.status(400).json({
+        success: false,
+        error: 'Payment digest already used for a completed upload',
+      });
+    }
+
+    // Check if there's an existing session with this payment (allow resume)
     const existingSession = await prisma.upload_sessions.findUnique({
       where: { payment_digest: paymentDigest },
     });
 
-    if (existingPayment || existingSession) {
-      return res.status(400).json({
-        success: false,
-        error: 'Payment digest already used',
+    if (existingSession) {
+      // Return existing session ID for resume instead of error
+      logger.info('Resuming existing upload session', {
+        uploadId: existingSession.id,
+        fileName: existingSession.file_name,
+        chunksReceived: existingSession.chunks_received,
+        totalChunks: existingSession.total_chunks,
+      });
+
+      return res.json({
+        success: true,
+        uploadId: existingSession.id,
+        message: 'Resuming existing upload session',
+        resuming: true,
+        chunksReceived: existingSession.chunks_received,
+        totalChunks: existingSession.total_chunks,
       });
     }
 
@@ -802,6 +822,91 @@ router.post('/initiate', authMiddleware, requireUploader, async (req: Request, r
     res.status(500).json({
       success: false,
       error: 'Failed to initiate upload',
+    });
+  }
+});
+
+/**
+ * GET /api/upload/resume/:uploadId
+ * Get upload session status and which chunks are already received
+ * This allows resuming interrupted uploads without re-payment
+ */
+router.get('/resume/:uploadId', authMiddleware, requireUploader, async (req: Request, res: Response) => {
+  try {
+    const { uploadId } = req.params;
+
+    // Get session
+    const session = await prisma.upload_sessions.findUnique({
+      where: { id: uploadId },
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        success: false,
+        error: 'Upload session not found',
+      });
+    }
+
+    // Verify ownership
+    if (session.uploader_id !== req.user!.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'Unauthorized',
+      });
+    }
+
+    // Check which chunks already exist on disk
+    const chunksDir = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', uploadId, 'chunks');
+    let receivedChunks: number[] = [];
+
+    try {
+      const files = await fs.readdir(chunksDir);
+      receivedChunks = files
+        .filter((f) => f.startsWith('chunk-'))
+        .map((f) => parseInt(f.replace('chunk-', '')))
+        .filter((n) => !isNaN(n))
+        .sort((a, b) => a - b);
+    } catch (err) {
+      // Directory doesn't exist yet - no chunks received
+      receivedChunks = [];
+    }
+
+    // Calculate which chunks are missing
+    const allChunks = Array.from({ length: session.total_chunks }, (_, i) => i);
+    const missingChunks = allChunks.filter((i) => !receivedChunks.includes(i));
+
+    logger.info('Upload session resume info requested', {
+      uploadId,
+      receivedChunks: receivedChunks.length,
+      missingChunks: missingChunks.length,
+      totalChunks: session.total_chunks,
+      status: session.status,
+    });
+
+    res.json({
+      success: true,
+      session: {
+        id: session.id,
+        fileName: session.file_name,
+        fileSize: Number(session.file_size),
+        totalChunks: session.total_chunks,
+        receivedChunks: receivedChunks,
+        missingChunks: missingChunks,
+        status: session.status,
+        progress: session.progress,
+        title: session.title,
+        description: session.description,
+        genre: session.genre,
+        epochs: session.epochs,
+        // Payment info is already verified, no need to pay again
+        paymentVerified: true,
+      },
+    });
+  } catch (error) {
+    logger.error('Failed to get resume info', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get upload status',
     });
   }
 });
@@ -867,16 +972,31 @@ router.post(
         'chunks',
         `chunk-${chunkIndex}`
       );
-      await fs.writeFile(chunkPath, req.file.buffer);
 
-      // Update chunks received count
-      const updatedSession = await prisma.upload_sessions.update({
-        where: { id: uploadId },
-        data: {
-          chunks_received: session.chunks_received + 1,
-          progress: Math.floor(((session.chunks_received + 1) / session.total_chunks) * 80), // 0-80% for chunks
-        },
-      });
+      // Check if chunk already exists (resumable upload)
+      let chunkAlreadyExists = false;
+      try {
+        await fs.access(chunkPath);
+        chunkAlreadyExists = true;
+        logger.info('Chunk already exists, skipping upload', {
+          sessionId: uploadId,
+          chunkIndex,
+        });
+      } catch (err) {
+        // Chunk doesn't exist, write it
+        await fs.writeFile(chunkPath, req.file.buffer);
+      }
+
+      // Update chunks received count only if this is a new chunk
+      const updatedSession = chunkAlreadyExists
+        ? session
+        : await prisma.upload_sessions.update({
+            where: { id: uploadId },
+            data: {
+              chunks_received: session.chunks_received + 1,
+              progress: Math.floor(((session.chunks_received + 1) / session.total_chunks) * 80), // 0-80% for chunks
+            },
+          });
 
       logger.info('Chunk uploaded', {
         sessionId: uploadId,
