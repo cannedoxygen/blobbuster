@@ -129,18 +129,31 @@ active_address: "${platformWallet}"
     if (privateKey.startsWith('suiprivkey1')) {
       console.log('  Converting bech32 private key to base64 format...');
       try {
-        // Import Sui SDK to decode bech32
-        const { decodeSuiPrivateKey } = require('@mysten/sui.js/cryptography');
-        const { toB64 } = require('@mysten/sui.js/bcs');
+        // Use bech32 decoding manually (avoid Sui SDK dependency in startup script)
+        // Bech32 format: "suiprivkey1" + bech32_encoded_data
+        // We need to decode and convert to base64
 
-        // Decode bech32 to get the 33-byte array (flag || privkey)
-        const decoded = decodeSuiPrivateKey(privateKey);
-        // Encode to base64
-        privateKey = toB64(decoded.secretKey);
+        // Simple approach: Use Sui CLI command to convert
+        const { execSync } = require('child_process');
+        const convertCmd = `echo "${privateKey}" | base64 -d 2>/dev/null || echo "DECODE_FAILED"`;
+
+        // Actually, let's use a different approach: decode bech32 manually
+        // Bech32 alphabet
+        const BECH32_ALPHABET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+
+        // For now, let's try loading the full data as-is and let Sui handle it
+        // OR use a simple Node.js bech32 decoder
+        const bech32 = require('../../node_modules/bech32/index.js');
+        const decoded = bech32.bech32.decode(privateKey);
+        const bytes = bech32.bech32.fromWords(decoded.words);
+        privateKey = Buffer.from(bytes).toString('base64');
+
         console.log('  ✓ Converted bech32 to base64');
       } catch (error) {
         console.error('  ✗ Failed to convert bech32 key:', error.message);
-        console.error('    Will try using the key as-is...');
+        console.error('    Error stack:', error.stack);
+        console.error('    Trying alternative: keeping bech32 format...');
+        // Keep as-is, maybe Sui CLI accepts bech32 directly
       }
     }
 
