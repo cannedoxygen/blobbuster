@@ -1222,19 +1222,38 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
     await updateSessionStatus(uploadId, 'assembling', 80);
     const assembledFilePath = await assembleChunks(uploadId, session.file_name);
 
-    // STEP 2: Extract video metadata and generate thumbnail
-    await updateSessionStatus(uploadId, 'analyzing', 85);
+    // STEP 2: Extract video metadata and check if transcoding needed
+    await updateSessionStatus(uploadId, 'analyzing', 82);
     const metadata = await transcodingService.getVideoMetadata(assembledFilePath);
+    const { skip, reason } = await transcodingService.shouldSkipTranscoding(metadata, assembledFilePath);
 
-    // Create work directory for thumbnail
+    // STEP 3: Transcode to MP4 if needed (for browser compatibility)
+    let finalVideoPath = assembledFilePath;
+    if (!skip) {
+      logger.info('Video needs transcoding to MP4', { reason, uploadId });
+      await updateSessionStatus(uploadId, 'transcoding', 85);
+
+      const transcodedPath = assembledFilePath.replace(/\.[^.]+$/, '.mp4');
+      await transcodingService.convertToMP4(assembledFilePath, transcodedPath);
+      finalVideoPath = transcodedPath;
+
+      // Clean up original non-MP4 file
+      await fs.unlink(assembledFilePath);
+      logger.info('Transcoding completed, cleaned up original file', { uploadId });
+    } else {
+      logger.info('Video is already browser-compatible MP4, skipping transcoding', { uploadId });
+    }
+
+    // STEP 4: Generate thumbnail
+    await updateSessionStatus(uploadId, 'analyzing', 87);
     const workDir = path.join(process.env.UPLOAD_DIR || '/tmp/uploads', uploadId, 'work');
     await fs.mkdir(workDir, { recursive: true });
 
-    const thumbnailPath = await transcodingService.generateThumbnail(assembledFilePath, workDir);
+    const thumbnailPath = await transcodingService.generateThumbnail(finalVideoPath, workDir);
 
-    // STEP 3: Upload video to Walrus
+    // STEP 5: Upload video to Walrus
     await updateSessionStatus(uploadId, 'uploading_to_walrus', 90);
-    const videoUploadResult = await walrusService.uploadFile(assembledFilePath, {
+    const videoUploadResult = await walrusService.uploadFile(finalVideoPath, {
       epochs: session.epochs,
     });
 
@@ -1432,6 +1451,7 @@ function getStatusMessage(status: string): string {
     receiving_chunks: 'Receiving chunks...',
     assembling: 'Assembling video file...',
     analyzing: 'Analyzing video...',
+    transcoding: 'Converting to MP4 format...',
     uploading_to_walrus: 'Uploading to Walrus...',
     registering_blockchain: 'Registering on blockchain...',
     complete: 'Upload complete!',
