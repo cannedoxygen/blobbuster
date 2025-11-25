@@ -418,15 +418,23 @@ router.get('/my-content', authMiddleware, requireUploader, async (req: Request, 
       });
     }
 
-    // Get all content for this uploader
+    // Get all content for this uploader (exclude deleted)
     const [content, total] = await Promise.all([
       prisma.content.findMany({
-        where: { uploader_id: uploaderProfile.id },
+        where: {
+          uploader_id: uploaderProfile.id,
+          status: { not: 3 } // Exclude deleted content
+        },
         orderBy: { created_at: 'desc' },
         take: limit,
         skip: offset,
       }),
-      prisma.content.count({ where: { uploader_id: uploaderProfile.id } }),
+      prisma.content.count({
+        where: {
+          uploader_id: uploaderProfile.id,
+          status: { not: 3 } // Exclude deleted content
+        }
+      }),
     ]);
 
     // Convert BigInt fields to Numbers and normalize to camelCase for frontend
