@@ -134,56 +134,25 @@ default_context: mainnet
   // Create keystore if SUI_PRIVATE_KEY is provided
   const keystorePath = path.join(suiConfigDir, 'sui.keystore');
   if (process.env.SUI_PRIVATE_KEY) {
-    let privateKey = process.env.SUI_PRIVATE_KEY.trim();
+    const privateKey = process.env.SUI_PRIVATE_KEY.trim();
 
-    // Convert bech32 format (suiprivkey1...) to base64 format if needed
-    if (privateKey.startsWith('suiprivkey1')) {
-      console.log('  Converting bech32 private key to base64 format...');
-      try {
-        // Use bech32 decoding manually (avoid Sui SDK dependency in startup script)
-        // Bech32 format: "suiprivkey1" + bech32_encoded_data
-        // We need to decode and convert to base64
-
-        // Simple approach: Use Sui CLI command to convert
-        const { execSync } = require('child_process');
-        const convertCmd = `echo "${privateKey}" | base64 -d 2>/dev/null || echo "DECODE_FAILED"`;
-
-        // Actually, let's use a different approach: decode bech32 manually
-        // Bech32 alphabet
-        const BECH32_ALPHABET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
-
-        // For now, let's try loading the full data as-is and let Sui handle it
-        // OR use a simple Node.js bech32 decoder
-        const bech32 = require('../../node_modules/bech32/index.js');
-        const decoded = bech32.bech32.decode(privateKey);
-        const bytes = bech32.bech32.fromWords(decoded.words);
-        privateKey = Buffer.from(bytes).toString('base64');
-
-        console.log('  ✓ Converted bech32 to base64');
-      } catch (error) {
-        console.error('  ✗ Failed to convert bech32 key:', error.message);
-        console.error('    Error stack:', error.stack);
-        console.error('    Trying alternative: keeping bech32 format...');
-        // Keep as-is, maybe Sui CLI accepts bech32 directly
-      }
-    }
-
-    // Keystore format: array of private keys with proper JSON formatting (newlines required!)
+    // Write key directly to keystore (must be base64 format for Walrus CLI)
     const keystore = [privateKey];
     const formattedKeystore = JSON.stringify(keystore, null, 2);
-    fs.writeFileSync(keystorePath, formattedKeystore);
+    fs.writeFileSync(keystorePath, formattedKeystore, 'utf8');
+
     console.log('  ✓ Sui keystore created from SUI_PRIVATE_KEY');
-    console.log('    Key format:', privateKey.startsWith('suiprivkey1') ? 'bech32' : 'base64');
     console.log('    Key length:', privateKey.length);
+    console.log('    Keystore file size:', formattedKeystore.length, 'bytes');
 
     // Validate the keystore was written correctly
     const writtenContent = fs.readFileSync(keystorePath, 'utf8');
-    console.log('    Keystore file first 100 chars:', writtenContent.substring(0, 100));
+    console.log('    Keystore first 50 chars:', writtenContent.substring(0, 50));
   } else {
-    // Create empty keystore with proper formatting
-    fs.writeFileSync(keystorePath, '[\n]');
+    // Create empty keystore
+    fs.writeFileSync(keystorePath, '[\n\n]', 'utf8');
     console.log('  ⚠ Warning: No SUI_PRIVATE_KEY set, created empty keystore');
-    console.log('    Walrus CLI will work for uploads but cannot sign transactions');
+    console.log('    Walrus CLI uploads will fail without a valid wallet');
   }
 
   console.log('  ✓ Walrus CLI configuration complete');
