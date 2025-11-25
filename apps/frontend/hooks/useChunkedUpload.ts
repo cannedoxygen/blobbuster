@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOTAL_CHUNKS = 5; // Always split into 5 chunks
+const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB per chunk (industry standard)
 
 interface ChunkedUploadOptions {
   file: File;
@@ -48,13 +48,16 @@ export function useChunkedUpload() {
       setStatusMessage('Preparing upload...');
 
       try {
+        // Calculate total chunks based on file size and 10MB chunk size
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
         // STEP 1: Initiate upload session
         const initiateResponse = await axios.post(
           `${API_URL}/api/upload/initiate`,
           {
             fileName: file.name,
             fileSize: file.size,
-            totalChunks: TOTAL_CHUNKS,
+            totalChunks,
             title,
             description,
             genre,
@@ -72,17 +75,16 @@ export function useChunkedUpload() {
         }
 
         const uploadId = initiateResponse.data.uploadId;
-        const chunkSize = Math.ceil(file.size / TOTAL_CHUNKS);
 
         // STEP 2: Upload chunks sequentially
-        for (let i = 0; i < TOTAL_CHUNKS; i++) {
-          const start = i * chunkSize;
-          const end = Math.min(start + chunkSize, file.size);
+        for (let i = 0; i < totalChunks; i++) {
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(start + CHUNK_SIZE, file.size);
           const chunk = file.slice(start, end);
 
-          setStatusMessage(`Uploading chunk ${i + 1}/${TOTAL_CHUNKS}...`);
+          setStatusMessage(`Uploading chunk ${i + 1}/${totalChunks}...`);
           if (onStatusUpdate) {
-            onStatusUpdate(`Uploading chunk ${i + 1}/${TOTAL_CHUNKS}...`);
+            onStatusUpdate(`Uploading chunk ${i + 1}/${totalChunks}...`);
           }
 
           const formData = new FormData();
@@ -97,7 +99,7 @@ export function useChunkedUpload() {
           });
 
           // Update progress (0-80% for chunks)
-          const progress = Math.floor(((i + 1) / TOTAL_CHUNKS) * 80);
+          const progress = Math.floor(((i + 1) / totalChunks) * 80);
           setUploadProgress(progress);
           if (onProgress) {
             onProgress(progress);
