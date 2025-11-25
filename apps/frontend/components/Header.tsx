@@ -47,13 +47,13 @@ export default function Header() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition">
-            <div className="w-12 h-12 bg-blobbuster-gold rounded-sm overflow-hidden flex items-center justify-center p-1">
+            <div className="w-12 h-12 overflow-hidden flex items-center justify-center border-2 border-blobbuster-yellow rounded-lg">
               <Image
                 src="/header.png"
                 alt="BLOBBUSTER"
                 width={48}
                 height={48}
-                className="object-contain w-full h-full"
+                className="object-cover w-full h-full"
                 priority
               />
             </div>

@@ -77,7 +77,7 @@ export default function HomePage() {
                 style={{
                   transform: 'translate(8px, 8px)',
                   zIndex: 0,
-                  color: '#002D72',
+                  color: '#001144',
                   fontWeight: 900
                 }}
               >
