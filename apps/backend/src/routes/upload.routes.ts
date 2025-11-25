@@ -1015,6 +1015,67 @@ router.get('/status/:uploadId', authMiddleware, async (req: Request, res: Respon
   }
 });
 
+/**
+ * DELETE /api/upload/:contentId
+ * Delete content (hard delete from database)
+ */
+router.delete('/:contentId', authMiddleware, requireUploader, async (req: Request, res: Response) => {
+  try {
+    const { contentId } = req.params;
+    const userId = req.user!.userId;
+
+    // Get uploader profile
+    const uploaderProfile = await prisma.uploader_profiles.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!uploaderProfile) {
+      return res.status(404).json({
+        success: false,
+        error: 'Uploader profile not found',
+      });
+    }
+
+    // Get content to verify ownership
+    const content = await prisma.content.findUnique({
+      where: { id: contentId },
+    });
+
+    if (!content) {
+      return res.status(404).json({
+        success: false,
+        error: 'Content not found',
+      });
+    }
+
+    // Verify ownership
+    if (content.uploader_id !== uploaderProfile.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'Not authorized to delete this content',
+      });
+    }
+
+    // Hard delete content from database
+    await prisma.content.delete({
+      where: { id: contentId },
+    });
+
+    logger.info(`Content deleted: ${contentId} by uploader ${uploaderProfile.id}`);
+
+    res.json({
+      success: true,
+      message: 'Content deleted successfully',
+    });
+  } catch (error) {
+    logger.error('Failed to delete content:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete content',
+    });
+  }
+});
+
 // ==========================================
 // BACKGROUND PROCESSING FUNCTIONS
 // ==========================================
