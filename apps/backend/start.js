@@ -102,30 +102,34 @@ default_context: mainnet
   const platformWallet = process.env.PLATFORM_WALLET || '0x0';
   const keystoreFilePath = path.join(suiConfigDir, 'sui.keystore');
 
-  // YAML format must match exactly what works locally
-  const suiConfig = `---
-keystore:
-  File: ${keystoreFilePath}
-envs:
-  - alias: mainnet
-    rpc: "https://fullnode.mainnet.sui.io:443"
-    ws: ~
-    basic_auth: ~
-  - alias: testnet
-    rpc: "https://fullnode.testnet.sui.io:443"
-    ws: ~
-    basic_auth: ~
-active_env: mainnet
-active_address: "${platformWallet}"
-`;
+  // Build YAML line by line with explicit newlines to avoid template literal issues
+  const suiConfigLines = [
+    '---',
+    'keystore:',
+    '  File: ' + keystoreFilePath,
+    'envs:',
+    '  - alias: mainnet',
+    '    rpc: "https://fullnode.mainnet.sui.io:443"',
+    '    ws: ~',
+    '    basic_auth: ~',
+    '  - alias: testnet',
+    '    rpc: "https://fullnode.testnet.sui.io:443"',
+    '    ws: ~',
+    '    basic_auth: ~',
+    'active_env: mainnet',
+    'active_address: "' + platformWallet + '"',
+    '' // trailing newline
+  ];
+  const suiConfig = suiConfigLines.join('\n');
 
   const suiConfigPath = path.join(suiConfigDir, 'client.yaml');
-  fs.writeFileSync(suiConfigPath, suiConfig);
+  fs.writeFileSync(suiConfigPath, suiConfig, 'utf8');
   console.log('  ✓ Sui wallet config created at:', suiConfigPath);
   console.log('    Keystore path:', keystoreFilePath);
   console.log('    Active address:', platformWallet);
-  console.log('    Config content preview:');
-  console.log(suiConfig.split('\n').slice(0, 8).join('\n'));
+  console.log('    File size:', suiConfig.length, 'bytes');
+  console.log('    First 200 chars:');
+  console.log(JSON.stringify(suiConfig.substring(0, 200)));
 
   // Create keystore if SUI_PRIVATE_KEY is provided
   const keystorePath = path.join(suiConfigDir, 'sui.keystore');
