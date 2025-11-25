@@ -783,6 +783,13 @@ router.post('/initiate', authMiddleware, requireUploader, async (req: Request, r
       });
     }
 
+    // Log the incoming tmdbId for debugging
+    logger.info('Creating upload session with TMDB ID', {
+      tmdbId,
+      tmdbIdType: typeof tmdbId,
+      title,
+    });
+
     // Create upload session
     const session = await prisma.upload_sessions.create({
       data: {
@@ -796,7 +803,7 @@ router.post('/initiate', authMiddleware, requireUploader, async (req: Request, r
         epochs,
         payment_digest: paymentDigest,
         paid_amount: paidAmount,
-        tmdb_id: tmdbId || null,
+        tmdb_id: tmdbId ? Number(tmdbId) : null,
         status: 'receiving_chunks',
         progress: 0,
       },
@@ -1252,19 +1259,54 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
 
     const thumbnailPath = await transcodingService.generateThumbnail(finalVideoPath, workDir);
 
-    // STEP 5: Upload video to Walrus
-    await updateSessionStatus(uploadId, 'uploading_to_walrus', 90);
-    const videoUploadResult = await walrusService.uploadFile(finalVideoPath, {
-      epochs: session.epochs,
+    // STEP 5: Generate HLS segments for seamless streaming
+    await updateSessionStatus(uploadId, 'transcoding', 88);
+    logger.info('Generating HLS segments', { uploadId });
+
+    const hlsResult = await transcodingService.generateHLSSegments(finalVideoPath, workDir);
+
+    logger.info('HLS segmentation completed', {
+      uploadId,
+      totalSegments: hlsResult.segments.length,
+      totalDuration: hlsResult.segments.reduce((sum, s) => sum + s.duration, 0),
     });
 
-    // STEP 4: Upload thumbnail to Walrus
+    // STEP 6: Upload HLS segments to Walrus
+    await updateSessionStatus(uploadId, 'uploading_to_walrus', 90);
+    logger.info(`Uploading ${hlsResult.segments.length} HLS segments to Walrus`, { uploadId });
+
+    // Upload all segments in parallel (with controlled concurrency)
+    const uploadedSegments: { index: number; blobId: string; duration: number }[] = [];
+    const BATCH_SIZE = 5; // Upload 5 segments at a time to avoid overwhelming Walrus
+
+    for (let i = 0; i < hlsResult.segments.length; i += BATCH_SIZE) {
+      const batch = hlsResult.segments.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(
+        batch.map(async (segment) => {
+          const result = await walrusService.uploadFile(segment.filePath, {
+            epochs: session.epochs,
+          });
+          return {
+            index: segment.index,
+            blobId: result.blobId,
+            duration: segment.duration,
+          };
+        })
+      );
+      uploadedSegments.push(...batchResults);
+
+      // Update progress as segments upload
+      const progress = 90 + Math.floor((uploadedSegments.length / hlsResult.segments.length) * 5);
+      await updateSessionStatus(uploadId, 'uploading_to_walrus', progress);
+    }
+
+    // Upload thumbnail to Walrus
     const thumbnailUploadResult = await walrusService.uploadFile(thumbnailPath, {
       epochs: session.epochs,
     });
 
-    // STEP 5: Register on SUI blockchain
-    await updateSessionStatus(uploadId, 'registering_blockchain', 95);
+    // STEP 7: Register on SUI blockchain
+    await updateSessionStatus(uploadId, 'registering_blockchain', 96);
 
     // Get uploader profile
     const uploaderProfile = await prisma.uploader_profiles.findUnique({
@@ -1275,8 +1317,10 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
       throw new Error('Uploader profile not found');
     }
 
+    // Create HLS blob IDs structure
     const blobIdsString = JSON.stringify({
-      video: videoUploadResult.blobId,
+      type: 'hls',
+      segments: uploadedSegments,
       thumbnail: thumbnailUploadResult.blobId,
     });
 
@@ -1294,13 +1338,30 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
     if (metadataService && metadataService.isEnabled()) {
       try {
         // Use tmdbId from session if available (user selected specific movie)
+        logger.info('TMDB metadata fetch - checking session', {
+          uploadId,
+          sessionTmdbId: session.tmdb_id,
+          sessionTitle: session.title,
+          hasTmdbId: !!session.tmdb_id,
+        });
+
         if (session.tmdb_id) {
-          logger.info('Fetching TMDB metadata by ID', { tmdbId: session.tmdb_id });
+          logger.info('Fetching TMDB metadata by specific ID (user selected)', { tmdbId: session.tmdb_id });
           tmdbMetadata = await metadataService.getMovieDetails(session.tmdb_id);
+          logger.info('TMDB metadata fetched by ID', {
+            fetchedTitle: tmdbMetadata?.title,
+            fetchedYear: tmdbMetadata?.year,
+            fetchedTmdbId: tmdbMetadata?.tmdbId,
+          });
         } else {
           // Fallback to title search
-          logger.info('Searching TMDB by title', { title: session.title });
+          logger.info('Searching TMDB by title (no tmdb_id in session)', { title: session.title });
           tmdbMetadata = await metadataService.searchMovie(session.title);
+          logger.info('TMDB metadata fetched by title search', {
+            fetchedTitle: tmdbMetadata?.title,
+            fetchedYear: tmdbMetadata?.year,
+            fetchedTmdbId: tmdbMetadata?.tmdbId,
+          });
         }
       } catch (error) {
         logger.warn('Failed to fetch TMDB metadata', { error });
@@ -1366,7 +1427,7 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
         status: 'complete',
         progress: 100,
         content_id: blockchainResult.contentId,
-        video_blob_id: videoUploadResult.blobId,
+        video_blob_id: uploadedSegments.length > 0 ? uploadedSegments[0].blobId : null, // First segment as reference
         thumbnail_blob_id: thumbnailUploadResult.blobId,
         completed_at: new Date(),
       },
@@ -1460,8 +1521,8 @@ function getStatusMessage(status: string): string {
     receiving_chunks: 'Receiving chunks...',
     assembling: 'Assembling video file...',
     analyzing: 'Analyzing video...',
-    transcoding: 'Converting to MP4 format...',
-    uploading_to_walrus: 'Uploading to Walrus...',
+    transcoding: 'Generating HLS segments for streaming...',
+    uploading_to_walrus: 'Uploading HLS segments to Walrus...',
     registering_blockchain: 'Registering on blockchain...',
     complete: 'Upload complete!',
     error: 'Upload failed',

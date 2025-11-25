@@ -42,22 +42,51 @@ export function VideoPlayer({
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
-        backBufferLength: 90, // Keep 90 seconds of buffer
-        maxBufferLength: 30, // Buffer 30 seconds ahead
-        maxMaxBufferLength: 60, // Maximum buffer size
-        maxBufferSize: 60 * 1000 * 1000, // 60 MB max buffer
+        // Buffer settings optimized for smooth VOD playback
+        backBufferLength: 90, // Keep 90 seconds of back buffer for seeking
+        maxBufferLength: 60, // Buffer 60 seconds ahead for seamless playback
+        maxMaxBufferLength: 120, // Allow up to 2 minutes buffer
+        maxBufferSize: 120 * 1000 * 1000, // 120 MB max buffer
         maxBufferHole: 0.5, // Maximum gap to skip
+        // Start loading immediately and aggressively
+        startLevel: -1, // Auto-select quality
+        autoStartLoad: true,
+        // Segment loading optimization
+        maxLoadingDelay: 4, // Max delay before aborting slow segment
+        fragLoadingTimeOut: 20000, // 20s timeout per segment
+        fragLoadingMaxRetry: 6, // Retry failed segments
+        fragLoadingRetryDelay: 1000, // 1s between retries
+        // Level loading
+        levelLoadingTimeOut: 10000,
+        levelLoadingMaxRetry: 4,
       });
 
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log('HLS manifest loaded, ready to play');
+      hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        console.log('HLS manifest loaded, ready to play', {
+          levels: data.levels.length,
+          firstLevel: data.firstLevel,
+        });
+        // Auto-play when manifest is ready
+        video.play().catch((err) => console.log('Auto-play prevented:', err));
+      });
+
+      hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
+        console.log(`HLS segment ${data.frag.sn} loaded (${(data.frag.stats.total / 1024).toFixed(0)}KB)`);
+      });
+
+      hls.on(Hls.Events.BUFFER_APPENDED, () => {
+        if (video.buffered.length > 0) {
+          const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+          const bufferedAhead = bufferedEnd - video.currentTime;
+          console.log(`Buffer: ${bufferedAhead.toFixed(1)}s ahead`);
+        }
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
-        console.error('HLS error:', data);
+        console.error('HLS error:', data.type, data.details, data);
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
