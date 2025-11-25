@@ -86,8 +86,8 @@ router.post(
           blobId: walrusBlobIds.videoBlobId,
         });
       } else {
-        // Legacy quality-based format (backwards compatibility)
-        const blobId = walrusBlobIds['720p'] || walrusBlobIds['1080p'] || walrusBlobIds['480p'] || '';
+        // Check for direct video key (current format) or legacy quality-based keys
+        const blobId = walrusBlobIds.video || walrusBlobIds['720p'] || walrusBlobIds['1080p'] || walrusBlobIds['480p'] || '';
         streamUrl = blobId ? `${apiBaseUrl}/api/stream/proxy/${blobId}` : '';
         logger.info(`Stream started (legacy quality): ${sessionId} for content ${contentId} by user ${userId}`, {
           streamUrl,
