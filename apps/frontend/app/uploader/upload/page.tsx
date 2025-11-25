@@ -976,6 +976,63 @@ export default function UploadPage() {
           setIsFetchingMetadata(false);
         }}
       />
+
+      {/* Upload In Progress Modal */}
+      {(isUploading || isPaying) && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-blobbuster-navy border-4 border-blobbuster-yellow rounded-xl max-w-md w-full p-8 text-center shadow-blobbuster">
+            {/* Warning Icon */}
+            <div className="text-6xl mb-4">
+              {isPaying ? '💳' : '📤'}
+            </div>
+
+            {/* Title */}
+            <h2 className="text-2xl font-heading text-blobbuster-yellow mb-4 uppercase">
+              {isPaying ? 'Processing Payment...' : 'Upload In Progress'}
+            </h2>
+
+            {/* Warning Message */}
+            <div className="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 mb-6">
+              <p className="text-red-400 font-bold text-lg mb-2">⚠️ DO NOT REFRESH OR CLOSE THIS PAGE</p>
+              <p className="text-gray-300 text-sm">
+                {isPaying
+                  ? 'Your payment is being processed. Interrupting may result in lost funds.'
+                  : 'Your content is being uploaded and processed. This may take several minutes for large files. Closing this page could result in lost funds and incomplete upload.'}
+              </p>
+            </div>
+
+            {/* Progress */}
+            {isUploading && (
+              <div className="mb-6">
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-400 uppercase">{statusMessage || 'Processing...'}</span>
+                  <span className="text-sm text-blobbuster-yellow font-bold">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-blobbuster-yellow to-yellow-400 h-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Spinner for payment */}
+            {isPaying && (
+              <div className="flex justify-center mb-6">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blobbuster-yellow border-t-transparent"></div>
+              </div>
+            )}
+
+            {/* Reassurance */}
+            <p className="text-gray-400 text-sm">
+              {isPaying
+                ? 'Please confirm the transaction in your wallet...'
+                : 'You will be automatically redirected when complete.'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
