@@ -195,6 +195,101 @@ default_context: mainnet
 }
 console.log('');
 
+// Test Walrus CLI with small file
+console.log('=== WALRUS CLI TEST ===');
+try {
+  const { execSync } = require('child_process');
+  const testFilePath = path.join(__dirname, 'walrus-test.txt');
+
+  // Create a small test file
+  fs.writeFileSync(testFilePath, 'Hello Walrus! This is a test upload.', 'utf8');
+  console.log('  ✓ Created test file:', testFilePath);
+  console.log('    File size:', fs.statSync(testFilePath).size, 'bytes');
+
+  // Check if Walrus CLI exists
+  const walrusCliPath = path.join(process.env.HOME || '/root', '.local', 'bin', 'walrus');
+  if (fs.existsSync(walrusCliPath)) {
+    console.log('  ✓ Walrus CLI found at:', walrusCliPath);
+  } else {
+    console.log('  ✗ Walrus CLI not found at:', walrusCliPath);
+  }
+
+  // Verify config files exist
+  const walrusConfigPath = path.join(process.env.HOME || '/root', '.config', 'walrus', 'client_config.yaml');
+  const suiConfigPath = path.join(process.env.HOME || '/root', '.sui', 'sui_config', 'client.yaml');
+  const keystorePath = path.join(process.env.HOME || '/root', '.sui', 'sui_config', 'sui.keystore');
+
+  console.log('  Config files:');
+  console.log('    Walrus config:', fs.existsSync(walrusConfigPath) ? '✓' : '✗');
+  console.log('    Sui config:', fs.existsSync(suiConfigPath) ? '✓' : '✗');
+  console.log('    Keystore:', fs.existsSync(keystorePath) ? '✓' : '✗');
+
+  // Read and display first 300 bytes of client.yaml
+  if (fs.existsSync(suiConfigPath)) {
+    const clientYaml = fs.readFileSync(suiConfigPath, 'utf8');
+    console.log('  client.yaml first 300 chars:');
+    console.log('    ' + JSON.stringify(clientYaml.substring(0, 300)));
+  }
+
+  // Read and display keystore
+  if (fs.existsSync(keystorePath)) {
+    const keystore = fs.readFileSync(keystorePath, 'utf8');
+    console.log('  Keystore preview (first 60 chars):');
+    console.log('    ' + JSON.stringify(keystore.substring(0, 60)));
+  }
+
+  console.log('');
+  console.log('  Attempting Walrus CLI upload...');
+
+  // Try to upload the test file with detailed error capture
+  const walrusCmd = `${walrusCliPath} store --epochs 1 --json "${testFilePath}"`;
+  console.log('  Command:', walrusCmd);
+
+  try {
+    const output = execSync(walrusCmd, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 30000,
+    });
+    console.log('  ✓ Walrus CLI upload successful!');
+    console.log('  Output:', output);
+  } catch (uploadError) {
+    console.error('  ✗ Walrus CLI upload failed');
+    console.error('  Error code:', uploadError.status);
+    console.error('  stdout:', uploadError.stdout?.toString());
+    console.error('  stderr:', uploadError.stderr?.toString());
+
+    // Try to get more details about the YAML parsing error
+    console.log('');
+    console.log('  Debugging YAML structure:');
+    if (fs.existsSync(suiConfigPath)) {
+      const content = fs.readFileSync(suiConfigPath, 'utf8');
+      const lines = content.split('\n');
+      console.log('  Total lines:', lines.length);
+      console.log('  Line 1:', JSON.stringify(lines[0]));
+      console.log('  Line 2:', JSON.stringify(lines[1]));
+      console.log('  Line 3:', JSON.stringify(lines[2]));
+
+      // Check for non-printable characters
+      console.log('  Checking for non-printable characters in line 2:');
+      const line2Bytes = Buffer.from(lines[1], 'utf8');
+      console.log('  Line 2 hex:', line2Bytes.toString('hex'));
+      console.log('  Line 2 bytes:', Array.from(line2Bytes).map(b => b + ' (0x' + b.toString(16) + ')').join(', '));
+    }
+  }
+
+  // Cleanup test file
+  try {
+    fs.unlinkSync(testFilePath);
+    console.log('  ✓ Test file cleaned up');
+  } catch (cleanupError) {
+    console.log('  Note: Could not cleanup test file');
+  }
+} catch (testError) {
+  console.error('  ✗ Walrus CLI test failed:', testError.message);
+}
+console.log('');
+
 // Attempt to load the main application
 console.log('=== LOADING APPLICATION ===');
 console.log('');
