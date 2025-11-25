@@ -124,10 +124,17 @@ active_address: "${platformWallet}"
   const keystorePath = path.join(suiConfigDir, 'sui.keystore');
   if (process.env.SUI_PRIVATE_KEY) {
     // Keystore format: array of private keys with proper JSON formatting (newlines required!)
-    const keystore = [process.env.SUI_PRIVATE_KEY];
+    const privateKey = process.env.SUI_PRIVATE_KEY.trim();
+    const keystore = [privateKey];
     const formattedKeystore = JSON.stringify(keystore, null, 2);
     fs.writeFileSync(keystorePath, formattedKeystore);
     console.log('  ✓ Sui keystore created from SUI_PRIVATE_KEY');
+    console.log('    Key length:', privateKey.length);
+    console.log('    Keystore preview:', formattedKeystore.substring(0, 50) + '...');
+
+    // Validate the keystore was written correctly
+    const writtenContent = fs.readFileSync(keystorePath, 'utf8');
+    console.log('    Keystore file first 100 chars:', writtenContent.substring(0, 100));
   } else {
     // Create empty keystore with proper formatting
     fs.writeFileSync(keystorePath, '[\n]');
