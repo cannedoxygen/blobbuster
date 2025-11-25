@@ -91,8 +91,8 @@ router.post('/prepare', authMiddleware, async (req: Request, res: Response) => {
       memberNumber: nextMemberNumber,
       activeCardUrl: cardResult.activeCardUrl,
       expiredCardUrl: cardResult.expiredCardUrl,
-      activeCardCID: cardResult.activeCardCID,
-      expiredCardCID: cardResult.expiredCardCID,
+      activeCardBlobId: cardResult.activeCardCID,
+      expiredCardBlobId: cardResult.expiredCardCID,
       message: `Cards generated for Member #${String(nextMemberNumber).padStart(6, '0')}`,
     });
   } catch (error) {
