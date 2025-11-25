@@ -472,6 +472,44 @@ export class TranscodingService {
   }
 
   /**
+   * Convert video to browser-compatible MP4 format (H.264 + AAC)
+   * Used for non-MP4 files (MKV, AVI, etc.) to ensure web playback
+   */
+  async convertToMP4(inputPath: string, outputPath: string): Promise<void> {
+    logger.info('Converting video to MP4 format', { input: inputPath, output: outputPath });
+
+    // Build FFmpeg command to convert to MP4
+    // -c:v libx264: H.264 video codec (widely supported)
+    // -preset fast: encoding speed (fast, medium, slow)
+    // -crf 23: quality (lower = better, 23 is good default)
+    // -c:a aac: AAC audio codec (widely supported)
+    // -movflags +faststart: optimize for web streaming
+    const cmd = `${this.ffmpegPath} -i "${inputPath}" \
+      -c:v libx264 \
+      -preset fast \
+      -crf 23 \
+      -c:a aac \
+      -b:a 128k \
+      -movflags +faststart \
+      -y \
+      "${outputPath}"`;
+
+    try {
+      await execAsync(cmd, { maxBuffer: 1024 * 1024 * 10 }); // 10MB buffer
+      logger.info('Video converted to MP4 successfully', {
+        output: outputPath,
+        size: (await fs.stat(outputPath)).size
+      });
+    } catch (error) {
+      logger.error('Failed to convert video to MP4', {
+        input: inputPath,
+        error: error instanceof Error ? error.message : error,
+      });
+      throw new Error(`MP4 conversion failed: ${error instanceof Error ? error.message : error}`);
+    }
+  }
+
+  /**
    * Validate that FFmpeg is available
    */
   async validateFFmpeg(): Promise<boolean> {
