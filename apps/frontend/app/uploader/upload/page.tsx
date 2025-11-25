@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth/AuthContext';
 import axios from 'axios';
 import { WalrusCostCalculator } from '@/components/WalrusCostCalculator';
 import { AboutWalrusModal } from '@/components/AboutWalrusModal';
+import { MovieSelectionModal } from '@/components/MovieSelectionModal';
 import { useCurrentAccount, useSignAndExecuteTransactionBlock, useSuiClient } from '@mysten/dapp-kit';
 import { payForWalrusStorage, checkWalletBalance } from '@/lib/walrusPayment';
 import { useChunkedUpload } from '@/hooks/useChunkedUpload';
@@ -64,6 +65,8 @@ export default function UploadPage() {
   const [metadataFound, setMetadataFound] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [duplicateContent, setDuplicateContent] = useState<any>(null);
+  const [movieOptions, setMovieOptions] = useState<any[]>([]);
+  const [isMovieSelectionOpen, setIsMovieSelectionOpen] = useState(false);
 
   // Editable fields
   const [title, setTitle] = useState('');
@@ -147,6 +150,20 @@ export default function UploadPage() {
     setDuplicateContent(null);
 
     try {
+      // First, check if there are multiple matches
+      const multiResponse = await axios.post(`${API_URL}/api/metadata/search-multiple`, {
+        filename,
+      });
+
+      if (multiResponse.data.success && multiResponse.data.count > 1) {
+        // Multiple matches found - show selection modal
+        setMovieOptions(multiResponse.data.results);
+        setIsMovieSelectionOpen(true);
+        setIsFetchingMetadata(false);
+        return;
+      }
+
+      // Single match or no matches - use existing single search
       const response = await axios.post(`${API_URL}/api/metadata/search`, {
         filename,
       });
@@ -293,6 +310,73 @@ export default function UploadPage() {
     } catch (error) {
       console.error('Manual search failed:', error);
       setError('Search failed. Please try again.');
+    } finally {
+      setIsFetchingMetadata(false);
+    }
+  };
+
+  const handleMovieSelect = async (movie: any) => {
+    // Close the modal
+    setIsMovieSelectionOpen(false);
+    setMovieOptions([]);
+
+    // Show loading state
+    setIsFetchingMetadata(true);
+    setError(null);
+    setIsDuplicate(false);
+    setDuplicateContent(null);
+
+    try {
+      // The movie from the search-multiple endpoint has basic info
+      // We can use it directly or fetch full details if needed
+      const meta = movie;
+      setMetadata(meta);
+      setMetadataFound(true);
+
+      // Pre-fill editable fields
+      setTitle(meta.title || '');
+      setDescription(meta.plot || '');
+
+      // Try to map TMDB genre to our genres
+      if (meta.genres && meta.genres.length > 0) {
+        const tmdbGenre = meta.genres[0].toLowerCase();
+        const genreMapping: { [key: string]: number } = {
+          action: 0,
+          comedy: 1,
+          drama: 2,
+          horror: 3,
+          'science fiction': 4,
+          romance: 5,
+          thriller: 6,
+          documentary: 7,
+          animation: 8,
+          fantasy: 9,
+        };
+        const mappedGenre = genreMapping[tmdbGenre];
+        if (mappedGenre !== undefined) {
+          setGenre(mappedGenre);
+        }
+      }
+
+      // Check for duplicates
+      if (meta.tmdbId) {
+        try {
+          const duplicateCheck = await axios.post(`${API_URL}/api/metadata/check-duplicate`, {
+            tmdbId: meta.tmdbId,
+          });
+
+          if (duplicateCheck.data.success && duplicateCheck.data.isDuplicate) {
+            setIsDuplicate(true);
+            setDuplicateContent(duplicateCheck.data.existingContent);
+          }
+        } catch (duplicateError) {
+          console.error('Duplicate check failed:', duplicateError);
+          // Don't block upload if duplicate check fails
+        }
+      }
+    } catch (error) {
+      console.error('Failed to process selected movie:', error);
+      setError('Failed to load movie details. Please try again.');
     } finally {
       setIsFetchingMetadata(false);
     }
@@ -878,6 +962,18 @@ export default function UploadPage() {
       <AboutWalrusModal
         isOpen={isAboutWalrusOpen}
         onClose={() => setIsAboutWalrusOpen(false)}
+      />
+
+      {/* Movie Selection Modal */}
+      <MovieSelectionModal
+        isOpen={isMovieSelectionOpen}
+        movies={movieOptions}
+        onSelect={handleMovieSelect}
+        onClose={() => {
+          setIsMovieSelectionOpen(false);
+          setMovieOptions([]);
+          setIsFetchingMetadata(false);
+        }}
       />
     </div>
   );

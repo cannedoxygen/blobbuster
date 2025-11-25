@@ -110,6 +110,80 @@ export class MetadataService {
   }
 
   /**
+   * Search for movies and return multiple results
+   * Used when we need to let the user choose between different matches
+   * Returns up to 10 results
+   */
+  async searchMovieMultiple(title: string, year?: number): Promise<Array<MovieMetadata & { popularity?: number }>> {
+    if (!this.isEnabled()) {
+      logger.warn('TMDB not configured, skipping metadata search');
+      return [];
+    }
+
+    try {
+      logger.info('Searching TMDB for multiple movies', { title, year });
+
+      const params: any = {
+        query: title,
+        include_adult: false,
+        language: 'en-US',
+        page: 1,
+      };
+
+      if (year) {
+        params.year = year;
+      }
+
+      // Use Read Access Token (Bearer auth) if available, otherwise API Key
+      const headers = this.tmdbReadToken
+        ? { Authorization: `Bearer ${this.tmdbReadToken}` }
+        : {};
+
+      const searchUrl = this.tmdbReadToken
+        ? `${this.tmdbBaseUrl}/search/movie`
+        : `${this.tmdbBaseUrl}/search/movie?api_key=${this.tmdbApiKey}`;
+
+      const response = await axios.get(searchUrl, {
+        params: this.tmdbReadToken ? params : { ...params, api_key: this.tmdbApiKey },
+        headers,
+        timeout: 10000,
+      });
+
+      if (!response.data.results || response.data.results.length === 0) {
+        logger.info(`No TMDB results found for: ${title}`);
+        return [];
+      }
+
+      // Take up to 10 results
+      const movies = response.data.results.slice(0, 10);
+
+      logger.info(`Found ${movies.length} TMDB matches for: ${title}`);
+
+      // Return basic info for each result (without fetching full details)
+      return movies.map((movie: any) => ({
+        tmdbId: movie.id,
+        imdbId: undefined, // Will be fetched if user selects this movie
+        title: movie.title,
+        originalTitle: movie.original_title,
+        year: movie.release_date ? new Date(movie.release_date).getFullYear() : undefined,
+        plot: movie.overview,
+        posterUrl: movie.poster_path ? `${this.imageBaseUrl}${movie.poster_path}` : undefined,
+        backdropUrl: movie.backdrop_path ? `${this.imageBaseUrl}${movie.backdrop_path}` : undefined,
+        rating: movie.vote_average,
+        language: movie.original_language,
+        popularity: movie.popularity,
+      }));
+    } catch (error: any) {
+      logger.error('Failed to search multiple movies', {
+        title,
+        error: error.message,
+        status: error.response?.status,
+      });
+      return [];
+    }
+  }
+
+  /**
    * Get detailed movie info by TMDB ID
    */
   async getMovieDetails(tmdbId: number): Promise<MovieMetadata> {
