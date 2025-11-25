@@ -1056,6 +1056,11 @@ router.delete('/:contentId', authMiddleware, requireUploader, async (req: Reques
       });
     }
 
+    // Delete related streams first (foreign key constraint)
+    await prisma.streams.deleteMany({
+      where: { content_id: contentId },
+    });
+
     // Hard delete content from database
     await prisma.content.delete({
       where: { id: contentId },
