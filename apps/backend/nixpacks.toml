@@ -1,2 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs_22", "npm-9_x", "python3", "gcc", "gnumake", "openssl", "ffmpeg"]
+nixPkgs = ["nodejs_22", "npm-9_x", "python3", "gcc", "gnumake", "openssl", "ffmpeg", "curl"]
+
+[phases.install]
+cmds = [
+  "mkdir -p $HOME/.local/bin",
+  "curl -fsSL https://storage.googleapis.com/mysten-walrus-binaries/walrus-testnet-latest-ubuntu-x86_64 -o $HOME/.local/bin/walrus || curl -fsSL https://storage.googleapis.com/mysten-walrus-binaries/walrus-mainnet-latest-ubuntu-x86_64 -o $HOME/.local/bin/walrus",
+  "chmod +x $HOME/.local/bin/walrus"
+]
