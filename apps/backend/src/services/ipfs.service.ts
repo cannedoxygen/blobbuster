@@ -31,8 +31,8 @@ export class IPFSService {
 
       logger.info('Uploading file to IPFS via Pinata', { fileName, size: data.length });
 
-      const upload = await this.pinata.upload.file(file);
-      const cid = upload.IpfsHash;
+      const upload = await this.pinata.upload.public.file(file);
+      const cid = upload.cid;
 
       const url = `ipfs://${cid}`;
       const gatewayUrl = `https://gateway.pinata.cloud/ipfs/${cid}`;
