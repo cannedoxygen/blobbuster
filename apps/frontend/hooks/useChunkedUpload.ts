@@ -13,6 +13,7 @@ interface ChunkedUploadOptions {
   paymentDigest: string;
   paidAmount: string;
   accessToken: string;
+  tmdbId?: number;
   onProgress?: (progress: number) => void;
   onStatusUpdate?: (status: string) => void;
 }
@@ -39,6 +40,7 @@ export function useChunkedUpload() {
         paymentDigest,
         paidAmount,
         accessToken,
+        tmdbId,
         onProgress,
         onStatusUpdate,
       } = options;
@@ -64,6 +66,7 @@ export function useChunkedUpload() {
             epochs,
             paymentDigest,
             paidAmount,
+            tmdbId,
           },
           {
             headers: { Authorization: `Bearer ${accessToken}` },

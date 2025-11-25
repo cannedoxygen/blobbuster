@@ -201,6 +201,7 @@ model upload_sessions {
   description       String?   @db.Text
   genre             Int
   epochs            Int
+  tmdb_id           Int?
 
   // Payment verification
   payment_digest    String    @unique @db.VarChar(255)

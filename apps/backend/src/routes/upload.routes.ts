@@ -728,7 +728,7 @@ router.post('/extend-storage/:contentId', authMiddleware, requireUploader, async
  */
 router.post('/initiate', authMiddleware, requireUploader, async (req: Request, res: Response) => {
   try {
-    const { fileName, fileSize, totalChunks, title, description, genre, epochs, paymentDigest, paidAmount } =
+    const { fileName, fileSize, totalChunks, title, description, genre, epochs, paymentDigest, paidAmount, tmdbId } =
       req.body;
 
     if (
@@ -796,6 +796,7 @@ router.post('/initiate', authMiddleware, requireUploader, async (req: Request, r
         epochs,
         payment_digest: paymentDigest,
         paid_amount: paidAmount,
+        tmdb_id: tmdbId || null,
         status: 'receiving_chunks',
         progress: 0,
       },
@@ -1292,7 +1293,15 @@ async function processUploadInBackground(uploadId: string): Promise<void> {
     let tmdbMetadata = null;
     if (metadataService && metadataService.isEnabled()) {
       try {
-        tmdbMetadata = await metadataService.searchMovie(session.title);
+        // Use tmdbId from session if available (user selected specific movie)
+        if (session.tmdb_id) {
+          logger.info('Fetching TMDB metadata by ID', { tmdbId: session.tmdb_id });
+          tmdbMetadata = await metadataService.getMovieDetails(session.tmdb_id);
+        } else {
+          // Fallback to title search
+          logger.info('Searching TMDB by title', { title: session.title });
+          tmdbMetadata = await metadataService.searchMovie(session.title);
+        }
       } catch (error) {
         logger.warn('Failed to fetch TMDB metadata', { error });
       }
