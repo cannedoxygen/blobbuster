@@ -97,6 +97,63 @@ router.post('/search', async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/metadata/search-multiple
+ * Search for multiple movie matches
+ * Returns up to 10 results for user to choose from
+ */
+router.post('/search-multiple', async (req: Request, res: Response) => {
+  try {
+    const { filename, title, year } = req.body;
+
+    if (!filename && !title) {
+      return res.status(400).json({
+        success: false,
+        error: 'Either filename or title is required',
+      });
+    }
+
+    logger.info('Multiple TMDB results requested', { filename, title, year });
+
+    const metadataService = getMetadataService();
+
+    if (!metadataService.isEnabled()) {
+      return res.json({
+        success: true,
+        results: [],
+        message: 'TMDB is not configured',
+      });
+    }
+
+    // Parse filename if provided
+    const searchTitle = title || metadataService.parseFilename(filename).title;
+    const searchYear = year || (filename ? metadataService.parseFilename(filename).year : undefined);
+
+    // Search for multiple matches
+    const results = await metadataService.searchMovieMultiple(searchTitle, searchYear);
+
+    logger.info(`Found ${results.length} TMDB matches`, { searchTitle, searchYear });
+
+    return res.json({
+      success: true,
+      results,
+      count: results.length,
+    });
+  } catch (error: any) {
+    logger.error('Multiple metadata search failed', {
+      error: error.message,
+      filename: req.body.filename,
+      title: req.body.title,
+    });
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to search metadata',
+      details: error.message,
+    });
+  }
+});
+
+/**
  * POST /api/metadata/search-by-title
  * Manual search by title (for when filename doesn't work)
  */
