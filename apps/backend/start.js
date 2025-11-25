@@ -136,18 +136,51 @@ default_context: mainnet
   if (process.env.SUI_PRIVATE_KEY) {
     const privateKey = process.env.SUI_PRIVATE_KEY.trim();
 
-    // Write key directly to keystore (must be base64 format for Walrus CLI)
-    const keystore = [privateKey];
+    let keystoreKey = privateKey;
+
+    // Walrus CLI requires base64 format in keystore
+    // If the key is in bech32 format (suiprivkey1...), convert it to base64
+    if (privateKey.startsWith('suiprivkey1')) {
+      console.log('  Converting bech32 private key to base64 format...');
+      try {
+        // Import Sui SDK to decode bech32
+        const { decodeSuiPrivateKey } = require('@mysten/sui.js/cryptography');
+
+        // Decode bech32 to get raw bytes
+        const decoded = decodeSuiPrivateKey(privateKey);
+
+        // Sui keystore expects: [flag byte (1 byte) || private key (32 bytes)]
+        // The decoded.secretKey is 32 bytes, we need to prepend the scheme flag
+        const ED25519_FLAG = 0x00;
+        const fullKey = Buffer.concat([
+          Buffer.from([ED25519_FLAG]),
+          Buffer.from(decoded.secretKey)
+        ]);
+
+        // Convert to base64
+        keystoreKey = fullKey.toString('base64');
+        console.log('  ✓ Converted bech32 to base64 format');
+        console.log('    Base64 key length:', keystoreKey.length);
+      } catch (conversionError) {
+        console.error('  ✗ Failed to convert bech32 key:', conversionError.message);
+        console.error('    Using original key format (will likely fail)');
+      }
+    } else {
+      console.log('  Key is already in base64 format');
+    }
+
+    // Write keystore with base64 format
+    const keystore = [keystoreKey];
     const formattedKeystore = JSON.stringify(keystore, null, 2);
     fs.writeFileSync(keystorePath, formattedKeystore, 'utf8');
 
     console.log('  ✓ Sui keystore created from SUI_PRIVATE_KEY');
-    console.log('    Key length:', privateKey.length);
-    console.log('    Keystore file size:', formattedKeystore.length, 'bytes');
+    console.log('    Final keystore key format:', keystoreKey.startsWith('suiprivkey1') ? 'bech32' : 'base64');
+    console.log('    Final keystore key length:', keystoreKey.length);
 
     // Validate the keystore was written correctly
     const writtenContent = fs.readFileSync(keystorePath, 'utf8');
-    console.log('    Keystore first 50 chars:', writtenContent.substring(0, 50));
+    console.log('    Keystore file first 100 chars:', writtenContent.substring(0, 100));
   } else {
     // Create empty keystore
     fs.writeFileSync(keystorePath, '[\n\n]', 'utf8');
