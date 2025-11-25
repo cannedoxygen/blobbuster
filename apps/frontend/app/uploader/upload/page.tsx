@@ -465,6 +465,7 @@ export default function UploadPage() {
         epochs: storageEpochs,
         paymentDigest,
         paidAmount: costEstimate!.costs.totalWithGas.toString(),
+        tmdbId: metadata?.tmdbId,
         accessToken,
         onProgress: (progress) => setUploadProgress(progress),
         onStatusUpdate: (status) => console.log('Status:', status),
