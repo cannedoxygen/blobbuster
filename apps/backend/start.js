@@ -100,9 +100,12 @@ default_context: mainnet
   // Create Sui wallet config
   // Use platform wallet address from environment
   const platformWallet = process.env.PLATFORM_WALLET || '0x0';
+  const keystoreFilePath = path.join(suiConfigDir, 'sui.keystore');
+
+  // YAML format must match exactly what works locally
   const suiConfig = `---
 keystore:
-  File: ${path.join(suiConfigDir, 'sui.keystore')}
+  File: ${keystoreFilePath}
 envs:
   - alias: mainnet
     rpc: "https://fullnode.mainnet.sui.io:443"
@@ -119,6 +122,10 @@ active_address: "${platformWallet}"
   const suiConfigPath = path.join(suiConfigDir, 'client.yaml');
   fs.writeFileSync(suiConfigPath, suiConfig);
   console.log('  ✓ Sui wallet config created at:', suiConfigPath);
+  console.log('    Keystore path:', keystoreFilePath);
+  console.log('    Active address:', platformWallet);
+  console.log('    Config content preview:');
+  console.log(suiConfig.split('\n').slice(0, 8).join('\n'));
 
   // Create keystore if SUI_PRIVATE_KEY is provided
   const keystorePath = path.join(suiConfigDir, 'sui.keystore');
