@@ -431,35 +431,15 @@ router.get('/proxy/:blobId', async (req: Request, res: Response) => {
       url: walrusUrl,
     });
 
-    // Optimize range requests for faster initial playback
+    // Pass through range requests exactly as the browser sends them
+    // Let the browser handle buffering - don't force chunk sizes
     const headers: any = {};
-    const initialChunkSize = 20 * 1024 * 1024; // 20 MB initial chunk
 
     if (req.headers.range) {
-      const rangeHeader = req.headers.range;
-
-      // Check if this is an initial "bytes=0-" request (no end specified)
-      // This typically means the browser wants the entire file
-      if (rangeHeader === 'bytes=0-') {
-        // Limit initial request to first 20 MB for faster startup
-        // Browser will automatically request more as needed
-        headers.Range = `bytes=0-${initialChunkSize - 1}`;
-        logger.info('Optimizing initial range request', {
-          original: rangeHeader,
-          optimized: headers.Range,
-        });
-      } else {
-        // Forward other range requests as-is (seeking, continuation, etc.)
-        headers.Range = rangeHeader;
-      }
-    } else {
-      // No Range header provided - force initial 20MB chunk for fast playback
-      // This prevents downloading the entire video on first request
-      headers.Range = `bytes=0-${initialChunkSize - 1}`;
-      logger.info('Forcing initial chunk for non-range request', {
-        chunk: headers.Range,
-      });
+      headers.Range = req.headers.range;
+      logger.debug('Forwarding range request', { range: req.headers.range });
     }
+    // If no Range header, let Walrus return the full file (browser will handle buffering)
 
     // Fetch from Walrus with longer timeout and keep-alive
     const response = await axios.get(walrusUrl, {
