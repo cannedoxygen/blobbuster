@@ -134,31 +134,12 @@ export class UploadService {
         contentId,
       });
 
-      // Step 2: Generate HLS segments for seamless streaming
-      this.updateProgress(contentId, {
-        contentId,
-        status: 'transcoding',
-        progress: 30,
-        currentStep: 'Generating HLS segments for streaming...',
-        startedAt: startTime,
-        fileSize: stats.size,
-        videoDuration: metadata.duration,
-      });
-
-      const hlsResult = await this.transcodingService.generateHLSSegments(request.filePath, workDir);
-
-      logger.info('HLS segmentation completed', {
-        contentId,
-        totalSegments: hlsResult.segments.length,
-        totalDuration: hlsResult.segments.reduce((sum, s) => sum + s.duration, 0),
-      });
-
-      // Step 3: Upload HLS segments to Walrus
+      // Step 2: Upload full video file to Walrus (single transaction)
       this.updateProgress(contentId, {
         contentId,
         status: 'uploading_walrus',
         progress: 50,
-        currentStep: `Uploading ${hlsResult.segments.length} HLS segments to Walrus...`,
+        currentStep: 'Uploading video file to Walrus storage...',
         startedAt: startTime,
         fileSize: stats.size,
         videoDuration: metadata.duration,
@@ -166,19 +147,28 @@ export class UploadService {
 
       const storageEpochs = request.epochs || 12;
 
-      // Upload all HLS segments + thumbnail to Walrus
-      const walrusUploadResult = await this.uploadHLSToWalrus(
-        hlsResult.segments,
-        thumbnailPath,
-        storageEpochs
-      );
+      // Upload video file (SINGLE transaction)
+      const videoUploadResult = await this.walrusService.uploadFile(request.filePath, {
+        epochs: storageEpochs,
+        permanent: false,
+      });
 
-      const thumbnailBlobId = walrusUploadResult.thumbnailBlobId;
-      const totalStorageCost = walrusUploadResult.totalCost;
+      // Upload thumbnail
+      let thumbnailBlobId: string | undefined;
+      let totalStorageCost = videoUploadResult.cost;
 
-      logger.info('Walrus HLS upload completed', {
+      if (thumbnailPath) {
+        const thumbnailUploadResult = await this.walrusService.uploadFile(thumbnailPath, {
+          epochs: storageEpochs,
+          permanent: false,
+        });
+        thumbnailBlobId = thumbnailUploadResult.blobId;
+        totalStorageCost += thumbnailUploadResult.cost;
+      }
+
+      logger.info('Walrus upload completed', {
         contentId,
-        totalSegments: walrusUploadResult.segments.length,
+        videoBlobId: videoUploadResult.blobId,
         thumbnailBlobId,
         totalCost: totalStorageCost,
       });
@@ -194,10 +184,10 @@ export class UploadService {
         videoDuration: metadata.duration,
       });
 
-      // Create blob IDs structure for HLS streaming
+      // Create blob IDs structure for single video file
       const blobIdsData = {
-        type: 'hls',
-        segments: walrusUploadResult.segments,
+        type: 'single',
+        videoBlobId: videoUploadResult.blobId,
         thumbnail: thumbnailBlobId || '',
       };
 
@@ -357,7 +347,7 @@ export class UploadService {
         contentId,
         blockchainContentId: blockchainResult.contentId,
         title: request.title,
-        walrusBlobIds: { type: 'hls', segments: walrusUploadResult.segments, thumbnailBlobId } as any,
+        walrusBlobIds: { videoBlobId: videoUploadResult.blobId, thumbnailBlobId } as any, // Single video file stored in database
         thumbnailUrl: this.walrusService.getStreamingUrl(thumbnailBlobId || ''),
         duration: Math.floor(metadata.duration),
         totalCost: totalStorageCost,
