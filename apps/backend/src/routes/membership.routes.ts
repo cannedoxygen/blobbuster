@@ -302,6 +302,117 @@ router.get('/:nftId', async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/membership/sync
+ * Sync membership from blockchain to database
+ * Use this if minting succeeded but /confirm failed
+ * Requires: Authentication
+ */
+router.post('/sync', authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+
+    // Get user's wallet address
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { wallet_address: true },
+    });
+
+    if (!user || !user.wallet_address) {
+      return res.status(404).json({
+        success: false,
+        error: 'User wallet not found',
+      });
+    }
+
+    logger.info('Syncing memberships from blockchain', { userId, wallet: user.wallet_address });
+
+    // Get all membership NFTs owned by this wallet from blockchain
+    const onChainMemberships = await suiService.getMembershipNFTsByWallet(user.wallet_address);
+
+    if (onChainMemberships.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No membership NFTs found in wallet',
+        synced: 0,
+      });
+    }
+
+    // Get existing memberships in database for this user
+    const existingMemberships = await prisma.memberships.findMany({
+      where: { user_id: userId },
+      select: { nft_object_id: true },
+    });
+    const existingNftIds = new Set(existingMemberships.map(m => m.nft_object_id));
+
+    // Find NFTs that exist on-chain but not in database
+    const missingMemberships = onChainMemberships.filter(m => !existingNftIds.has(m.nftId));
+
+    if (missingMemberships.length === 0) {
+      return res.json({
+        success: true,
+        message: 'All memberships already synced',
+        synced: 0,
+      });
+    }
+
+    // Sync missing memberships to database
+    const syncedMemberships = [];
+    for (const membership of missingMemberships) {
+      try {
+        const newMembership = await prisma.memberships.create({
+          data: {
+            id: uuidv4(),
+            user_id: userId,
+            nft_object_id: membership.nftId,
+            member_number: membership.memberNumber,
+            tier: 1,
+            issued_at: new Date(membership.issuedAt),
+            expires_at: new Date(membership.expiresAt),
+            is_active: membership.isActive,
+            // Card URLs will be missing for synced memberships - user can regenerate if needed
+            active_card_url: null,
+            expired_card_url: null,
+          },
+        });
+
+        syncedMemberships.push({
+          id: newMembership.id,
+          nftId: membership.nftId,
+          memberNumber: membership.memberNumber,
+        });
+
+        logger.info('Synced membership from blockchain', {
+          userId,
+          nftId: membership.nftId,
+          memberNumber: membership.memberNumber,
+        });
+      } catch (error) {
+        logger.error('Failed to sync individual membership', {
+          nftId: membership.nftId,
+          error: error instanceof Error ? error.message : error,
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Synced ${syncedMemberships.length} membership(s) from blockchain`,
+      synced: syncedMemberships.length,
+      memberships: syncedMemberships,
+    });
+  } catch (error) {
+    logger.error('Membership sync failed', {
+      error: error instanceof Error ? error.message : error,
+    });
+    res.status(500).json({
+      success: false,
+      error: 'Failed to sync memberships',
+      details: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
+/**
  * GET /api/membership/user/me
  * Get current user's membership
  * Requires: Authentication

@@ -35,6 +35,9 @@ interface Content {
   storage_epochs?: number;
   storage_expires_at?: string;
 
+  // Walrus blob IDs for prefetching
+  walrusBlobIds?: string | object;
+
   uploader: {
     id: string;
     user: {

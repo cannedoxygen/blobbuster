@@ -361,6 +361,56 @@ export class SuiBlockchainService {
   getPlatformAddress(): string {
     return this.platformKeypair.getPublicKey().toSuiAddress();
   }
+
+  /**
+   * Get all membership NFTs owned by a wallet address
+   * Used for syncing memberships that were minted but not confirmed in DB
+   */
+  async getMembershipNFTsByWallet(walletAddress: string): Promise<Array<{
+    nftId: string;
+    memberNumber: number;
+    issuedAt: number;
+    expiresAt: number;
+    isActive: boolean;
+  }>> {
+    try {
+      const membershipType = `${this.MEMBERSHIP_PACKAGE}::membership::MembershipNFT`;
+
+      const ownedObjects = await this.client.getOwnedObjects({
+        owner: walletAddress,
+        filter: {
+          StructType: membershipType,
+        },
+        options: {
+          showContent: true,
+        },
+      });
+
+      const memberships = [];
+      const now = Date.now();
+
+      for (const obj of ownedObjects.data) {
+        if (obj.data?.content && 'fields' in obj.data.content) {
+          const fields = (obj.data.content as any).fields;
+          const expiresAt = parseInt(fields.expires_at);
+
+          memberships.push({
+            nftId: obj.data.objectId,
+            memberNumber: parseInt(fields.member_number),
+            issuedAt: parseInt(fields.issued_at),
+            expiresAt,
+            isActive: expiresAt > now,
+          });
+        }
+      }
+
+      logger.info(`Found ${memberships.length} membership NFTs for wallet ${walletAddress}`);
+      return memberships;
+    } catch (error) {
+      logger.error(`Failed to get membership NFTs for wallet ${walletAddress}:`, error);
+      throw error;
+    }
+  }
 }
 
 // Singleton instance
