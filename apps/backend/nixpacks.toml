@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_22", "npm-9_x", "python3", "gcc", "gnumake", "openssl", "ffmpeg", "curl"]
+nixPkgs = ["nodejs_22", "npm-9_x", "python3", "gcc", "gnumake", "openssl", "ffmpeg", "curl", "fontconfig", "liberation_ttf"]
 
 [phases.install]
 cmds = [
