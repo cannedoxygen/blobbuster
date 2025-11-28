@@ -3,6 +3,7 @@ import { optionalAuthMiddleware } from '../middleware/auth.middleware';
 import { prisma } from '../config/database';
 import { logger } from '../utils/logger';
 
+// Content routes - restored from working version 39e0c7e
 const router = Router();
 
 /**
