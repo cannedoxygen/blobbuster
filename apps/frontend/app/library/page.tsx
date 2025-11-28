@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/AuthContext';
 import axios from 'axios';
 import Header from '@/components/Header';
 import { MovieDetailsModal } from '@/components/MovieDetailsModal';
+import { LibraryFilters, FilterState, DEFAULT_FILTERS } from '@/components/LibraryFilters';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -38,6 +39,9 @@ interface Content {
   // Walrus blob IDs for prefetching
   walrusBlobIds?: string | object;
 
+  // Per-user watch status
+  watchedByUser?: boolean;
+
   uploader: {
     id: string;
     user: {
@@ -66,12 +70,14 @@ export default function LibraryPage() {
   const { isAuthenticated, accessToken } = useAuth();
   const [content, setContent] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
-  const [genre, setGenre] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [showMembershipModal, setShowMembershipModal] = useState(false);
   const [showMovieModal, setShowMovieModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Content | null>(null);
   const [hasMembership, setHasMembership] = useState(false);
+  const [totalResults, setTotalResults] = useState(0);
+
+  // New filter state
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
   // Provider filter state
   const [providerCode, setProviderCode] = useState('');
@@ -90,7 +96,7 @@ export default function LibraryPage() {
 
   useEffect(() => {
     fetchContent();
-  }, [genre, activeProviderCode]);
+  }, [filters, activeProviderCode, accessToken]);
 
   // Check if user has membership
   useEffect(() => {
@@ -136,19 +142,36 @@ export default function LibraryPage() {
         // Fetch from provider-specific endpoint
         url = `${API_URL}/api/referral/content/${activeProviderCode}`;
       } else {
-        // Fetch all content
+        // Build query params from filters
         const params = new URLSearchParams();
-        if (genre !== 'all') {
-          params.append('genre', genre);
-        }
+
+        if (filters.genre) params.append('genre', filters.genre);
+        if (filters.year) params.append('year', filters.year);
+        if (filters.decade) params.append('decade', filters.decade);
+        if (filters.ratingMin) params.append('ratingMin', filters.ratingMin);
+        if (filters.director) params.append('director', filters.director);
+        if (filters.country) params.append('country', filters.country);
+        if (filters.language) params.append('language', filters.language);
+        if (filters.q) params.append('q', filters.q);
+        if (filters.sort) params.append('sort', filters.sort);
+        if (filters.order) params.append('order', filters.order);
+        if (filters.watched) params.append('watched', filters.watched);
+
         url = `${API_URL}/api/content?${params.toString()}`;
       }
 
-      const response = await fetch(url);
+      // Include auth header if available (for watched status)
+      const headers: HeadersInit = {};
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch(url, { headers });
       const data = await response.json();
 
       if (data.success) {
         setContent(data.content);
+        setTotalResults(data.pagination?.total || data.content.length);
         if (data.provider) {
           setProviderInfo({
             username: data.provider.username,
@@ -250,12 +273,8 @@ export default function LibraryPage() {
     setShowMovieModal(true);
   };
 
-  const filteredContent = content.filter((item) =>
-    searchQuery
-      ? item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
-      : true
-  );
+  // Content is now filtered server-side, just use content directly
+  const filteredContent = content;
 
   return (
     <div className="min-h-screen">
@@ -338,34 +357,19 @@ export default function LibraryPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-4 mb-8">
-          <select
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            className="px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold"
-            style={{ color: '#FFD700' }}
-          >
-            <option value="all" className="bg-blobbuster-navy text-white">All Genres</option>
-            <option value="1" className="bg-blobbuster-navy text-white">Action</option>
-            <option value="2" className="bg-blobbuster-navy text-white">Comedy</option>
-            <option value="3" className="bg-blobbuster-navy text-white">Drama</option>
-            <option value="4" className="bg-blobbuster-navy text-white">Horror</option>
-            <option value="5" className="bg-blobbuster-navy text-white">Sci-Fi</option>
-            <option value="6" className="bg-blobbuster-navy text-white">Documentary</option>
-            <option value="7" className="bg-blobbuster-navy text-white">Thriller</option>
-            <option value="8" className="bg-blobbuster-navy text-white">Romance</option>
-            <option value="9" className="bg-blobbuster-navy text-white">Animation</option>
-            <option value="10" className="bg-blobbuster-navy text-white">Other</option>
-          </select>
+        <LibraryFilters
+          filters={filters}
+          onFilterChange={setFilters}
+          isAuthenticated={isAuthenticated}
+          hasMembership={hasMembership}
+        />
 
-          <input
-            type="search"
-            placeholder="Search content..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500"
-          />
-        </div>
+        {/* Results count */}
+        {!loading && (
+          <div className="mb-4 text-gray-400 text-sm">
+            {totalResults} {totalResults === 1 ? 'movie' : 'movies'} found
+          </div>
+        )}
 
         {/* Loading State */}
         {loading && (
@@ -379,8 +383,8 @@ export default function LibraryPage() {
           <div className="text-center py-12">
             <div className="text-gray-400 text-xl mb-4">No content found</div>
             <p className="text-gray-500">
-              {searchQuery
-                ? 'Try a different search term'
+              {filters.q || filters.genre || filters.decade || filters.ratingMin
+                ? 'Try adjusting your filters'
                 : 'Be the first to upload content!'}
             </p>
           </div>
@@ -419,6 +423,16 @@ export default function LibraryPage() {
                       {item.externalRating && (
                         <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded text-xs font-bold backdrop-blur-sm">
                           ⭐ {item.externalRating.toFixed(1)}
+                        </div>
+                      )}
+
+                      {/* Watched Badge */}
+                      {item.watchedByUser && (
+                        <div className="absolute bottom-2 right-2 bg-green-600/90 px-2 py-1 rounded text-xs font-bold backdrop-blur-sm text-white flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Watched
                         </div>
                       )}
 
