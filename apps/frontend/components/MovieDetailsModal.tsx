@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCurrentAccount, useSignAndExecuteTransactionBlock } from '@mysten/dapp-kit';
 import { TransactionBlock } from '@mysten/sui.js/transactions';
 import axios from 'axios';
+import { useVideoPrefetch } from '@/lib/hooks/useVideoPrefetch';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -30,6 +31,7 @@ interface MovieDetailsModalProps {
     totalStreams?: number;
     storage_expires_at?: string;
     tagline?: string;
+    walrusBlobIds?: string | object;
     uploader?: {
       id: string;
       user: {
@@ -65,6 +67,13 @@ export function MovieDetailsModal({
   const [showTipModal, setShowTipModal] = useState(false);
   const [tipAmount, setTipAmount] = useState('');
   const [isTipping, setIsTipping] = useState(false);
+
+  // Prefetch first 5MB of video when modal opens
+  // This warms up the cache so playback starts faster
+  useVideoPrefetch(
+    isOpen ? content.id : null,
+    isOpen ? content.walrusBlobIds || null : null
+  );
 
   if (!isOpen) return null;
 

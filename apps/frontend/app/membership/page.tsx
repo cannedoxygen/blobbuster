@@ -31,6 +31,8 @@ export default function MembershipPage() {
   const [myReferralCode, setMyReferralCode] = useState<string | null>(null);
   const [myReferralCount, setMyReferralCount] = useState<number>(0);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
   const PRICE_PER_MONTH_USD = 5;
 
@@ -368,6 +370,44 @@ export default function MembershipPage() {
       setError(errorMsg);
     } finally {
       setIsPurchasing(false);
+    }
+  };
+
+  // Sync membership from blockchain if confirm failed
+  const handleSyncMembership = async () => {
+    if (!isAuthenticated || !accessToken) {
+      setSyncMessage('Please sign in first');
+      return;
+    }
+
+    setIsSyncing(true);
+    setSyncMessage(null);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/membership/sync`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.synced > 0) {
+          setSyncMessage(`Found and synced ${data.synced} membership(s)! Refreshing...`);
+          // Reload the page to show the synced membership
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          setSyncMessage(data.message || 'No memberships found to sync');
+        }
+      } else {
+        setSyncMessage(data.error || 'Sync failed');
+      }
+    } catch (err: any) {
+      setSyncMessage(err.message || 'Failed to sync membership');
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -743,6 +783,32 @@ export default function MembershipPage() {
               <p className="text-center text-sm text-gray-400 mt-4">
                 Your membership card NFT will be minted instantly
               </p>
+            </div>
+          </div>
+
+          {/* Sync Membership Section */}
+          <div className="max-w-2xl mx-auto mt-8">
+            <div className="bg-blobbuster-navy/30 rounded-lg p-6 border border-gray-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-gray-300">Already have a membership NFT?</h4>
+                  <p className="text-sm text-gray-500 mt-1">
+                    If you purchased but it's not showing, sync from blockchain
+                  </p>
+                </div>
+                <button
+                  onClick={handleSyncMembership}
+                  disabled={isSyncing || !isAuthenticated}
+                  className="px-6 py-2 bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 rounded-lg text-sm font-bold transition disabled:opacity-50"
+                >
+                  {isSyncing ? 'Syncing...' : 'Sync from Wallet'}
+                </button>
+              </div>
+              {syncMessage && (
+                <p className={`mt-3 text-sm ${syncMessage.includes('Found') ? 'text-green-400' : 'text-gray-400'}`}>
+                  {syncMessage}
+                </p>
+              )}
             </div>
           </div>
           </>
