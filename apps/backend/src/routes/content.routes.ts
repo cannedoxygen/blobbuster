@@ -31,7 +31,18 @@ router.get('/', optionalAuthMiddleware, async (req: Request, res: Response) => {
     const status = 1; // Only show active content
 
     // Build dynamic where clause
-    const where: any = { status };
+    // Only show content that is active AND not expired
+    const where: any = {
+      status,
+      AND: [
+        {
+          OR: [
+            { storage_expires_at: null },
+            { storage_expires_at: { gt: new Date() } }
+          ]
+        }
+      ]
+    };
 
     // Genre filter (existing)
     const genre = req.query.genre ? parseInt(req.query.genre as string) : undefined;
@@ -259,6 +270,15 @@ router.get('/', optionalAuthMiddleware, async (req: Request, res: Response) => {
  */
 router.get('/filters', async (req: Request, res: Response) => {
   try {
+    // Base filter: active and not expired
+    const activeFilter = {
+      status: 1,
+      OR: [
+        { storage_expires_at: null },
+        { storage_expires_at: { gt: new Date() } }
+      ]
+    };
+
     // Get distinct values from the database for each filterable field
     const [
       years,
@@ -269,28 +289,28 @@ router.get('/filters', async (req: Request, res: Response) => {
     ] = await Promise.all([
       // Years (distinct, sorted desc)
       prisma.content.findMany({
-        where: { status: 1, year: { not: null } },
+        where: { ...activeFilter, year: { not: null } },
         select: { year: true },
         distinct: ['year'],
         orderBy: { year: 'desc' },
       }),
       // Directors (distinct, sorted alpha)
       prisma.content.findMany({
-        where: { status: 1, director: { not: null } },
+        where: { ...activeFilter, director: { not: null } },
         select: { director: true },
         distinct: ['director'],
         orderBy: { director: 'asc' },
       }),
       // Countries (distinct)
       prisma.content.findMany({
-        where: { status: 1, country: { not: null } },
+        where: { ...activeFilter, country: { not: null } },
         select: { country: true },
         distinct: ['country'],
         orderBy: { country: 'asc' },
       }),
       // Languages (distinct)
       prisma.content.findMany({
-        where: { status: 1, language: { not: null } },
+        where: { ...activeFilter, language: { not: null } },
         select: { language: true },
         distinct: ['language'],
         orderBy: { language: 'asc' },
@@ -298,7 +318,7 @@ router.get('/filters', async (req: Request, res: Response) => {
       // Genres with counts
       prisma.content.groupBy({
         by: ['genre'],
-        where: { status: 1 },
+        where: activeFilter,
         _count: { genre: true },
         orderBy: { genre: 'asc' },
       }),
