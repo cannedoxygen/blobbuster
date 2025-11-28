@@ -85,25 +85,92 @@ if (process.env.NODE_ENV === 'development') {
 // ===== Health Check =====
 
 app.get('/health', async (req, res) => {
+  const startTime = Date.now();
   try {
     // Ping database to wake it up
     const { prisma } = await import('./config/database');
     await prisma.$queryRaw`SELECT 1`;
+    const dbLatency = Date.now() - startTime;
 
     res.json({
       status: 'ok',
       database: 'connected',
+      dbLatencyMs: dbLatency,
       timestamp: new Date().toISOString(),
       uptime: process.uptime()
     });
-  } catch (error) {
+  } catch (error: any) {
+    const dbLatency = Date.now() - startTime;
+    logger.error('Health check failed - Database error:', error.message);
+
     res.status(503).json({
       status: 'error',
       database: 'disconnected',
+      dbLatencyMs: dbLatency,
+      error: error.message || 'Unknown database error',
+      errorCode: error.code || null,
       timestamp: new Date().toISOString(),
-      uptime: process.uptime()
+      uptime: process.uptime(),
+      hint: error.message?.includes('timeout')
+        ? 'Database may be paused (Supabase free tier pauses after inactivity)'
+        : error.message?.includes('ECONNREFUSED')
+        ? 'Cannot reach database server - check DATABASE_URL'
+        : 'Check Supabase dashboard for project status'
     });
   }
+});
+
+// Detailed diagnostics endpoint
+app.get('/health/details', async (req, res) => {
+  const results: any = {
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    checks: {}
+  };
+
+  // Test database connection
+  const dbStart = Date.now();
+  try {
+    const { prisma } = await import('./config/database');
+    const dbResult = await prisma.$queryRaw`SELECT NOW() as time, current_database() as db`;
+    results.checks.database = {
+      status: 'ok',
+      latencyMs: Date.now() - dbStart,
+      details: dbResult
+    };
+  } catch (error: any) {
+    results.checks.database = {
+      status: 'error',
+      latencyMs: Date.now() - dbStart,
+      error: error.message,
+      code: error.code
+    };
+  }
+
+  // Test Redis if configured
+  try {
+    const { getRedisClient } = await import('./utils/redis');
+    const redis = getRedisClient();
+    if (redis) {
+      const redisStart = Date.now();
+      await redis.ping();
+      results.checks.redis = {
+        status: 'ok',
+        latencyMs: Date.now() - redisStart
+      };
+    } else {
+      results.checks.redis = { status: 'disabled' };
+    }
+  } catch (error: any) {
+    results.checks.redis = {
+      status: 'error',
+      error: error.message
+    };
+  }
+
+  const hasErrors = Object.values(results.checks).some((c: any) => c.status === 'error');
+  res.status(hasErrors ? 503 : 200).json(results);
 });
 
 // ===== API Routes =====
