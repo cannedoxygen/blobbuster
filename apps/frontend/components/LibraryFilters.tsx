@@ -139,25 +139,24 @@ export function LibraryFilters({
   return (
     <div className="mb-8 space-y-4">
       {/* Main Filter Bar */}
-      <div className="p-4 bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg space-y-4">
-        {/* Search Row */}
-        <div className="w-full">
-          <input
-            type="search"
-            placeholder="Search movies, actors, directors..."
-            value={filters.q}
-            onChange={(e) => updateFilter('q', e.target.value)}
-            className="w-full px-4 py-3 bg-blobbuster-navy border border-neon-cyan/20 rounded-lg text-white placeholder-gray-500 focus:border-neon-cyan focus:outline-none text-lg"
-          />
-        </div>
+      <div className="p-4 bg-blobbuster-navy/50 border border-neon-cyan/20 rounded-lg">
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* Search */}
+          <div className="flex-1 min-w-[200px]">
+            <input
+              type="search"
+              placeholder="Search movies, actors, directors..."
+              value={filters.q}
+              onChange={(e) => updateFilter('q', e.target.value)}
+              className="w-full px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500 focus:border-neon-cyan focus:outline-none"
+            />
+          </div>
 
-        {/* Filter Dropdowns Row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {/* Genre */}
           <select
             value={filters.genre}
             onChange={(e) => updateFilter('genre', e.target.value)}
-            className="w-full px-3 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none text-sm"
+            className="px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none"
           >
             <option value="" className="bg-blobbuster-navy text-white">All Genres</option>
             {filterOptions?.genres.map((g) => (
@@ -171,7 +170,7 @@ export function LibraryFilters({
           <select
             value={filters.decade}
             onChange={(e) => updateFilter('decade', e.target.value)}
-            className="w-full px-3 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none text-sm"
+            className="px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none"
           >
             <option value="" className="bg-blobbuster-navy text-white">All Decades</option>
             {filterOptions?.decades.map((d) => (
@@ -185,7 +184,7 @@ export function LibraryFilters({
           <select
             value={filters.ratingMin}
             onChange={(e) => updateFilter('ratingMin', e.target.value)}
-            className="w-full px-3 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none text-sm"
+            className="px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none"
           >
             <option value="" className="bg-blobbuster-navy text-white">Any Rating</option>
             <option value="9" className="bg-blobbuster-navy text-white">9+ Excellent</option>
@@ -199,7 +198,7 @@ export function LibraryFilters({
           <select
             value={filters.sort}
             onChange={(e) => updateFilter('sort', e.target.value)}
-            className="w-full px-3 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none text-sm"
+            className="px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none"
           >
             {filterOptions?.sortOptions.map((opt) => (
               <option key={opt.value} value={opt.value} className="bg-blobbuster-navy text-white">
@@ -208,20 +207,10 @@ export function LibraryFilters({
             ))}
           </select>
 
-          {/* Sort Order */}
-          <select
-            value={filters.order}
-            onChange={(e) => updateFilter('order', e.target.value)}
-            className="w-full px-3 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded font-bold text-blobbuster-gold focus:border-neon-cyan focus:outline-none text-sm"
-          >
-            <option value="desc" className="bg-blobbuster-navy text-white">Descending</option>
-            <option value="asc" className="bg-blobbuster-navy text-white">Ascending</option>
-          </select>
-
           {/* More Filters Toggle */}
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className={`w-full px-3 py-2 rounded font-bold transition text-sm ${
+            className={`px-4 py-2 rounded font-bold transition ${
               showAdvanced
                 ? 'bg-neon-cyan/20 border border-neon-cyan text-neon-cyan'
                 : 'bg-gray-700/50 border border-gray-600 text-gray-300 hover:border-neon-cyan/50'
