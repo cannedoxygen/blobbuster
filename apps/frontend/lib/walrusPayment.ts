@@ -10,7 +10,7 @@ interface PaymentParams {
   totalSUI: number; // Total cost in SUI (already includes WAL->SUI conversion + gas)
   recipientAddress: string; // Platform wallet address that will pay Walrus
   senderAddress: string;
-  signAndExecute: (transaction: { transactionBlock: TransactionBlock }) => Promise<any>;
+  signAndExecute: (transaction: { transactionBlock: TransactionBlock; options?: any }) => Promise<any>;
 }
 
 interface PaymentResult {
@@ -56,25 +56,52 @@ export async function payForWalrusStorage(
     });
 
     // Sign and execute transaction
+    // Request showEffects to ensure we wait for transaction confirmation
     const result = await signAndExecute({
       transactionBlock: tx,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
     });
 
     console.log('Payment transaction result:', result);
 
+    // The result should have a digest after the transaction is confirmed
     if (result.digest) {
+      // Double-check that transaction actually succeeded by checking effects
+      const status = result.effects?.status?.status;
+      if (status === 'failure') {
+        const errorMsg = result.effects?.status?.error || 'Transaction failed on-chain';
+        console.error('Transaction failed on-chain:', errorMsg);
+        return {
+          success: false,
+          error: `Transaction failed: ${errorMsg}`,
+        };
+      }
+
       return {
         success: true,
         digest: result.digest,
       };
     }
 
+    // If no digest but also no error thrown, the wallet might have rejected
     return {
       success: false,
-      error: 'Transaction failed: no digest returned',
+      error: 'Transaction was not completed - please try again',
     };
   } catch (error: any) {
     console.error('Payment transaction failed:', error);
+
+    // Check for user rejection
+    if (error.message?.includes('rejected') || error.message?.includes('cancelled')) {
+      return {
+        success: false,
+        error: 'Transaction was cancelled',
+      };
+    }
+
     return {
       success: false,
       error: error.message || 'Payment failed',
