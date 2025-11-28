@@ -34,14 +34,6 @@ router.get('/', optionalAuthMiddleware, async (req: Request, res: Response) => {
     // Only show content that is active AND not expired
     const where: any = {
       status,
-      AND: [
-        {
-          OR: [
-            { storage_expires_at: null },
-            { storage_expires_at: { gt: new Date() } }
-          ]
-        }
-      ]
     };
 
     // Genre filter (existing)
@@ -270,14 +262,8 @@ router.get('/', optionalAuthMiddleware, async (req: Request, res: Response) => {
  */
 router.get('/filters', async (req: Request, res: Response) => {
   try {
-    // Base filter: active and not expired
-    const activeFilter = {
-      status: 1,
-      OR: [
-        { storage_expires_at: null },
-        { storage_expires_at: { gt: new Date() } }
-      ]
-    };
+    // Base filter: active content only
+    const activeFilter = { status: 1 };
 
     // Get distinct values from the database for each filterable field
     const [
