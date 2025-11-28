@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const PREFETCH_SIZE = 5 * 1024 * 1024; // 5MB
+const PREFETCH_SIZE = 20 * 1024 * 1024; // 20MB
 
 interface WalrusBlobIds {
   type?: 'single' | 'hls';
@@ -15,7 +15,7 @@ interface WalrusBlobIds {
 }
 
 /**
- * Hook to prefetch the first 5MB of a video when the movie details modal opens.
+ * Hook to prefetch the first 20MB of a video when the movie details modal opens.
  * This warms up the browser cache so playback starts faster.
  */
 export function useVideoPrefetch(contentId: string | null, walrusBlobIds: WalrusBlobIds | string | null) {
@@ -90,7 +90,7 @@ export function useVideoPrefetch(contentId: string | null, walrusBlobIds: Walrus
       }
 
       prefetchedRef.current.add(blobId);
-      console.log('[Prefetch] Completed prefetch for:', contentId, '(~5MB cached)');
+      console.log('[Prefetch] Completed prefetch for:', contentId, '(~20MB cached)');
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('[Prefetch] Aborted prefetch for:', contentId);
