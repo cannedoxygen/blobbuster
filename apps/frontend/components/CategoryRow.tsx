@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import Image from 'next/image';
 
 interface Movie {
   id: string;
@@ -120,12 +119,10 @@ export function CategoryRow({
               {/* Poster */}
               <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 ring-2 ring-transparent group-hover/card:ring-neon-cyan transition-all duration-200 group-hover/card:scale-105">
                 {movie.posterUrl || movie.thumbnailUrl ? (
-                  <Image
+                  <img
                     src={movie.posterUrl || movie.thumbnailUrl || ''}
                     alt={movie.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 176px"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-gray-500">
