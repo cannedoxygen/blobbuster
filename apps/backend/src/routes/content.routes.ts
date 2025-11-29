@@ -624,4 +624,413 @@ router.get('/featured', optionalAuthMiddleware, async (req: Request, res: Respon
   }
 });
 
+/**
+ * GET /api/content/categories
+ * Get movies grouped by category for Netflix-style library
+ *
+ * Query params:
+ * - categories: comma-separated list of category IDs
+ *   Available categories:
+ *   - recently_added: Last 20 movies added
+ *   - popular: Most viewed (by total_streams)
+ *   - highest_rated: 8+ rating
+ *   - decade_2020s, decade_2010s, decade_2000s, decade_1990s, decade_1980s, decade_1970s
+ *   - genre_action, genre_comedy, genre_drama, genre_horror, genre_scifi,
+ *     genre_documentary, genre_thriller, genre_romance, genre_animation
+ *   - unwatched: Per-user movies they haven't watched (requires auth)
+ */
+router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Response) => {
+  try {
+    const categoriesParam = req.query.categories as string || 'recently_added,popular,highest_rated,decade_1980s';
+    const categoryIds = categoriesParam.split(',').map(c => c.trim());
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    // Genre mapping
+    const GENRE_MAP: { [key: string]: number } = {
+      'genre_action': 1,
+      'genre_comedy': 2,
+      'genre_drama': 3,
+      'genre_horror': 4,
+      'genre_scifi': 5,
+      'genre_documentary': 6,
+      'genre_thriller': 7,
+      'genre_romance': 8,
+      'genre_animation': 9,
+    };
+
+    const GENRE_LABELS: { [key: string]: string } = {
+      'genre_action': 'Action Movies',
+      'genre_comedy': 'Comedies',
+      'genre_drama': 'Drama',
+      'genre_horror': 'Horror',
+      'genre_scifi': 'Sci-Fi',
+      'genre_documentary': 'Documentaries',
+      'genre_thriller': 'Thrillers',
+      'genre_romance': 'Romance',
+      'genre_animation': 'Animation',
+    };
+
+    const DECADE_LABELS: { [key: string]: string } = {
+      'decade_2020s': '2020s',
+      'decade_2010s': '2010s',
+      'decade_2000s': '2000s',
+      'decade_1990s': '90s Classics',
+      'decade_1980s': '80s Classics',
+      'decade_1970s': '70s Classics',
+    };
+
+    // Get user's watched content IDs if authenticated
+    const userId = req.user?.userId;
+    let watchedContentIds: Set<string> = new Set();
+    let userMembershipId: string | null = null;
+
+    if (userId) {
+      const membership = await prisma.memberships.findFirst({
+        where: { user_id: userId, is_active: true },
+        select: { id: true },
+      });
+      userMembershipId = membership?.id || null;
+
+      if (userMembershipId) {
+        const watches = await prisma.membership_watches.findMany({
+          where: { membership_id: userMembershipId },
+          select: { content_id: true },
+        });
+        watchedContentIds = new Set(watches.map(w => w.content_id));
+      }
+    }
+
+    // Helper to serialize content
+    const serializeContent = (items: any[]) => items.map((item: any) => ({
+      id: item.id,
+      blockchainId: item.blockchain_id,
+      title: item.title,
+      description: item.description,
+      genre: item.genre,
+      year: item.year,
+      posterUrl: item.poster_url,
+      thumbnailUrl: item.thumbnail_url,
+      externalRating: item.external_rating,
+      totalStreams: Number(item.total_streams),
+      createdAt: item.created_at,
+      watchedByUser: watchedContentIds.has(item.id),
+    }));
+
+    // Build category data
+    const categories: any[] = [];
+
+    for (const categoryId of categoryIds) {
+      let where: any = { status: 1 };
+      let orderBy: any[] = [];
+      let label = '';
+
+      // Handle different category types
+      if (categoryId === 'recently_added') {
+        label = 'Recently Added';
+        orderBy = [{ created_at: 'desc' }];
+      } else if (categoryId === 'popular') {
+        label = 'Most Popular';
+        orderBy = [{ total_streams: 'desc' }];
+      } else if (categoryId === 'highest_rated') {
+        label = 'Highest Rated';
+        where.external_rating = { gte: 8 };
+        orderBy = [{ external_rating: 'desc' }];
+      } else if (categoryId.startsWith('decade_')) {
+        label = DECADE_LABELS[categoryId] || categoryId;
+        const decadeStr = categoryId.replace('decade_', '').replace('s', '');
+        const decade = parseInt(decadeStr.length === 2 ? '19' + decadeStr : decadeStr);
+        where.year = { gte: decade, lt: decade + 10 };
+        orderBy = [{ external_rating: 'desc' }, { total_streams: 'desc' }];
+      } else if (categoryId.startsWith('genre_')) {
+        label = GENRE_LABELS[categoryId] || categoryId;
+        const genreId = GENRE_MAP[categoryId];
+        if (genreId) {
+          where.genre = genreId;
+          orderBy = [{ total_streams: 'desc' }];
+        }
+      } else if (categoryId === 'unwatched' && userMembershipId) {
+        label = 'Unwatched';
+        const watchedIds = Array.from(watchedContentIds);
+        if (watchedIds.length > 0) {
+          where.id = { notIn: watchedIds };
+        }
+        orderBy = [{ created_at: 'desc' }];
+      } else {
+        // Unknown category, skip
+        continue;
+      }
+
+      // Fetch movies for this category
+      const [movies, totalCount] = await Promise.all([
+        prisma.content.findMany({
+          where,
+          orderBy,
+          take: limit,
+        }),
+        prisma.content.count({ where }),
+      ]);
+
+      categories.push({
+        id: categoryId,
+        label,
+        movies: serializeContent(movies),
+        totalCount,
+      });
+    }
+
+    res.json({
+      success: true,
+      categories,
+    });
+  } catch (error) {
+    logger.error('Get categories error:', error);
+    res.status(500).json({ error: 'Failed to get categories' });
+  }
+});
+
+/**
+ * GET /api/content/category/:categoryId
+ * Get all movies for a specific category with pagination (for "See All")
+ */
+router.get('/category/:categoryId', optionalAuthMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { categoryId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    // Genre mapping
+    const GENRE_MAP: { [key: string]: number } = {
+      'genre_action': 1,
+      'genre_comedy': 2,
+      'genre_drama': 3,
+      'genre_horror': 4,
+      'genre_scifi': 5,
+      'genre_documentary': 6,
+      'genre_thriller': 7,
+      'genre_romance': 8,
+      'genre_animation': 9,
+    };
+
+    const GENRE_LABELS: { [key: string]: string } = {
+      'genre_action': 'Action Movies',
+      'genre_comedy': 'Comedies',
+      'genre_drama': 'Drama',
+      'genre_horror': 'Horror',
+      'genre_scifi': 'Sci-Fi',
+      'genre_documentary': 'Documentaries',
+      'genre_thriller': 'Thrillers',
+      'genre_romance': 'Romance',
+      'genre_animation': 'Animation',
+    };
+
+    const DECADE_LABELS: { [key: string]: string } = {
+      'decade_2020s': '2020s',
+      'decade_2010s': '2010s',
+      'decade_2000s': '2000s',
+      'decade_1990s': '90s Classics',
+      'decade_1980s': '80s Classics',
+      'decade_1970s': '70s Classics',
+    };
+
+    // Get user's watched content IDs
+    const userId = req.user?.userId;
+    let watchedContentIds: Set<string> = new Set();
+    let userMembershipId: string | null = null;
+
+    if (userId) {
+      const membership = await prisma.memberships.findFirst({
+        where: { user_id: userId, is_active: true },
+        select: { id: true },
+      });
+      userMembershipId = membership?.id || null;
+
+      if (userMembershipId) {
+        const watches = await prisma.membership_watches.findMany({
+          where: { membership_id: userMembershipId },
+          select: { content_id: true },
+        });
+        watchedContentIds = new Set(watches.map(w => w.content_id));
+      }
+    }
+
+    // Build query based on category
+    let where: any = { status: 1 };
+    let orderBy: any[] = [];
+    let label = '';
+
+    if (categoryId === 'recently_added') {
+      label = 'Recently Added';
+      orderBy = [{ created_at: 'desc' }];
+    } else if (categoryId === 'popular') {
+      label = 'Most Popular';
+      orderBy = [{ total_streams: 'desc' }];
+    } else if (categoryId === 'highest_rated') {
+      label = 'Highest Rated';
+      where.external_rating = { gte: 8 };
+      orderBy = [{ external_rating: 'desc' }];
+    } else if (categoryId.startsWith('decade_')) {
+      label = DECADE_LABELS[categoryId] || categoryId;
+      const decadeStr = categoryId.replace('decade_', '').replace('s', '');
+      const decade = parseInt(decadeStr.length === 2 ? '19' + decadeStr : decadeStr);
+      where.year = { gte: decade, lt: decade + 10 };
+      orderBy = [{ external_rating: 'desc' }, { total_streams: 'desc' }];
+    } else if (categoryId.startsWith('genre_')) {
+      label = GENRE_LABELS[categoryId] || categoryId;
+      const genreId = GENRE_MAP[categoryId];
+      if (genreId) {
+        where.genre = genreId;
+        orderBy = [{ total_streams: 'desc' }];
+      }
+    } else if (categoryId === 'unwatched' && userMembershipId) {
+      label = 'Unwatched';
+      const watchedIds = Array.from(watchedContentIds);
+      if (watchedIds.length > 0) {
+        where.id = { notIn: watchedIds };
+      }
+      orderBy = [{ created_at: 'desc' }];
+    } else {
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+
+    const [movies, total] = await Promise.all([
+      prisma.content.findMany({
+        where,
+        orderBy,
+        take: limit,
+        skip: offset,
+      }),
+      prisma.content.count({ where }),
+    ]);
+
+    const serializedMovies = movies.map((item: any) => ({
+      id: item.id,
+      blockchainId: item.blockchain_id,
+      title: item.title,
+      description: item.description,
+      genre: item.genre,
+      year: item.year,
+      posterUrl: item.poster_url,
+      thumbnailUrl: item.thumbnail_url,
+      externalRating: item.external_rating,
+      totalStreams: Number(item.total_streams),
+      createdAt: item.created_at,
+      watchedByUser: watchedContentIds.has(item.id),
+    }));
+
+    res.json({
+      success: true,
+      category: {
+        id: categoryId,
+        label,
+        movies: serializedMovies,
+        pagination: {
+          total,
+          limit,
+          offset,
+          hasMore: offset + limit < total,
+        },
+      },
+    });
+  } catch (error) {
+    logger.error('Get category error:', error);
+    res.status(500).json({ error: 'Failed to get category' });
+  }
+});
+
+/**
+ * GET /api/content/available-categories
+ * Get list of all available categories for the category picker
+ */
+router.get('/available-categories', async (req: Request, res: Response) => {
+  try {
+    // Get content counts for each category type
+    const [
+      totalCount,
+      highRatedCount,
+      decadeCounts,
+      genreCounts,
+    ] = await Promise.all([
+      prisma.content.count({ where: { status: 1 } }),
+      prisma.content.count({ where: { status: 1, external_rating: { gte: 8 } } }),
+      // Get decade counts
+      prisma.content.groupBy({
+        by: ['year'],
+        where: { status: 1, year: { not: null } },
+        _count: true,
+      }),
+      // Get genre counts
+      prisma.content.groupBy({
+        by: ['genre'],
+        where: { status: 1 },
+        _count: true,
+      }),
+    ]);
+
+    // Calculate decade counts
+    const decadeMap: { [key: number]: number } = {};
+    decadeCounts.forEach((d: any) => {
+      if (d.year) {
+        const decade = Math.floor(d.year / 10) * 10;
+        decadeMap[decade] = (decadeMap[decade] || 0) + d._count;
+      }
+    });
+
+    // Genre mapping
+    const GENRE_NAMES: { [key: number]: string } = {
+      1: 'Action Movies',
+      2: 'Comedies',
+      3: 'Drama',
+      4: 'Horror',
+      5: 'Sci-Fi',
+      6: 'Documentaries',
+      7: 'Thrillers',
+      8: 'Romance',
+      9: 'Animation',
+    };
+
+    const categories = [
+      { id: 'recently_added', label: 'Recently Added', count: totalCount, group: 'general' },
+      { id: 'popular', label: 'Most Popular', count: totalCount, group: 'general' },
+      { id: 'highest_rated', label: 'Highest Rated', count: highRatedCount, group: 'general' },
+    ];
+
+    // Add decades
+    const decades = Object.keys(decadeMap).map(Number).sort((a, b) => b - a);
+    decades.forEach(decade => {
+      const decadeLabel = decade >= 2000 ? `${decade}s` : `${decade.toString().slice(2)}s Classics`;
+      categories.push({
+        id: `decade_${decade}s`,
+        label: decadeLabel,
+        count: decadeMap[decade],
+        group: 'decade',
+      });
+    });
+
+    // Add genres
+    genreCounts.forEach((g: any) => {
+      const genreName = GENRE_NAMES[g.genre];
+      if (genreName) {
+        const genreKey = genreName.toLowerCase().replace(/\s+/g, '_').replace('_movies', '');
+        categories.push({
+          id: `genre_${genreKey === 'action' ? 'action' : genreKey}`,
+          label: genreName,
+          count: g._count,
+          group: 'genre',
+        });
+      }
+    });
+
+    // Add unwatched (requires auth, count shown as 0 if not authenticated)
+    categories.push({ id: 'unwatched', label: 'Unwatched', count: 0, group: 'personal' });
+
+    res.json({
+      success: true,
+      categories,
+    });
+  } catch (error) {
+    logger.error('Get available categories error:', error);
+    res.status(500).json({ error: 'Failed to get available categories' });
+  }
+});
+
 export default router;
