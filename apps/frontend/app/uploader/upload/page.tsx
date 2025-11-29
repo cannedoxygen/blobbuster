@@ -539,17 +539,21 @@ export default function UploadPage() {
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-heading text-white mb-4 uppercase">
+          {/* Header Card */}
+          <div className="blobbuster-card p-8 mb-8 text-center">
+            <h1 className="text-5xl font-heading text-blobbuster-yellow mb-4 uppercase">
               Upload Content
             </h1>
-            <p className="text-xl text-blobbuster-yellow font-bold uppercase">
+            <p className="text-xl text-white font-bold uppercase">
               Drop your movie → Preview metadata → Upload
             </p>
           </div>
 
           {/* Step 1: File Upload (always visible) */}
-          <div className="mb-8">
+          <div className="mb-8 blobbuster-card p-6">
+            <h3 className="text-lg font-bold text-blobbuster-yellow uppercase mb-4">
+              Step 1: Select Video File
+            </h3>
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -558,7 +562,7 @@ export default function UploadPage() {
               className={`border-3 border-dashed rounded-lg p-12 text-center cursor-pointer transition ${
                 isDragging
                   ? 'border-blobbuster-yellow bg-blobbuster-yellow/10'
-                  : 'border-blobbuster-yellow/30 hover:border-blobbuster-yellow bg-blobbuster-darkBlue/30'
+                  : 'border-blobbuster-yellow/30 hover:border-blobbuster-yellow bg-blobbuster-darkBlue/50'
               }`}
             >
               <input
@@ -570,9 +574,9 @@ export default function UploadPage() {
               />
               {videoFile ? (
                 <div>
-                  <div className="text-5xl mb-4">📹</div>
-                  <p className="text-xl font-bold text-blobbuster-yellow mb-2 uppercase">{videoFile.name}</p>
-                  <p className="text-sm text-gray-400">
+                  <div className="text-6xl mb-4">📹</div>
+                  <p className="text-2xl font-bold text-blobbuster-yellow mb-2 uppercase">{videoFile.name}</p>
+                  <p className="text-lg text-gray-400">
                     {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                   <button
@@ -583,17 +587,17 @@ export default function UploadPage() {
                       setMetadata(null);
                       setMetadataFound(false);
                     }}
-                    className="mt-4 text-blobbuster-yellow hover:underline uppercase font-bold"
+                    className="mt-4 text-red-400 hover:text-red-300 uppercase font-bold"
                   >
-                    Remove
+                    ✕ Remove File
                   </button>
                 </div>
               ) : (
                 <div>
-                  <div className="text-5xl mb-4">⬆️</div>
-                  <p className="text-xl font-bold mb-2 uppercase">Drag & drop your video here</p>
-                  <p className="text-sm text-gray-400 mb-4">or click to browse</p>
-                  <p className="text-xs text-gray-500 uppercase">
+                  <div className="text-6xl mb-4">⬆️</div>
+                  <p className="text-2xl font-bold text-white mb-2 uppercase">Drag & drop your video here</p>
+                  <p className="text-lg text-gray-400 mb-4">or click to browse</p>
+                  <p className="text-sm text-gray-500 uppercase">
                     Accepted formats: MP4, AVI, MKV, MOV, WEBM (Max 10GB)
                   </p>
                 </div>
@@ -609,9 +613,14 @@ export default function UploadPage() {
             </div>
           )}
 
-          {/* Step 3: Metadata Preview (if found or file selected) */}
+          {/* Step 2: Metadata Preview (if found or file selected) */}
           {videoFile && !isFetchingMetadata && (
             <div className="blobbuster-card rounded-lg overflow-hidden mb-8">
+              <div className="p-4 border-b-3 border-blobbuster-yellow/30">
+                <h3 className="text-lg font-bold text-blobbuster-yellow uppercase">
+                  Step 2: Movie Details
+                </h3>
+              </div>
               {metadata?.backdropUrl && (
                 <div
                   className="h-48 bg-cover bg-center relative"
@@ -815,11 +824,11 @@ export default function UploadPage() {
           {videoFile && !isFetchingMetadata && (
             <>
               {/* Storage Duration */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-lg font-bold text-blobbuster-yellow uppercase">
-                    Storage Duration
-                  </label>
+              <div className="mb-8 blobbuster-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-blobbuster-yellow uppercase">
+                    Step 3: Storage Duration
+                  </h3>
                   <button
                     type="button"
                     onClick={() => setIsAboutWalrusOpen(true)}
@@ -864,8 +873,8 @@ export default function UploadPage() {
                     <p className="text-xs text-gray-400 mt-1 text-center uppercase">epochs</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-400 mt-2">
-                  Each epoch ≈ 14 days on mainnet. Your content will be stored for {sliderValue * 14} days.
+                <p className="text-sm text-gray-400 mt-3">
+                  Each epoch ≈ 14 days on mainnet. Your content will be stored for <span className="text-blobbuster-yellow font-bold">{sliderValue * 14} days</span>.
                 </p>
               </div>
 
