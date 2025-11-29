@@ -947,7 +947,7 @@ export default function UploadPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={startUpload}
+                    onClick={() => startUpload()}
                     disabled={isUploading || !videoFile || isDuplicate}
                     className="btn-primary flex-1 py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed justify-center"
                   >

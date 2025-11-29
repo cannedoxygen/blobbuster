@@ -6,43 +6,38 @@ import { useAuth } from '@/lib/auth/AuthContext';
 import axios from 'axios';
 import Header from '@/components/Header';
 import { MovieDetailsModal } from '@/components/MovieDetailsModal';
-import { LibraryFilters, FilterState, DEFAULT_FILTERS } from '@/components/LibraryFilters';
+import { CategoryRow } from '@/components/CategoryRow';
+import { CategorySelector } from '@/components/CategorySelector';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-interface Content {
+// Default categories to show
+const DEFAULT_CATEGORIES = ['recently_added', 'popular', 'highest_rated', 'decade_1980s'];
+const STORAGE_KEY = 'blobBuster_libraryCategories';
+
+interface Movie {
   id: string;
   title: string;
-  description: string;
-  thumbnailUrl: string | null;
-  duration: number;
-  genre: number;
-  totalStreams: number;
-  createdAt: string;
-
-  // TMDB Metadata
+  description?: string;
+  thumbnailUrl?: string;
   posterUrl?: string;
-  backdropUrl?: string;
   year?: number;
+  externalRating?: number;
+  totalStreams?: number;
+  createdAt?: string;
+  watchedByUser?: boolean;
+  // Additional fields for modal
   plot?: string;
   runtime?: number;
-  externalRating?: number;
   genresList?: string;
   director?: string;
   cast?: string;
   tagline?: string;
-
-  // Storage expiration
-  storage_epochs?: number;
-  storage_expires_at?: string;
-
-  // Walrus blob IDs for prefetching
+  backdropUrl?: string;
+  genre?: number;
   walrusBlobIds?: string | object;
-
-  // Per-user watch status
-  watchedByUser?: boolean;
-
-  uploader: {
+  storage_expires_at?: string;
+  uploader?: {
     id: string;
     user: {
       username: string;
@@ -51,39 +46,63 @@ interface Content {
   };
 }
 
-const GENRE_MAP: { [key: number]: string } = {
-  1: 'Action',
-  2: 'Comedy',
-  3: 'Drama',
-  4: 'Horror',
-  5: 'Sci-Fi',
-  6: 'Documentary',
-  7: 'Thriller',
-  8: 'Romance',
-  9: 'Animation',
-  10: 'Other',
-};
+interface Category {
+  id: string;
+  label: string;
+  movies: Movie[];
+  totalCount: number;
+}
+
+interface AvailableCategory {
+  id: string;
+  label: string;
+  count: number;
+  group: string;
+}
 
 export default function LibraryPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, accessToken } = useAuth();
-  const [content, setContent] = useState<Content[]>([]);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<AvailableCategory[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(true);
   const [showMembershipModal, setShowMembershipModal] = useState(false);
   const [showMovieModal, setShowMovieModal] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<Content | null>(null);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [hasMembership, setHasMembership] = useState(false);
-  const [totalResults, setTotalResults] = useState(0);
 
-  // New filter state
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  // Category selector state
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
+  const [editingCategoryIndex, setEditingCategoryIndex] = useState<number | null>(null);
 
   // Provider filter state
   const [providerCode, setProviderCode] = useState('');
   const [activeProviderCode, setActiveProviderCode] = useState<string | null>(null);
   const [providerInfo, setProviderInfo] = useState<{ username: string; contentCount: number } | null>(null);
   const [providerError, setProviderError] = useState<string | null>(null);
+
+  // Load saved categories from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 4) {
+          setSelectedCategoryIds(parsed);
+        }
+      } catch (e) {
+        console.error('Failed to parse saved categories');
+      }
+    }
+  }, []);
+
+  // Save categories to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedCategoryIds));
+  }, [selectedCategoryIds]);
 
   // Check URL params for provider code on mount
   useEffect(() => {
@@ -94,35 +113,31 @@ export default function LibraryPage() {
     }
   }, []);
 
+  // Fetch categories when selection changes
   useEffect(() => {
-    fetchContent();
-  }, [filters, activeProviderCode, accessToken]);
+    if (!activeProviderCode) {
+      fetchCategories();
+    }
+  }, [selectedCategoryIds, accessToken, activeProviderCode]);
+
+  // Fetch available categories for the picker
+  useEffect(() => {
+    fetchAvailableCategories();
+  }, []);
 
   // Check if user has membership
   useEffect(() => {
     const checkMembership = async () => {
-      console.log('[Library] Checking membership...', { isAuthenticated, hasAccessToken: !!accessToken });
-
       if (!isAuthenticated || !accessToken) {
-        console.log('[Library] Not authenticated or no access token');
         setHasMembership(false);
         return;
       }
 
       try {
         const response = await axios.get(`${API_URL}/api/membership/user/me`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
-
-        console.log('[Library] Membership API response:', response.data);
-        console.log('[Library] Has membership:', response.data.hasMembership);
-        console.log('[Library] Membership is active:', response.data.membership?.isActive);
-
-        // Check both hasMembership AND isActive status
         const hasActiveMembership = response.data.hasMembership && response.data.membership?.isActive;
-        console.log('[Library] Final hasActiveMembership:', hasActiveMembership);
         setHasMembership(hasActiveMembership);
       } catch (error) {
         console.error('[Library] Error checking membership:', error);
@@ -133,56 +148,39 @@ export default function LibraryPage() {
     checkMembership();
   }, [isAuthenticated, accessToken]);
 
-  const fetchContent = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
+      const params = new URLSearchParams();
+      params.append('categories', selectedCategoryIds.join(','));
 
-      let url: string;
-      if (activeProviderCode) {
-        // Fetch from provider-specific endpoint
-        url = `${API_URL}/api/referral/content/${activeProviderCode}`;
-      } else {
-        // Build query params from filters
-        const params = new URLSearchParams();
-
-        if (filters.genre) params.append('genre', filters.genre);
-        if (filters.year) params.append('year', filters.year);
-        if (filters.decade) params.append('decade', filters.decade);
-        if (filters.ratingMin) params.append('ratingMin', filters.ratingMin);
-        if (filters.director) params.append('director', filters.director);
-        if (filters.country) params.append('country', filters.country);
-        if (filters.language) params.append('language', filters.language);
-        if (filters.q) params.append('q', filters.q);
-        if (filters.sort) params.append('sort', filters.sort);
-        if (filters.order) params.append('order', filters.order);
-        if (filters.watched) params.append('watched', filters.watched);
-
-        url = `${API_URL}/api/content?${params.toString()}`;
-      }
-
-      // Include auth header if available (for watched status)
       const headers: HeadersInit = {};
       if (accessToken) {
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
-      const response = await fetch(url, { headers });
+      const response = await fetch(`${API_URL}/api/content/categories?${params.toString()}`, { headers });
       const data = await response.json();
 
       if (data.success) {
-        setContent(data.content);
-        setTotalResults(data.pagination?.total || data.content.length);
-        if (data.provider) {
-          setProviderInfo({
-            username: data.provider.username,
-            contentCount: data.pagination.total,
-          });
-        }
+        setCategories(data.categories);
       }
     } catch (error) {
-      console.error('Failed to fetch content:', error);
+      console.error('Failed to fetch categories:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAvailableCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/content/available-categories`);
+      const data = await response.json();
+      if (data.success) {
+        setAvailableCategories(data.categories);
+      }
+    } catch (error) {
+      console.error('Failed to fetch available categories:', error);
     }
   };
 
@@ -194,15 +192,10 @@ export default function LibraryPage() {
     }
 
     try {
-      // Validate code first
-      const response = await axios.post(`${API_URL}/api/referral/validate`, {
-        code: normalized,
-      });
-
+      const response = await axios.post(`${API_URL}/api/referral/validate`, { code: normalized });
       if (response.data.valid) {
         setActiveProviderCode(normalized);
         setProviderError(null);
-        // Update URL
         const url = new URL(window.location.href);
         url.searchParams.set('provider', normalized);
         window.history.pushState({}, '', url);
@@ -222,42 +215,12 @@ export default function LibraryPage() {
     setActiveProviderCode(null);
     setProviderInfo(null);
     setProviderError(null);
-    // Remove URL param
     const url = new URL(window.location.href);
     url.searchParams.delete('provider');
     window.history.pushState({}, '', url);
   };
 
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
-  };
-
-  const getExpirationWarning = (expiresAt?: string) => {
-    if (!expiresAt) return null;
-
-    const now = new Date();
-    const expirationDate = new Date(expiresAt);
-    const daysRemaining = Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (daysRemaining <= 0) {
-      return { message: 'EXPIRED', color: 'bg-red-600', days: 0 };
-    } else if (daysRemaining <= 7) {
-      return { message: `${daysRemaining}d left`, color: 'bg-red-500', days: daysRemaining };
-    } else if (daysRemaining <= 14) {
-      return { message: `${daysRemaining}d left`, color: 'bg-orange-500', days: daysRemaining };
-    } else if (daysRemaining <= 30) {
-      return { message: `${daysRemaining}d left`, color: 'bg-yellow-500', days: daysRemaining };
-    }
-
-    return null; // Don't show warning if more than 30 days
-  };
-
-  const handleMovieClick = (item: Content) => {
+  const handleMovieClick = async (movie: Movie) => {
     if (!isAuthenticated) {
       router.push('/membership');
       return;
@@ -268,13 +231,44 @@ export default function LibraryPage() {
       return;
     }
 
-    // Open movie details modal
-    setSelectedMovie(item);
-    setShowMovieModal(true);
+    // Fetch full movie details for the modal
+    try {
+      const headers: HeadersInit = {};
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+      const response = await fetch(`${API_URL}/api/content/${movie.id}`, { headers });
+      const data = await response.json();
+      if (data.success) {
+        setSelectedMovie(data.content);
+        setShowMovieModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch movie details:', error);
+      // Fall back to basic info
+      setSelectedMovie(movie);
+      setShowMovieModal(true);
+    }
   };
 
-  // Content is now filtered server-side, just use content directly
-  const filteredContent = content;
+  const handleCategoryClick = (categoryId: string) => {
+    // Find which index this category is at
+    const index = selectedCategoryIds.indexOf(categoryId);
+    if (index !== -1) {
+      setEditingCategoryIndex(index);
+      setShowCategorySelector(true);
+    }
+  };
+
+  const handleCategorySelect = (newCategoryId: string) => {
+    if (editingCategoryIndex !== null) {
+      const newCategories = [...selectedCategoryIds];
+      newCategories[editingCategoryIndex] = newCategoryId;
+      setSelectedCategoryIds(newCategories);
+    }
+    setShowCategorySelector(false);
+    setEditingCategoryIndex(null);
+  };
 
   return (
     <div className="min-h-screen">
@@ -290,7 +284,7 @@ export default function LibraryPage() {
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label className="block text-sm font-bold text-blobbuster-gold uppercase mb-2">
-                🎬 Browse by Provider
+                Browse by Provider
               </label>
               <div className="flex gap-2">
                 <input
@@ -323,7 +317,7 @@ export default function LibraryPage() {
                 )}
               </div>
               {providerError && (
-                <p className="text-red-400 text-sm mt-2">⚠️ {providerError}</p>
+                <p className="text-red-400 text-sm mt-2">{providerError}</p>
               )}
             </div>
           </div>
@@ -356,20 +350,12 @@ export default function LibraryPage() {
           )}
         </div>
 
-        {/* Filters */}
-        <LibraryFilters
-          filters={filters}
-          onFilterChange={setFilters}
-          isAuthenticated={isAuthenticated}
-          hasMembership={hasMembership}
-        />
-
-        {/* Results count */}
-        {!loading && (
-          <div className="mb-4 text-gray-400 text-sm">
-            {totalResults} {totalResults === 1 ? 'movie' : 'movies'} found
-          </div>
-        )}
+        {/* Category Rows Info */}
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm text-gray-400">
+            Click on a category name to change it
+          </p>
+        </div>
 
         {/* Loading State */}
         {loading && (
@@ -378,141 +364,53 @@ export default function LibraryPage() {
           </div>
         )}
 
-        {/* Empty State */}
-        {!loading && filteredContent.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-xl mb-4">No content found</div>
-            <p className="text-gray-500">
-              {filters.q || filters.genre || filters.decade || filters.ratingMin
-                ? 'Try adjusting your filters'
-                : 'Be the first to upload content!'}
-            </p>
-          </div>
-        )}
-
-        {/* Content Grid */}
-        {!loading && filteredContent.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {filteredContent.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => handleMovieClick(item)}
-                className="group cursor-pointer relative"
-              >
-                <div className="aspect-[2/3] bg-blobbuster-navy/50 rounded-lg mb-2 overflow-hidden border border-neon-cyan/20 group-hover:border-neon-pink transition relative">
-                  {/* Use TMDB poster if available, fallback to thumbnail */}
-                  {item.posterUrl || item.thumbnailUrl ? (
-                    <>
-                      <img
-                        src={item.posterUrl || item.thumbnailUrl || ''}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-
-                      {/* Expiration Warning Badge */}
-                      {(() => {
-                        const warning = getExpirationWarning(item.storage_expires_at);
-                        return warning ? (
-                          <div className={`absolute top-2 left-2 ${warning.color} px-2 py-1 rounded text-xs font-bold backdrop-blur-sm text-white shadow-lg`}>
-                            ⚠️ {warning.message}
-                          </div>
-                        ) : null;
-                      })()}
-
-                      {/* Rating Badge */}
-                      {item.externalRating && (
-                        <div className="absolute top-2 right-2 bg-black/80 px-2 py-1 rounded text-xs font-bold backdrop-blur-sm">
-                          ⭐ {item.externalRating.toFixed(1)}
-                        </div>
-                      )}
-
-                      {/* Watched/Unplayed Badge - only show if user is authenticated with membership */}
-                      {hasMembership && (
-                        item.watchedByUser ? (
-                          <div className="absolute bottom-2 right-2 bg-green-600/90 px-2 py-1 rounded text-xs font-bold backdrop-blur-sm text-white flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            Played
-                          </div>
-                        ) : (
-                          <div className="absolute bottom-2 right-2 bg-neon-cyan/80 px-2 py-1 rounded text-xs font-bold backdrop-blur-sm text-black flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                            </svg>
-                            Unplayed
-                          </div>
-                        )
-                      )}
-
-                      {/* Hover Overlay with Plot */}
-                      {item.plot && (
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                          <p className="text-xs text-gray-300 line-clamp-4 leading-relaxed">
-                            {item.plot}
-                          </p>
-                          {item.director && (
-                            <p className="text-xs text-neon-cyan mt-2">
-                              Dir: {item.director}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-600">
-                      <div className="text-center p-4">
-                        <div className="text-4xl mb-2">🎬</div>
-                        <div className="text-sm">{item.title}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Title */}
-                <h3 className="font-bold text-sm mb-1 group-hover:text-neon-cyan transition line-clamp-2">
-                  {item.title}
-                </h3>
-
-                {/* Metadata */}
-                <p className="text-xs text-gray-400">
-                  {item.year || new Date(item.createdAt).getFullYear()} •{' '}
-                  {item.runtime ? `${item.runtime} min` : formatDuration(item.duration)}
-                </p>
-
-                {/* Genres from TMDB or fallback */}
-                {item.genresList ? (
-                  <p className="text-xs text-gray-500 mt-1">
-                    {JSON.parse(item.genresList).slice(0, 2).join(', ')}
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500 mt-1">
-                    {GENRE_MAP[item.genre] || 'Other'}
-                  </p>
-                )}
-
-                {/* Views */}
-                <p className="text-xs text-gray-600 mt-1">
-                  {item.totalStreams.toLocaleString()} views
-                </p>
-              </div>
+        {/* Category Rows */}
+        {!loading && !activeProviderCode && (
+          <div className="space-y-2">
+            {categories.map((category) => (
+              <CategoryRow
+                key={category.id}
+                categoryId={category.id}
+                label={category.label}
+                movies={category.movies}
+                totalCount={category.totalCount}
+                onMovieClick={handleMovieClick}
+                onCategoryClick={handleCategoryClick}
+                hasMembership={hasMembership}
+              />
             ))}
           </div>
         )}
 
+        {/* Empty State */}
+        {!loading && categories.length === 0 && !activeProviderCode && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-xl mb-4">No content found</div>
+            <p className="text-gray-500">Be the first to upload content!</p>
+          </div>
+        )}
+
+        {/* Category Selector Modal */}
+        <CategorySelector
+          isOpen={showCategorySelector}
+          onClose={() => {
+            setShowCategorySelector(false);
+            setEditingCategoryIndex(null);
+          }}
+          currentCategoryId={editingCategoryIndex !== null ? selectedCategoryIds[editingCategoryIndex] : ''}
+          availableCategories={availableCategories}
+          onSelect={handleCategorySelect}
+        />
+
         {/* Membership Required Modal */}
         {showMembershipModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
             <div
               className="fixed inset-0 bg-black/80 backdrop-blur-sm"
               onClick={() => setShowMembershipModal(false)}
             ></div>
-
-            {/* Modal */}
             <div className="relative z-10 bg-gradient-to-br from-blobbuster-navy to-blobbuster-navy/90 border-2 border-neon-cyan/30 rounded-xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300">
               <div className="text-center">
-                {/* Icon */}
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-neon-pink/20 flex items-center justify-center">
                   <svg
                     className="w-10 h-10 text-neon-pink"
@@ -528,18 +426,12 @@ export default function LibraryPage() {
                     />
                   </svg>
                 </div>
-
-                {/* Title */}
                 <h2 className="text-2xl font-heading text-blobbuster-gold mb-4">
                   Membership Required
                 </h2>
-
-                {/* Message */}
                 <p className="text-gray-300 mb-8 leading-relaxed">
                   You need an active BlobBuster membership to watch content. Get instant access to our entire library!
                 </p>
-
-                {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button
                     onClick={() => router.push('/membership')}
