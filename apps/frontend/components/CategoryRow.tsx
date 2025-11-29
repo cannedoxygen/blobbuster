@@ -68,48 +68,50 @@ export function CategoryRow({
   }
 
   return (
-    <div className="mb-8">
-      {/* Category Header - Clickable to open selector */}
-      <div className="flex items-center justify-between mb-3 px-2">
-        <button
-          onClick={() => onCategoryClick(categoryId)}
-          className="group flex items-center gap-2 text-lg font-bold text-white hover:text-neon-cyan transition-colors"
-        >
-          <span>{label}</span>
-          <svg
-            className="w-4 h-4 text-gray-400 group-hover:text-neon-cyan transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-          <span className="text-sm text-gray-500 font-normal">({totalCount})</span>
-        </button>
-      </div>
-
-      {/* Scrollable Row */}
-      <div className="relative group/row">
-        {/* Left Arrow */}
-        {canScrollLeft && (
+    <div className="mb-6">
+      {/* BlobBuster Card Container */}
+      <div className="blobbuster-card p-4">
+        {/* Category Header - Clickable to open selector */}
+        <div className="flex items-center justify-between mb-4">
           <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-r from-blobbuster-dark to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity"
+            onClick={() => onCategoryClick(categoryId)}
+            className="group flex items-center gap-2 text-lg font-bold text-blobbuster-yellow hover:text-white transition-colors uppercase"
           >
-            <div className="w-10 h-10 bg-black/80 rounded-full flex items-center justify-center hover:bg-neon-cyan/20 hover:border-neon-cyan border border-gray-600 transition">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </div>
+            <span>{label}</span>
+            <svg
+              className="w-4 h-4 text-blobbuster-yellow/60 group-hover:text-white transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+            <span className="text-sm text-gray-400 font-normal">({totalCount})</span>
           </button>
-        )}
+        </div>
 
-        {/* Movies Container */}
-        <div
-          ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth px-2"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
+        {/* Scrollable Row */}
+        <div className="relative group/row">
+          {/* Left Arrow */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-r from-[#001144] to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity"
+            >
+              <div className="w-10 h-10 bg-black/80 rounded-full flex items-center justify-center hover:bg-blobbuster-yellow/20 hover:border-blobbuster-yellow border border-gray-600 transition">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+            </button>
+          )}
+
+          {/* Movies Container */}
+          <div
+            ref={scrollRef}
+            className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
           {movies.map((movie) => (
             <div
               key={movie.id}
@@ -117,7 +119,7 @@ export function CategoryRow({
               className="flex-shrink-0 w-36 sm:w-40 md:w-44 cursor-pointer group/card"
             >
               {/* Poster */}
-              <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 ring-2 ring-transparent group-hover/card:ring-neon-cyan transition-all duration-200 group-hover/card:scale-105">
+              <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 ring-2 ring-transparent group-hover/card:ring-blobbuster-yellow transition-all duration-200 group-hover/card:scale-105">
                 {movie.posterUrl || movie.thumbnailUrl ? (
                   <img
                     src={movie.posterUrl || movie.thumbnailUrl || ''}
@@ -163,7 +165,7 @@ export function CategoryRow({
               </div>
 
               {/* Title */}
-              <h3 className="text-sm text-white font-medium truncate group-hover/card:text-neon-cyan transition-colors">
+              <h3 className="text-sm text-white font-medium truncate group-hover/card:text-blobbuster-yellow transition-colors">
                 {movie.title}
               </h3>
               {movie.year && (
@@ -173,19 +175,20 @@ export function CategoryRow({
           ))}
         </div>
 
-        {/* Right Arrow */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-l from-blobbuster-dark to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity"
-          >
-            <div className="w-10 h-10 bg-black/80 rounded-full flex items-center justify-center hover:bg-neon-cyan/20 hover:border-neon-cyan border border-gray-600 transition">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </button>
-        )}
+          {/* Right Arrow */}
+          {canScrollRight && (
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 top-0 bottom-0 z-10 w-12 bg-gradient-to-l from-[#001144] to-transparent flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-opacity"
+            >
+              <div className="w-10 h-10 bg-black/80 rounded-full flex items-center justify-center hover:bg-blobbuster-yellow/20 hover:border-blobbuster-yellow border border-gray-600 transition">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
