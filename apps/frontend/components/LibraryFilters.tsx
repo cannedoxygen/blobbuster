@@ -360,7 +360,7 @@ export function LibraryFilters({
         >
           Highest Rated
         </button>
-        {filterOptions?.decades.map((d) => (
+        {filterOptions?.decades.slice(0, 4).map((d) => (
           <button
             key={d}
             onClick={() => onFilterChange({ ...DEFAULT_FILTERS, decade: d.toString() })}
