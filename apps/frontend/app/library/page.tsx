@@ -298,7 +298,7 @@ export default function LibraryPage() {
                   }}
                   placeholder="Enter 5-character code"
                   maxLength={5}
-                  className="flex-1 px-4 py-3 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg text-white placeholder-gray-500 uppercase font-mono text-lg tracking-wider focus:border-blobbuster-yellow focus:outline-none"
+                  className="flex-1 px-4 py-3 bg-white border-3 border-blobbuster-yellow/30 rounded-lg text-blobbuster-navy placeholder-gray-400 uppercase font-mono text-lg tracking-wider focus:border-blobbuster-yellow focus:outline-none"
                 />
                 <button
                   onClick={() => applyProviderFilter(providerCode)}
