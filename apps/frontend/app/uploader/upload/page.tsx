@@ -427,8 +427,8 @@ export default function UploadPage() {
         setError(null);
         console.log('Payment successful:', paymentResult.digest);
 
-        // Auto-upload after successful payment
-        await startUpload();
+        // Auto-upload after successful payment - pass digest directly since state update is async
+        await startUpload(paymentResult.digest);
       } else {
         setError(`Payment failed: ${paymentResult.error}`);
       }
@@ -440,14 +440,15 @@ export default function UploadPage() {
     }
   };
 
-  const startUpload = async () => {
+  const startUpload = async (digestOverride?: string) => {
     if (!videoFile || !accessToken) {
       setError('Missing required information for upload');
       return;
     }
 
-    // Require payment proof before upload
-    if (!paymentDigest) {
+    // Use passed digest or fall back to state
+    const digest = digestOverride || paymentDigest;
+    if (!digest) {
       setError('Payment verification missing - please pay for storage first');
       return;
     }
@@ -463,7 +464,7 @@ export default function UploadPage() {
         description: description || 'Auto-generated from TMDB',
         genre,
         epochs: storageEpochs,
-        paymentDigest,
+        paymentDigest: digest,
         paidAmount: costEstimate!.costs.totalWithGas.toString(),
         tmdbId: metadata?.tmdbId,
         accessToken,
