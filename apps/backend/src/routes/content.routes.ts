@@ -374,7 +374,7 @@ router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Resp
   try {
     const categoriesParam = req.query.categories as string || 'recently_added,popular,highest_rated,decade_1980s';
     const categoryIds = categoriesParam.split(',').map(c => c.trim());
-    const limit = parseInt(req.query.limit as string) || 20;
+    const limit = parseInt(req.query.limit as string) || 100; // Show all movies in category rows
 
     // Genre mapping
     const GENRE_MAP: { [key: string]: number } = {
