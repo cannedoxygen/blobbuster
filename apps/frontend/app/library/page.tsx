@@ -280,12 +280,12 @@ export default function LibraryPage() {
         </h1>
 
         {/* Provider Filter Section */}
-        <div className="mb-8 p-6 bg-blobbuster-navy/50 border-2 border-neon-cyan/30 rounded-lg">
+        <div className="mb-8 blobbuster-card p-6">
+          <h3 className="text-xl font-bold text-blobbuster-yellow uppercase mb-4">
+            Browse by Provider
+          </h3>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-bold text-blobbuster-gold uppercase mb-2">
-                Browse by Provider
-              </label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -298,19 +298,19 @@ export default function LibraryPage() {
                   }}
                   placeholder="Enter 5-character code"
                   maxLength={5}
-                  className="flex-1 px-4 py-2 bg-blobbuster-navy border border-neon-cyan/20 rounded text-white placeholder-gray-500 uppercase font-mono text-lg tracking-wider"
+                  className="flex-1 px-4 py-3 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/30 rounded-lg text-white placeholder-gray-500 uppercase font-mono text-lg tracking-wider focus:border-blobbuster-yellow focus:outline-none"
                 />
                 <button
                   onClick={() => applyProviderFilter(providerCode)}
                   disabled={providerCode.length !== 5}
-                  className="px-6 py-2 btn-primary rounded font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-3 btn-primary rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed uppercase"
                 >
                   Find Collection
                 </button>
                 {activeProviderCode && (
                   <button
                     onClick={clearProviderFilter}
-                    className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded font-bold transition"
+                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold transition uppercase border-3 border-gray-600"
                   >
                     Clear
                   </button>
@@ -324,11 +324,11 @@ export default function LibraryPage() {
 
           {/* Active Provider Banner */}
           {activeProviderCode && providerInfo && (
-            <div className="mt-4 p-4 bg-blobbuster-gold/10 border border-blobbuster-gold/30 rounded">
+            <div className="mt-4 p-4 bg-blobbuster-darkBlue border-3 border-blobbuster-yellow/50 rounded-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400 uppercase font-bold">Currently Viewing</p>
-                  <p className="text-xl font-black text-blobbuster-gold">
+                  <p className="text-xl font-black text-blobbuster-yellow uppercase">
                     {providerInfo.username}'s Collection
                   </p>
                   <p className="text-sm text-gray-400">
@@ -337,14 +337,14 @@ export default function LibraryPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-gray-400 uppercase">Code</p>
-                  <p className="text-2xl font-black text-neon-cyan tracking-widest">{activeProviderCode}</p>
+                  <p className="text-2xl font-black text-blobbuster-yellow tracking-widest">{activeProviderCode}</p>
                 </div>
               </div>
             </div>
           )}
 
           {!activeProviderCode && (
-            <p className="mt-3 text-sm text-gray-400 text-center">
+            <p className="mt-4 text-sm text-gray-400 text-center">
               Enter a provider's referral code to browse their exclusive collection
             </p>
           )}
