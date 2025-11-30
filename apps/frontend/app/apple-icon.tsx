@@ -13,8 +13,8 @@ export default function AppleIcon() {
     (
       <div
         style={{
-          fontSize: 120,
-          background: '#FFD700',
+          fontSize: 140,
+          background: '#001a4d',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -25,10 +25,11 @@ export default function AppleIcon() {
       >
         <span
           style={{
-            color: '#001a4d',
+            color: '#FFD700',
             fontWeight: 900,
-            fontFamily: 'Arial Black, sans-serif',
-            marginTop: -8,
+            fontFamily: 'Impact, Arial Black, sans-serif',
+            marginTop: -5,
+            letterSpacing: '-3px',
           }}
         >
           B

@@ -437,14 +437,30 @@ router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Resp
       blockchainId: item.blockchain_id,
       title: item.title,
       description: item.description,
+      plot: item.plot,
       genre: item.genre,
       year: item.year,
+      runtime: item.runtime,
       posterUrl: item.poster_url,
+      backdropUrl: item.backdrop_url,
       thumbnailUrl: item.thumbnail_url,
       externalRating: item.external_rating,
       totalStreams: Number(item.total_streams),
       createdAt: item.created_at,
       watchedByUser: watchedContentIds.has(item.id),
+      director: item.director,
+      cast: item.cast,
+      genresList: item.genres_list,
+      tagline: item.tagline,
+      walrusBlobIds: item.walrus_blob_ids,
+      storage_expires_at: item.storage_expires_at,
+      uploader: item.uploader_profiles ? {
+        id: item.uploader_profiles.id,
+        user: {
+          username: item.uploader_profiles.users?.username,
+          walletAddress: item.uploader_profiles.users?.wallet_address,
+        },
+      } : undefined,
     }));
 
     // Build category data
@@ -497,6 +513,20 @@ router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Resp
           where,
           orderBy,
           take: limit,
+          include: {
+            uploader_profiles: {
+              select: {
+                id: true,
+                user_id: true,
+                users: {
+                  select: {
+                    username: true,
+                    wallet_address: true,
+                  },
+                },
+              },
+            },
+          },
         }),
         prisma.content.count({ where }),
       ]);
@@ -629,6 +659,20 @@ router.get('/category/:categoryId', optionalAuthMiddleware, async (req: Request,
         orderBy,
         take: limit,
         skip: offset,
+        include: {
+          uploader_profiles: {
+            select: {
+              id: true,
+              user_id: true,
+              users: {
+                select: {
+                  username: true,
+                  wallet_address: true,
+                },
+              },
+            },
+          },
+        },
       }),
       prisma.content.count({ where }),
     ]);
@@ -638,14 +682,30 @@ router.get('/category/:categoryId', optionalAuthMiddleware, async (req: Request,
       blockchainId: item.blockchain_id,
       title: item.title,
       description: item.description,
+      plot: item.plot,
       genre: item.genre,
       year: item.year,
+      runtime: item.runtime,
       posterUrl: item.poster_url,
+      backdropUrl: item.backdrop_url,
       thumbnailUrl: item.thumbnail_url,
       externalRating: item.external_rating,
       totalStreams: Number(item.total_streams),
       createdAt: item.created_at,
       watchedByUser: watchedContentIds.has(item.id),
+      director: item.director,
+      cast: item.cast,
+      genresList: item.genres_list,
+      tagline: item.tagline,
+      walrusBlobIds: item.walrus_blob_ids,
+      storage_expires_at: item.storage_expires_at,
+      uploader: item.uploader_profiles ? {
+        id: item.uploader_profiles.id,
+        user: {
+          username: item.uploader_profiles.users?.username,
+          walletAddress: item.uploader_profiles.users?.wallet_address,
+        },
+      } : undefined,
     }));
 
     res.json({

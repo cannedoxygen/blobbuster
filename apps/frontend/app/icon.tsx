@@ -13,8 +13,8 @@ export default function Icon() {
     (
       <div
         style={{
-          fontSize: 24,
-          background: '#FFD700',
+          fontSize: 26,
+          background: '#001a4d',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -25,10 +25,11 @@ export default function Icon() {
       >
         <span
           style={{
-            color: '#001a4d',
+            color: '#FFD700',
             fontWeight: 900,
-            fontFamily: 'Arial Black, sans-serif',
-            marginTop: -2,
+            fontFamily: 'Impact, Arial Black, sans-serif',
+            marginTop: -1,
+            letterSpacing: '-1px',
           }}
         >
           B
