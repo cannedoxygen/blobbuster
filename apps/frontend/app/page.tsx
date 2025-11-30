@@ -240,16 +240,37 @@ export default function HomePage() {
             <div>
               <h4 className="font-bold mb-4 text-blobbuster-yellow uppercase">Resources</h4>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li><a href="#" className="blobbuster-link">Documentation</a></li>
+                <li><Link href="/docs" className="blobbuster-link">Documentation</Link></li>
                 <li><a href="#" className="blobbuster-link">API</a></li>
-                <li><a href="#" className="blobbuster-link">Support</a></li>
+                <li>
+                  <a
+                    href="https://x.com/blobbuster"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="blobbuster-link"
+                  >
+                    Support
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-4 text-blobbuster-yellow uppercase">Community</h4>
               <ul className="space-y-2 text-gray-300 text-sm">
+                <li>
+                  <a
+                    href="https://x.com/blobbuster"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="blobbuster-link flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    @blobbuster
+                  </a>
+                </li>
                 <li><a href="#" className="blobbuster-link">Discord</a></li>
-                <li><a href="#" className="blobbuster-link">Twitter</a></li>
                 <li><a href="#" className="blobbuster-link">GitHub</a></li>
               </ul>
             </div>
