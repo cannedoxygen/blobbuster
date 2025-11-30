@@ -119,7 +119,10 @@ export function CategoryRow({
               className="flex-shrink-0 w-36 sm:w-40 md:w-44 cursor-pointer group/card py-2"
             >
               {/* Poster */}
-              <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 border-3 border-blobbuster-yellow transition-all duration-200 group-hover/card:scale-105 group-hover/card:shadow-lg group-hover/card:shadow-blobbuster-yellow/30">
+              <div
+                className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 transition-all duration-200 group-hover/card:scale-105 group-hover/card:shadow-lg group-hover/card:shadow-blobbuster-yellow/30"
+                style={{ border: '3px solid #FFD700' }}
+              >
                 {movie.posterUrl || movie.thumbnailUrl ? (
                   <img
                     src={movie.posterUrl || movie.thumbnailUrl || ''}
