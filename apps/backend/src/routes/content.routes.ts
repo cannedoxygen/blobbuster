@@ -822,16 +822,8 @@ router.get('/:id', optionalAuthMiddleware, async (req: Request, res: Response) =
       where: { id },
       include: {
         uploader_profiles: {
-          select: {
-            id: true,
-            user_id: true,
-            users: {
-              select: {
-                id: true,
-                username: true,
-                avatar_url: true,
-              },
-            },
+          include: {
+            users: true,
           },
         },
       },
@@ -891,8 +883,11 @@ router.get('/:id', optionalAuthMiddleware, async (req: Request, res: Response) =
         updatedAt: content.updated_at,
         uploader: {
           id: content.uploader_profiles.id,
-          username: content.uploader_profiles.users.username,
-          avatarUrl: content.uploader_profiles.users.avatar_url,
+          user: {
+            username: content.uploader_profiles.users?.username || null,
+            walletAddress: content.uploader_profiles.users?.wallet_address || null,
+            avatarUrl: content.uploader_profiles.users?.avatar_url || null,
+          },
         },
       },
     });
