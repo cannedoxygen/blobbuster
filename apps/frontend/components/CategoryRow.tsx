@@ -116,10 +116,10 @@ export function CategoryRow({
             <div
               key={movie.id}
               onClick={() => onMovieClick(movie)}
-              className="flex-shrink-0 w-36 sm:w-40 md:w-44 cursor-pointer group/card"
+              className="flex-shrink-0 w-36 sm:w-40 md:w-44 cursor-pointer group/card py-2"
             >
               {/* Poster */}
-              <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 ring-2 ring-transparent group-hover/card:ring-blobbuster-yellow transition-all duration-200 group-hover/card:scale-105">
+              <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 mb-2 border-3 border-blobbuster-yellow transition-all duration-200 group-hover/card:scale-105 group-hover/card:shadow-lg group-hover/card:shadow-blobbuster-yellow/30">
                 {movie.posterUrl || movie.thumbnailUrl ? (
                   <img
                     src={movie.posterUrl || movie.thumbnailUrl || ''}
