@@ -445,7 +445,7 @@ router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Resp
       backdropUrl: item.backdrop_url,
       thumbnailUrl: item.thumbnail_url,
       externalRating: item.external_rating,
-      totalStreams: Number(item.total_streams),
+      totalStreams: Number(item.total_streams || 0),
       createdAt: item.created_at,
       watchedByUser: watchedContentIds.has(item.id),
       director: item.director,
@@ -457,8 +457,8 @@ router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Resp
       uploader: item.uploader_profiles ? {
         id: item.uploader_profiles.id,
         user: {
-          username: item.uploader_profiles.users?.username,
-          walletAddress: item.uploader_profiles.users?.wallet_address,
+          username: item.uploader_profiles.users?.username || null,
+          walletAddress: item.uploader_profiles.users?.wallet_address || null,
         },
       } : undefined,
     }));
@@ -515,15 +515,8 @@ router.get('/categories', optionalAuthMiddleware, async (req: Request, res: Resp
           take: limit,
           include: {
             uploader_profiles: {
-              select: {
-                id: true,
-                user_id: true,
-                users: {
-                  select: {
-                    username: true,
-                    wallet_address: true,
-                  },
-                },
+              include: {
+                users: true,
               },
             },
           },
@@ -661,15 +654,8 @@ router.get('/category/:categoryId', optionalAuthMiddleware, async (req: Request,
         skip: offset,
         include: {
           uploader_profiles: {
-            select: {
-              id: true,
-              user_id: true,
-              users: {
-                select: {
-                  username: true,
-                  wallet_address: true,
-                },
-              },
+            include: {
+              users: true,
             },
           },
         },
@@ -690,7 +676,7 @@ router.get('/category/:categoryId', optionalAuthMiddleware, async (req: Request,
       backdropUrl: item.backdrop_url,
       thumbnailUrl: item.thumbnail_url,
       externalRating: item.external_rating,
-      totalStreams: Number(item.total_streams),
+      totalStreams: Number(item.total_streams || 0),
       createdAt: item.created_at,
       watchedByUser: watchedContentIds.has(item.id),
       director: item.director,
@@ -702,8 +688,8 @@ router.get('/category/:categoryId', optionalAuthMiddleware, async (req: Request,
       uploader: item.uploader_profiles ? {
         id: item.uploader_profiles.id,
         user: {
-          username: item.uploader_profiles.users?.username,
-          walletAddress: item.uploader_profiles.users?.wallet_address,
+          username: item.uploader_profiles.users?.username || null,
+          walletAddress: item.uploader_profiles.users?.wallet_address || null,
         },
       } : undefined,
     }));
