@@ -10,6 +10,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  needsReauth: boolean; // Wallet connected but not authenticated - needs sign-in
   login: () => Promise<void>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
@@ -31,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [hasInitialized, setHasInitialized] = useState(false);
   const [previousWallet, setPreviousWallet] = useState<string | null>(null);
   const [walletConnectedThisSession, setWalletConnectedThisSession] = useState(false);
+  const [needsReauth, setNeedsReauth] = useState(false); // Flag when wallet connected but auth failed
 
   // Load tokens from localStorage on mount
   useEffect(() => {
@@ -105,6 +107,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [currentAccount, user, hasInitialized, isLoading, walletConnectedThisSession]);
 
+  // Sync wallet connection with auth state
+  // Detects when wallet is connected but user is not authenticated (needs re-login)
+  useEffect(() => {
+    if (!hasInitialized || isLoading) return;
+
+    const isWalletConnected = !!currentAccount;
+    const isUserAuthenticated = !!user && !!accessToken;
+
+    if (isWalletConnected && !isUserAuthenticated) {
+      // Wallet is connected but we're not authenticated
+      // This happens after page refresh when token verification fails
+      console.log('[Auth] Wallet connected but not authenticated - needs re-auth');
+      setNeedsReauth(true);
+    } else {
+      setNeedsReauth(false);
+    }
+  }, [currentAccount, user, accessToken, hasInitialized, isLoading]);
+
   const login = useCallback(async () => {
     if (!currentAccount) {
       setError('Please connect your wallet first');
@@ -140,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setAccessToken(response.accessToken);
       setUser(response.user);
+      setNeedsReauth(false); // Clear the reauth flag on successful login
     } catch (error: any) {
       console.error('Login failed:', error);
       setError(error.message || 'Authentication failed');
@@ -187,6 +208,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user && !!accessToken,
     isLoading,
     error,
+    needsReauth,
     login,
     logout,
     refreshAuth,

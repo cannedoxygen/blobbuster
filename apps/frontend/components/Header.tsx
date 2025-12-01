@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth/AuthContext';
 
 export default function Header() {
   const currentAccount = useCurrentAccount();
-  const { isAuthenticated, login, logout, user, isLoading } = useAuth();
+  const { isAuthenticated, login, logout, user, isLoading, needsReauth } = useAuth();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [userClickedSignIn, setUserClickedSignIn] = useState(false);
 
@@ -101,13 +101,25 @@ export default function Header() {
                 </button>
               </>
             ) : currentAccount ? (
-              <button
-                onClick={handleSignIn}
-                disabled={isSigningIn || isLoading}
-                className="px-6 py-2 bg-blobbuster-yellow text-blobbuster-blue hover:bg-blobbuster-yellow/90 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed uppercase"
-              >
-                {isSigningIn ? 'Signing In...' : 'Sign In'}
-              </button>
+              // Wallet connected but not authenticated - show prominent sign-in button
+              <div className="flex items-center gap-3">
+                {needsReauth && (
+                  <span className="text-xs text-orange-400 font-bold animate-pulse">
+                    Session expired
+                  </span>
+                )}
+                <button
+                  onClick={handleSignIn}
+                  disabled={isSigningIn || isLoading}
+                  className={`px-6 py-2 rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed uppercase ${
+                    needsReauth
+                      ? 'bg-orange-500 text-white hover:bg-orange-400 animate-pulse'
+                      : 'bg-blobbuster-yellow text-blobbuster-blue hover:bg-blobbuster-yellow/90'
+                  }`}
+                >
+                  {isSigningIn ? 'Signing In...' : needsReauth ? 'Sign In Again' : 'Sign In'}
+                </button>
+              </div>
             ) : (
               <div onClick={() => setUserClickedSignIn(true)}>
                 <ConnectButton
