@@ -66,21 +66,35 @@ export async function connectWallet(
 
 /**
  * Verify JWT token
+ * Returns { valid: false } on any error instead of throwing
  */
 export async function verifyToken(token: string): Promise<VerifyResponse> {
-  const { data } = await authApi.post<VerifyResponse>('/verify', {
-    token,
-  });
-  return data;
+  try {
+    const { data } = await authApi.post<VerifyResponse>('/verify', {
+      token,
+    });
+    return data;
+  } catch (error: any) {
+    // Return valid: false instead of throwing - let caller handle refresh logic
+    console.log('[verifyToken] Token verification failed:', error?.response?.data || error.message);
+    return {
+      success: false,
+      valid: false,
+      user: null as any,
+    };
+  }
 }
 
 /**
  * Refresh access token
+ * Throws on error - caller should handle and clear tokens
  */
 export async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
+  console.log('[refreshAccessToken] Attempting to refresh token...');
   const { data } = await authApi.post('/refresh', {
     refreshToken,
   });
+  console.log('[refreshAccessToken] Refresh successful');
   return data;
 }
 
