@@ -37,41 +37,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Load tokens from localStorage on mount
   useEffect(() => {
     const loadAuth = async () => {
+      console.log('[Auth:loadAuth] Starting auth restoration...');
       try {
         const storedToken = localStorage.getItem(TOKEN_KEY);
+        const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        console.log('[Auth:loadAuth] Stored tokens:', {
+          hasAccessToken: !!storedToken,
+          hasRefreshToken: !!storedRefreshToken,
+          accessTokenPreview: storedToken ? storedToken.substring(0, 20) + '...' : null
+        });
 
         if (storedToken) {
           // Verify stored token
+          console.log('[Auth:loadAuth] Verifying stored token...');
           const { valid, user: userData } = await verifyToken(storedToken);
+          console.log('[Auth:loadAuth] Token verification result:', { valid, userData });
 
           if (valid) {
+            console.log('[Auth:loadAuth] Token valid, setting auth state');
             setAccessToken(storedToken);
             setUser(userData);
             setPreviousWallet(userData.walletAddress);
           } else {
             // Try to refresh token
+            console.log('[Auth:loadAuth] Token invalid, attempting refresh...');
             const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
             if (refreshToken) {
-              const { accessToken: newToken } = await refreshAccessToken(refreshToken);
-              localStorage.setItem(TOKEN_KEY, newToken);
-              setAccessToken(newToken);
+              console.log('[Auth:loadAuth] Refresh token found, refreshing...');
+              try {
+                const { accessToken: newToken } = await refreshAccessToken(refreshToken);
+                localStorage.setItem(TOKEN_KEY, newToken);
+                setAccessToken(newToken);
 
-              // Get user with new token
-              const { user: userData } = await verifyToken(newToken);
-              setUser(userData);
-              setPreviousWallet(userData.walletAddress);
+                // Get user with new token
+                const verifyResult = await verifyToken(newToken);
+                if (verifyResult.valid && verifyResult.user) {
+                  console.log('[Auth:loadAuth] Refresh successful, user:', verifyResult.user);
+                  setUser(verifyResult.user);
+                  setPreviousWallet(verifyResult.user.walletAddress);
+                } else {
+                  console.log('[Auth:loadAuth] New token also invalid, clearing tokens');
+                  localStorage.removeItem(TOKEN_KEY);
+                  localStorage.removeItem(REFRESH_TOKEN_KEY);
+                }
+              } catch (refreshError) {
+                console.error('[Auth:loadAuth] Refresh token failed:', refreshError);
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(REFRESH_TOKEN_KEY);
+              }
             } else {
               // Clear invalid tokens
+              console.log('[Auth:loadAuth] No refresh token, clearing tokens');
               localStorage.removeItem(TOKEN_KEY);
               localStorage.removeItem(REFRESH_TOKEN_KEY);
             }
           }
+        } else {
+          console.log('[Auth:loadAuth] No stored token found');
         }
       } catch (error) {
-        console.error('Failed to restore auth:', error);
+        console.error('[Auth:loadAuth] Failed to restore auth:', error);
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(REFRESH_TOKEN_KEY);
       } finally {
+        console.log('[Auth:loadAuth] Auth restoration complete');
         setIsLoading(false);
         setHasInitialized(true);
       }
@@ -93,18 +122,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hasInitialized || isLoading) return;
 
+    console.log('[Auth:walletSync] Checking wallet sync:', {
+      hasUser: !!user,
+      userWallet: user?.walletAddress,
+      currentAccount: currentAccount?.address,
+      walletConnectedThisSession,
+      hasInitialized,
+      isLoading
+    });
+
     // Only logout if wallet was connected this session and is now disconnected
     // (not if page just loaded and wallet hasn't connected yet)
     if (user && walletConnectedThisSession && !currentAccount) {
-      console.log('[Auth] Wallet disconnected, logging out');
+      console.log('[Auth:walletSync] Wallet disconnected, logging out');
       logout();
+      return;
     }
 
     // If user logged in but wallet changed to different address
-    if (user && currentAccount && currentAccount.address !== user.walletAddress) {
-      console.log('[Auth] Wallet changed, logging out');
+    if (user && currentAccount && currentAccount.address.toLowerCase() !== user.walletAddress.toLowerCase()) {
+      console.log('[Auth:walletSync] Wallet address mismatch!', {
+        currentWallet: currentAccount.address,
+        userWallet: user.walletAddress
+      });
       logout();
+      return;
     }
+
+    console.log('[Auth:walletSync] Wallet sync OK');
   }, [currentAccount, user, hasInitialized, isLoading, walletConnectedThisSession]);
 
   // Sync wallet connection with auth state
