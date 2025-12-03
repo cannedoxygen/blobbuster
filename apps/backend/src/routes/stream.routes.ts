@@ -65,31 +65,33 @@ router.post(
         ? JSON.parse(content.walrus_blob_ids)
         : content.walrus_blob_ids;
 
-      // Generate streaming URL through our proxy
+      // Stream directly from Walrus aggregator (bypasses Railway proxy timeout issues)
+      const walrusAggregatorUrl = process.env.WALRUS_AGGREGATOR_URL || 'https://aggregator.walrus-mainnet.walrus.space';
       const apiBaseUrl = process.env.API_BASE_URL || 'http://localhost:3001';
 
       let streamUrl = '';
 
       // Check if content uses HLS segments or single blob
       if (walrusBlobIds.type === 'hls' && walrusBlobIds.segments) {
-        // HLS streaming - provide playlist URL
+        // HLS streaming - still needs our playlist generator
         streamUrl = `${apiBaseUrl}/api/stream/hls/${contentId}/playlist.m3u8`;
         logger.info(`Stream started (HLS): ${sessionId} for content ${contentId} by user ${userId}`, {
           streamUrl,
           totalSegments: walrusBlobIds.segments.length,
         });
       } else if (walrusBlobIds.type === 'single' && walrusBlobIds.videoBlobId) {
-        // New single-file format (post-HLS removal)
-        streamUrl = `${apiBaseUrl}/api/stream/proxy/${walrusBlobIds.videoBlobId}`;
-        logger.info(`Stream started (single file): ${sessionId} for content ${contentId} by user ${userId}`, {
+        // New single-file format - stream directly from Walrus
+        streamUrl = `${walrusAggregatorUrl}/v1/blobs/${walrusBlobIds.videoBlobId}`;
+        logger.info(`Stream started (single file, direct): ${sessionId} for content ${contentId} by user ${userId}`, {
           streamUrl,
           blobId: walrusBlobIds.videoBlobId,
         });
       } else {
         // Check for direct video key (current format) or legacy quality-based keys
+        // Stream directly from Walrus aggregator
         const blobId = walrusBlobIds.video || walrusBlobIds['720p'] || walrusBlobIds['1080p'] || walrusBlobIds['480p'] || '';
-        streamUrl = blobId ? `${apiBaseUrl}/api/stream/proxy/${blobId}` : '';
-        logger.info(`Stream started (legacy quality): ${sessionId} for content ${contentId} by user ${userId}`, {
+        streamUrl = blobId ? `${walrusAggregatorUrl}/v1/blobs/${blobId}` : '';
+        logger.info(`Stream started (direct from Walrus): ${sessionId} for content ${contentId} by user ${userId}`, {
           streamUrl,
           qualities: Object.keys(walrusBlobIds),
         });
