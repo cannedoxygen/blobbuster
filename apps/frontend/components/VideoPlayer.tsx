@@ -152,6 +152,16 @@ export function VideoPlayer({
 
     const handleError = () => {
       console.error('Video error:', video.error);
+      // Provide more helpful error context
+      if (video.error) {
+        const errorMessages: { [key: number]: string } = {
+          1: 'Video loading was aborted',
+          2: 'Network error - video could not be loaded. The content may have expired on Walrus storage.',
+          3: 'Video decoding error - the file may be corrupted',
+          4: 'Video format not supported or content unavailable. The storage may have expired.',
+        };
+        console.error('Error details:', errorMessages[video.error.code] || 'Unknown error');
+      }
     };
 
     const handleWaiting = () => {
