@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const WALRUS_AGGREGATOR_URL = 'https://aggregator.walrus-mainnet.walrus.space';
 const PREFETCH_SIZE = 20 * 1024 * 1024; // 20MB
 
 interface WalrusBlobIds {
@@ -59,7 +59,8 @@ export function useVideoPrefetch(contentId: string | null, walrusBlobIds: Walrus
     }
 
     abortControllerRef.current = new AbortController();
-    const streamUrl = `${API_URL}/api/stream/proxy/${blobId}`;
+    // Stream directly from Walrus aggregator
+    const streamUrl = `${WALRUS_AGGREGATOR_URL}/v1/blobs/${blobId}`;
 
     console.log('[Prefetch] Starting prefetch for:', contentId, 'blob:', blobId);
 
