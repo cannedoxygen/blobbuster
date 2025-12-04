@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import Hls from 'hls.js';
 
@@ -27,6 +27,10 @@ export function VideoPlayer({
   const hlsRef = useRef<Hls | null>(null);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const watchDurationRef = useRef(0);
+
+  // Loading notice state
+  const [showLoadingNotice, setShowLoadingNotice] = useState(true);
+  const [isBuffering, setIsBuffering] = useState(true);
 
   // Initialize HLS.js for m3u8 streams
   useEffect(() => {
@@ -175,6 +179,8 @@ export function VideoPlayer({
 
     const handlePlaying = () => {
       console.log('Video playing');
+      setIsBuffering(false);
+      setShowLoadingNotice(false);
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
@@ -289,6 +295,35 @@ export function VideoPlayer({
       >
         Your browser does not support the video tag.
       </video>
+
+      {/* First-time loading notice */}
+      {showLoadingNotice && isBuffering && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 animate-in fade-in slide-in-from-top duration-300">
+          <div className="bg-blobbuster-blue/95 border border-blobbuster-yellow/30 rounded-lg px-4 py-3 shadow-lg max-w-md">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-blobbuster-yellow animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-white">
+                  <span className="font-bold text-blobbuster-yellow">First time watching?</span>
+                  {' '}Content is loading from decentralized storage. This may take up to a minute.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowLoadingNotice(false)}
+                className="flex-shrink-0 text-gray-400 hover:text-white transition"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
