@@ -117,10 +117,15 @@ export function VideoPlayer({
       // Safari has native HLS support
       console.log('Using native HLS support (Safari)');
       video.src = streamUrl;
+      video.play().catch((err) => console.log('Auto-play prevented (Safari HLS):', err));
     } else {
-      // Regular MP4 playback (legacy)
+      // Regular MP4 playback
       console.log('Using standard video playback');
       video.src = streamUrl;
+      // Auto-play when video is ready
+      video.addEventListener('canplay', () => {
+        video.play().catch((err) => console.log('Auto-play prevented:', err));
+      }, { once: true });
     }
   }, [streamUrl]);
 
