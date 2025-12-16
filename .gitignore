@@ -69,3 +69,6 @@ postgres-data/
 wallet.json
 keystore.json
 *.wallet
+convert-key.js
+test-mint.js
+**/test-mint.js
