@@ -29,7 +29,7 @@ export class PaymentVerificationService {
 
     // Platform wallet that receives storage payments
     this.platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET ||
-                         '0xdeb24a3a025e4be1cb4371435f1db978b4f4f8b2526621035470d45c80060231';
+                         '0xbeef1f109b13a5cfe22ee360fd1052554e7df984d7cccb116af6e2c9df41c3ed';
 
     logger.info('Payment verification service initialized', {
       platformWallet: this.platformWallet,
