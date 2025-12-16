@@ -662,9 +662,13 @@ router.post('/extend-storage/:contentId', authMiddleware, requireUploader, async
 
     // Calculate new expiration date
     // Each epoch is ~14 days on Walrus
-    const currentExpiration = content.storage_expires_at || new Date();
+    const now = new Date();
+    // If content is already expired, start from today; otherwise extend from current expiration
+    const baseDate = content.storage_expires_at && content.storage_expires_at > now
+      ? content.storage_expires_at
+      : now;
     const daysToAdd = additionalEpochs * 14;
-    const newExpiration = new Date(currentExpiration);
+    const newExpiration = new Date(baseDate);
     newExpiration.setDate(newExpiration.getDate() + daysToAdd);
 
     const newTotalEpochs = (content.storage_epochs || 0) + additionalEpochs;
