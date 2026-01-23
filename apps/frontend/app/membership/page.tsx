@@ -608,11 +608,10 @@ export default function MembershipPage() {
           <>
           {/* Promo Banner */}
           {isPromoActive() && (
-            <div className="mb-8 bg-gradient-to-r from-green-500/20 via-green-400/20 to-green-500/20 border-2 border-green-500 rounded-lg p-6 text-center">
-              <div className="text-3xl mb-2">🎉</div>
-              <h3 className="text-2xl font-heading text-green-400 mb-2">FREE MEMBERSHIP PROMO!</h3>
-              <p className="text-gray-300">Get your BlobBuster membership card for free through February 28, 2026</p>
-              <p className="text-sm text-gray-400 mt-2">(Only ~0.001 SUI for transaction fees)</p>
+            <div className="mb-8 bg-green-600 border-2 border-green-400 rounded-lg p-6 text-center">
+              <h3 className="text-2xl font-heading text-white mb-2">FREE MEMBERSHIP PROMO</h3>
+              <p className="text-green-100">Get your BlobBuster membership card for free through February 28, 2026</p>
+              <p className="text-sm text-green-200 mt-2">(Only ~0.001 SUI for transaction fees)</p>
             </div>
           )}
 
