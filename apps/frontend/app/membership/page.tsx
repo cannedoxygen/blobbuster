@@ -608,10 +608,13 @@ export default function MembershipPage() {
           <>
           {/* Promo Banner */}
           {isPromoActive() && (
-            <div className="mb-8 bg-green-600 border-2 border-green-400 rounded-lg p-6 text-center">
-              <h3 className="text-2xl font-heading text-white mb-2">FREE MEMBERSHIP PROMO</h3>
-              <p className="text-green-100">Get your BlobBuster membership card for free through February 28, 2026</p>
-              <p className="text-sm text-green-200 mt-2">(Only ~0.001 SUI for transaction fees)</p>
+            <div className="mb-8 relative overflow-hidden rounded-lg p-6 text-center bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-600 border border-green-400/50 shadow-lg shadow-green-500/25">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+              <div className="relative z-10">
+                <h3 className="text-2xl font-heading text-white mb-2 drop-shadow-lg">FREE MEMBERSHIP PROMO</h3>
+                <p className="text-white/90 font-medium">Get your BlobBuster membership card for free through February 28, 2026</p>
+                <p className="text-sm text-white/70 mt-2">(Only ~0.001 SUI for transaction fees)</p>
+              </div>
             </div>
           )}
 

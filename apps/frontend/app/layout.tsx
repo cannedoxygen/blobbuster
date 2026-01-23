@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Archivo_Black } from 'next/font/google';
 import '../styles/globals.css';
 import { Providers } from './providers';
+import PromoBanner from '@/components/PromoBanner';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const archivoBlack = Archivo_Black({
@@ -28,6 +29,9 @@ export default function RootLayout({
           <div className="min-h-screen">
             {/* Grid background effect */}
             <div className="fixed inset-0 bg-grid-pattern bg-[length:50px_50px] opacity-10 pointer-events-none animate-grid-move" />
+
+            {/* Promo Banner */}
+            <PromoBanner />
 
             {/* Content */}
             <div className="relative z-10">
