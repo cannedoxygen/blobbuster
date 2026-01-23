@@ -10,6 +10,14 @@ const router = Router();
 const suiService = getSuiBlockchainService();
 const nftCardService = new NFTCardService();
 
+// PROMO: Free memberships Jan 23 - Feb 28, 2026
+const PROMO_START = new Date('2026-01-23T00:00:00Z');
+const PROMO_END = new Date('2026-02-28T23:59:59Z');
+const isPromoActive = (): boolean => {
+  const now = new Date();
+  return now >= PROMO_START && now <= PROMO_END;
+};
+
 // Initialize NFT card service
 nftCardService.init().catch(err => {
   logger.error('Failed to initialize NFT card service', { error: err });
@@ -20,12 +28,15 @@ nftCardService.init().catch(err => {
  * Get membership information
  */
 router.get('/info', async (req, res) => {
+  const promo = isPromoActive();
   res.json({
     membership: {
       name: 'Blockbuster Membership',
-      priceUSD: 5,
-      priceSUI: 2.5,
+      priceUSD: promo ? 0 : 5,
+      priceSUI: promo ? 0.001 : 2.5,
       billingPeriod: 'monthly',
+      isPromo: promo,
+      promoEnds: promo ? '2026-02-28' : null,
       features: [
         'Unlimited streaming access',
         'Support content creators',
@@ -33,7 +44,9 @@ router.get('/info', async (req, res) => {
         'Dynamic card that changes when expired',
         'Unique member number',
       ],
-      description: 'Simple monthly membership - Just like the good old days, but better.',
+      description: promo
+        ? 'FREE PROMO! Get your membership card free through February 28, 2026!'
+        : 'Simple monthly membership - Just like the good old days, but better.',
     },
   });
 });

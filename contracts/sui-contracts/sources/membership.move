@@ -28,8 +28,9 @@ module blockbuster::membership {
     // ===== Constants =====
 
     // Price in MIST (1 SUI = 1_000_000_000 MIST)
-    // $5 USD ≈ 2.5 SUI
-    const MEMBERSHIP_PRICE: u64 = 2_500_000_000;  // 2.5 SUI per month
+    // PROMO: Jan 23 - Feb 28, 2026 - Free memberships (revert to 2_500_000_000 after)
+    // Original: $5 USD ≈ 2.5 SUI = 2_500_000_000 MIST
+    const MEMBERSHIP_PRICE: u64 = 1;  // Near-zero for promo period
 
     // ===== Structs =====
 

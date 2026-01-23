@@ -36,6 +36,16 @@ export default function MembershipPage() {
 
   const PRICE_PER_MONTH_USD = 5;
 
+  // PROMO: Free memberships Jan 23 - Feb 28, 2026
+  const PROMO_START = new Date('2026-01-23T00:00:00Z');
+  const PROMO_END = new Date('2026-02-28T23:59:59Z');
+  const PROMO_PRICE_SUI = 0.001; // Minimum for contract validation
+
+  const isPromoActive = () => {
+    const now = new Date();
+    return now >= PROMO_START && now <= PROMO_END;
+  };
+
   // Convert IPFS URL to HTTP gateway URL
   const convertIpfsUrl = (url: string): string => {
     if (url.startsWith('ipfs://')) {
@@ -54,6 +64,11 @@ export default function MembershipPage() {
 
   // Calculate price with discounts applied
   const calculatePrice = (days: number) => {
+    // Return promo price during promotional period
+    if (isPromoActive()) {
+      return PROMO_PRICE_SUI;
+    }
+
     const months = days / 30;
     const baseUsdPrice = PRICE_PER_MONTH_USD * months;
     let discount = 0;
@@ -591,6 +606,16 @@ export default function MembershipPage() {
 
           {!currentMembership && !isLoadingMembership && (
           <>
+          {/* Promo Banner */}
+          {isPromoActive() && (
+            <div className="mb-8 bg-gradient-to-r from-green-500/20 via-green-400/20 to-green-500/20 border-2 border-green-500 rounded-lg p-6 text-center">
+              <div className="text-3xl mb-2">🎉</div>
+              <h3 className="text-2xl font-heading text-green-400 mb-2">FREE MEMBERSHIP PROMO!</h3>
+              <p className="text-gray-300">Get your BlobBuster membership card for free through February 28, 2026</p>
+              <p className="text-sm text-gray-400 mt-2">(Only ~0.001 SUI for transaction fees)</p>
+            </div>
+          )}
+
           {/* Membership Card - Single Option */}
           <div className="mb-12">
             <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-yellow-600 rounded-lg p-1 shadow-2xl">
@@ -609,10 +634,12 @@ export default function MembershipPage() {
                   </div>
                   <div className="text-right">
                     <div className="text-4xl font-bold text-blobbuster-gold">
-                      ${membership.priceUSD}
+                      {isPromoActive() ? 'FREE' : `$${membership.priceUSD}`}
                     </div>
                     <div className="text-sm text-gray-400">
-                      {isLoadingPrice ? 'Loading...' : `${membership.priceSUI.toFixed(2)} SUI/mo`}
+                      {isPromoActive()
+                        ? 'Limited time offer!'
+                        : isLoadingPrice ? 'Loading...' : `${membership.priceSUI.toFixed(2)} SUI/mo`}
                     </div>
                   </div>
                 </div>
@@ -691,7 +718,9 @@ export default function MembershipPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Price per month:</span>
                   <span className="font-bold">
-                    ${PRICE_PER_MONTH_USD} {isLoadingPrice ? '(loading...)' : `(${calculateSuiAmount(PRICE_PER_MONTH_USD).toFixed(2)} SUI)`}
+                    {isPromoActive()
+                      ? <span className="text-green-400">FREE (Promo)</span>
+                      : `$${PRICE_PER_MONTH_USD} ${isLoadingPrice ? '(loading...)' : `(${calculateSuiAmount(PRICE_PER_MONTH_USD).toFixed(2)} SUI)`}`}
                   </span>
                 </div>
                 {suiPrice && (
@@ -755,7 +784,9 @@ export default function MembershipPage() {
                 <div className="border-t border-gray-700 pt-4 flex justify-between text-xl">
                   <span className="font-bold">Total:</span>
                   <span className="font-bold text-blobbuster-gold">
-                    {isLoadingPrice ? 'Loading...' : `${calculatePrice(duration).toFixed(2)} SUI`}
+                    {isPromoActive()
+                      ? <span className="text-green-400">{PROMO_PRICE_SUI} SUI (FREE!)</span>
+                      : isLoadingPrice ? 'Loading...' : `${calculatePrice(duration).toFixed(2)} SUI`}
                   </span>
                 </div>
               </div>

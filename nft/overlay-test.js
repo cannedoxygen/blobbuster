@@ -7,7 +7,7 @@ async function testNameOverlay() {
 
   // Test data
   const memberNumber = '000042';
-  const walletAddress = '0xdeb24a3a025e4be1cb4371435f1db978';
+  const walletAddress = '0xbeef1f109b13a5cfe22ee360fd10525';
   const status = 'ACTIVE'; // or 'EXPIRED'
   const isActive = status === 'ACTIVE';
 
